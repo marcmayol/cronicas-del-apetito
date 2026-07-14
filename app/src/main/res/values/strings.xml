@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">Crónicas del Apetito</string>
+    <string name="entry_title">Anotar comida</string>
+    <string name="notif_channel_name">Recordatorios de comida</string>
+    <string name="notif_channel_desc">Te pregunta cada hora si has comido</string>
+    <string name="notif_title">¿Has comido algo?</string>
+    <string name="notif_text">Toca Sí para anotarlo o No para descartar</string>
+    <string name="action_yes">Sí</string>
+    <string name="action_no">No</string>
+    <string name="action_nothing">Nada</string>
+    <string name="input_hint">¿Qué has comido? Recuerda anotar la cantidad (ej.: 1 o 2 platos de macarrones)</string>
+    <string name="save">Guardar</string>
+    <string name="export_pdf">Exportar PDF</string>
+    <string name="export_all">Todo el historial</string>
+    <string name="export_range">Rango de fechas</string>
+    <string name="from_date">Desde</string>
+    <string name="to_date">Hasta</string>
+    <string name="empty_history">Aún no has anotado nada. Cuando llegue una notificación, pulsa Sí para empezar.</string>
+    <string name="gym_notif_channel_name">Recordatorio de gimnasio</string>
+    <string name="gym_notif_channel_desc">Cada noche a las 22:00 te pregunta si has ido al gimnasio</string>
+    <string name="gym_notif_title">¿Has ido al gimnasio hoy?</string>
+    <string name="gym_notif_text">Toca Sí o No para registrarlo</string>
+    <string name="sleep_button">Me voy a dormir</string>
+    <string name="sleep_dialog_title">¿Te vas a dormir?</string>
+    <string name="sleep_dialog_text">No recibirás más recordatorios de comida esta noche. Volverán solos mañana a las 8:00.</string>
+    <string name="sleep_confirm">Buenas noches</string>
+    <string name="sleep_cancel">Todavía no</string>
+    <string name="sleep_toast">Buenas noches. Te avisaré mañana a las 8:00 🌙</string>
+    <string name="sleep_banner">Modo a dormir activo · los avisos volverán a las 8:00</string>
+    <string name="wake_button">Ya estoy despierto</string>
+    <string name="wake_toast">¡Buenos días! Vuelvo a avisarte ☀️</string>
+</resources>

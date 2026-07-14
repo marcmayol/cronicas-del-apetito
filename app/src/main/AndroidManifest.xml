@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <application
+        android:name=".CronicasApp"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.CronicasDelApetito">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.CronicasDelApetito">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".ui.EntryActivity"
+            android:exported="false"
+            android:label="@string/entry_title"
+            android:theme="@style/Theme.CronicasDelApetito"
+            android:launchMode="singleTop" />
+
+        <activity
+            android:name=".ui.WalkMoodActivity"
+            android:exported="false"
+            android:label="Seguimiento"
+            android:theme="@style/Theme.CronicasDelApetito"
+            android:launchMode="singleTop" />
+
+        <receiver
+            android:name=".notifications.MealAlarmReceiver"
+            android:exported="false" />
+
+        <receiver
+            android:name=".notifications.GymAlarmReceiver"
+            android:exported="false" />
+
+        <receiver
+            android:name=".notifications.GymLogReceiver"
+            android:exported="false" />
+
+        <receiver
+            android:name=".notifications.NothingLogReceiver"
+            android:exported="false" />
+
+        <receiver
+            android:name=".notifications.BootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
+    </application>
+</manifest>
