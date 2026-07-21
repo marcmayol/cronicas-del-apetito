@@ -42,19 +42,19 @@ object MealNotifier {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        // Acción "No" → abre el flujo de caminata + estado de ánimo
-        val noIntent = Intent(context, WalkMoodActivity::class.java).apply {
+        // Acción "Caminar" → abre el flujo de caminata + estado de ánimo
+        val walkIntent = Intent(context, WalkMoodActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
-        val noPi = PendingIntent.getActivity(
-            context, 11, noIntent,
+        val walkPi = PendingIntent.getActivity(
+            context, 11, walkIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        // Acción "Nada" → registra directamente que no se ha hecho nada (sin abrir pantalla)
-        val nothingIntent = Intent(context, NothingLogReceiver::class.java)
-        val nothingPi = PendingIntent.getBroadcast(
-            context, 12, nothingIntent,
+        // Acción "No" → ni comida ni caminata: solo descarta el aviso
+        val noIntent = Intent(context, NothingLogReceiver::class.java)
+        val noPi = PendingIntent.getBroadcast(
+            context, 12, noIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
@@ -66,8 +66,8 @@ object MealNotifier {
             .setAutoCancel(true)
             .setContentIntent(yesPi)
             .addAction(0, context.getString(R.string.action_yes), yesPi)
+            .addAction(0, context.getString(R.string.action_walk), walkPi)
             .addAction(0, context.getString(R.string.action_no), noPi)
-            .addAction(0, context.getString(R.string.action_nothing), nothingPi)
             .build()
 
         try {

@@ -4,10 +4,10 @@
     <string name="notif_channel_name">Recordatorios de comida</string>
     <string name="notif_channel_desc">Te pregunta cada hora si has comido</string>
     <string name="notif_title">¿Has comido algo?</string>
-    <string name="notif_text">Toca Sí para anotarlo o No para descartar</string>
+    <string name="notif_text">Toca Sí para anotarlo, Caminar si sales a andar, o No para descartar</string>
     <string name="action_yes">Sí</string>
     <string name="action_no">No</string>
-    <string name="action_nothing">Nada</string>
+    <string name="action_walk">Caminar</string>
     <string name="input_hint">¿Qué has comido? Recuerda anotar la cantidad (ej.: 1 o 2 platos de macarrones)</string>
     <string name="save">Guardar</string>
     <string name="export_pdf">Exportar PDF</string>

@@ -86,15 +86,10 @@ private fun EntryScreen(
     onSave: (foodText: String, moodText: String, timestamp: Long) -> Unit,
     onCancel: () -> Unit
 ) {
-    val context = LocalContext.current
     var foodText by remember { mutableStateOf("") }
     var moodText by remember { mutableStateOf("") }
     var selectedTime by remember { mutableLongStateOf(System.currentTimeMillis()) }
     val scrollState = rememberScrollState()
-
-    val dateTimeFormat = remember {
-        SimpleDateFormat("EEEE d 'de' MMMM, HH:mm", Locale("es"))
-    }
 
     Scaffold(
         topBar = { TopAppBar(title = { Text(stringResource(R.string.entry_title)) }) }
@@ -107,41 +102,10 @@ private fun EntryScreen(
                 .verticalScroll(scrollState),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    Icons.Filled.Schedule,
-                    contentDescription = null,
-                    modifier = Modifier.padding(end = 8.dp)
-                )
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = "Fecha y hora",
-                        style = MaterialTheme.typography.labelMedium
-                    )
-                    Text(
-                        text = dateTimeFormat.format(Date(selectedTime))
-                            .replaceFirstChar { it.uppercase() },
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-                OutlinedButton(
-                    onClick = {
-                        pickDateTime(context, selectedTime) { chosen ->
-                            selectedTime = chosen
-                        }
-                    }
-                ) {
-                    Icon(
-                        Icons.Filled.Edit,
-                        contentDescription = null,
-                        modifier = Modifier.padding(end = 4.dp)
-                    )
-                    Text("Cambiar")
-                }
-            }
+            DateTimeRow(
+                selectedTime = selectedTime,
+                onPicked = { selectedTime = it }
+            )
 
             Text(
                 text = "¿Qué has comido?",
@@ -185,6 +149,49 @@ private fun EntryScreen(
                     Text(stringResource(R.string.save))
                 }
             }
+        }
+    }
+}
+
+/**
+ * Fila "Fecha y hora" con botón para cambiarla. La usan tanto la pantalla de comida
+ * como la de caminata, para poder anotar algo que se olvidó en su momento.
+ */
+@Composable
+internal fun DateTimeRow(selectedTime: Long, onPicked: (Long) -> Unit) {
+    val context = LocalContext.current
+    val dateTimeFormat = remember {
+        SimpleDateFormat("EEEE d 'de' MMMM, HH:mm", Locale("es"))
+    }
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            Icons.Filled.Schedule,
+            contentDescription = null,
+            modifier = Modifier.padding(end = 8.dp)
+        )
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = "Fecha y hora",
+                style = MaterialTheme.typography.labelMedium
+            )
+            Text(
+                text = dateTimeFormat.format(Date(selectedTime))
+                    .replaceFirstChar { it.uppercase() },
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+        OutlinedButton(
+            onClick = { pickDateTime(context, selectedTime, onPicked) }
+        ) {
+            Icon(
+                Icons.Filled.Edit,
+                contentDescription = null,
+                modifier = Modifier.padding(end = 4.dp)
+            )
+            Text("Cambiar")
         }
     }
 }

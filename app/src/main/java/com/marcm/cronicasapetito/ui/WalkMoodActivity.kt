@@ -23,6 +23,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -56,13 +57,13 @@ class WalkMoodActivity : ComponentActivity() {
             CronicasTheme {
                 WalkMoodFlow(
                     initialStep = if (startAtMinutes) Step.WALK_MINUTES else Step.WALK_QUESTION,
-                    onSave = { walkMinutes, moodText ->
+                    onSave = { walkMinutes, moodText, timestamp ->
                         lifecycleScope.launch {
                             if (walkMinutes != null && walkMinutes > 0) {
-                                repo.addWalk(walkMinutes)
+                                repo.addWalk(walkMinutes, timestamp)
                             }
                             if (moodText.isNotBlank()) {
-                                repo.addMood(moodText.trim())
+                                repo.addMood(moodText.trim(), timestamp)
                             }
                             finish()
                         }
@@ -78,13 +79,14 @@ class WalkMoodActivity : ComponentActivity() {
 @Composable
 private fun WalkMoodFlow(
     initialStep: Step = Step.WALK_QUESTION,
-    onSave: (walkMinutes: Int?, moodText: String) -> Unit,
+    onSave: (walkMinutes: Int?, moodText: String, timestamp: Long) -> Unit,
     onCancel: () -> Unit
 ) {
     var step by remember { mutableStateOf(initialStep) }
     var walkMinutes by remember { mutableStateOf<Int?>(null) }
     var minutesText by remember { mutableStateOf("") }
     var moodText by remember { mutableStateOf("") }
+    var selectedTime by remember { mutableLongStateOf(System.currentTimeMillis()) }
 
     Scaffold(
         topBar = { TopAppBar(title = { Text("Seguimiento") }) }
@@ -113,7 +115,7 @@ private fun WalkMoodFlow(
                         OutlinedButton(
                             onClick = {
                                 walkMinutes = null
-                                onSave(null, "")
+                                onSave(null, "", selectedTime)
                             },
                             modifier = Modifier.weight(1f)
                         ) { Text("No") }
@@ -124,6 +126,10 @@ private fun WalkMoodFlow(
                     Text(
                         text = "¿Cuánto tiempo has caminado?",
                         style = MaterialTheme.typography.headlineSmall
+                    )
+                    DateTimeRow(
+                        selectedTime = selectedTime,
+                        onPicked = { selectedTime = it }
                     )
                     OutlinedTextField(
                         value = minutesText,
@@ -183,7 +189,7 @@ private fun WalkMoodFlow(
                         TextButton(onClick = onCancel) { Text("Cancelar") }
                         Spacer(Modifier.width(8.dp))
                         Button(
-                            onClick = { onSave(walkMinutes, moodText) }
+                            onClick = { onSave(walkMinutes, moodText, selectedTime) }
                         ) { Text(if (moodText.isBlank()) "Omitir" else "Guardar") }
                     }
                 }
