@@ -20,6 +20,11 @@ class PrefsActualizador(context: Context) {
         get() = sp.getBoolean(PERMISO_PEDIDO, false)
         set(v) = sp.edit().putBoolean(PERMISO_PEDIDO, v).apply()
 
+    /** Última cadencia conocida del manifiesto (horas). 0 = aún sin conocer. */
+    var checkHoras: Int
+        get() = sp.getInt(CHECK_HORAS, 0)
+        set(v) = sp.edit().putInt(CHECK_HORAS, v).apply()
+
     fun guardarDisponible(info: InfoActualizacion?) {
         val e = sp.edit()
         if (info == null) {
@@ -49,6 +54,7 @@ class PrefsActualizador(context: Context) {
         private const val ARCHIVO = "actualizador"
         private const val BUSCAR = "buscar_activado"
         private const val PERMISO_PEDIDO = "permiso_pedido_una_vez"
+        private const val CHECK_HORAS = "check_horas"
         private const val VC = "disp_version_code"
         private const val VN = "disp_version_name"
         private const val URL = "disp_url"

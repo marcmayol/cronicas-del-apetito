@@ -33,6 +33,7 @@ class Actualizador(
         set(v) { prefs.buscarActivado = v }
 
     init {
+        instancia = this
         // Si un worker previo dejó una versión disponible, muéstrala ya en el banner.
         prefs.leerDisponible()?.let { info ->
             if (ComparadorVersion.hayNovedad(info.versionCode, config.versionCodeActual)) {
@@ -72,9 +73,17 @@ class Actualizador(
             }
             return
         }
+        prefs.checkHoras = manifiesto.checkHoras
         val nuevo = estadoTrasManifiesto(modo, manifiesto, config.versionCodeActual)
         prefs.guardarDisponible((nuevo as? EstadoActualizacion.Disponible)?.info)
         _estado.value = nuevo
+    }
+
+    /** (Re)programa la comprobación periódica según el check_horas conocido. */
+    fun programarPeriodica() {
+        val horas = prefs.checkHoras.takeIf { it > 0 }?.toLong()
+            ?: config.checkHorasPorDefecto.toLong()
+        ComprobacionWorker.programar(app, horas)
     }
 
     /**
@@ -135,4 +144,12 @@ class Actualizador(
 
     private fun infoDisponible(): InfoActualizacion? =
         (_estado.value as? EstadoActualizacion.Disponible)?.info ?: prefs.leerDisponible()
+
+    companion object {
+        @Volatile
+        private var instancia: Actualizador? = null
+
+        /** La usa el worker de segundo plano para alcanzar la fachada ya construida. */
+        internal fun instancia(): Actualizador? = instancia
+    }
 }
