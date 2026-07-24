@@ -40,7 +40,7 @@ MANIFIESTO = RAIZ / "docs" / "updates.json"
 APK_RELEASE = RAIZ / "app" / "build" / "outputs" / "apk" / "release" / "app-release.apk"
 
 _REPO = "marcmayol/cronicas-del-apetito"
-_PAGES_URL = "https://marcmayol.github.io/cronicas-del-apetito/updates.json"
+_PAGES_URL = "https://marcmayol.com/cronicas-del-apetito/updates.json"
 _CHECK_HORAS = 24
 _ENV_FIRMA = (
     "CRONICAS_STORE_FILE",

@@ -2,7 +2,7 @@
   "versionCode": 4,
   "versionName": "1.3",
   "url": "https://github.com/marcmayol/cronicas-del-apetito/releases/download/v1.3/cronicas-del-apetito-v1.3.apk",
-  "sha256": "736dd128c965ece2774943b5887f7f385291781d65ff7f9df5407ebbd92514a5",
+  "sha256": "dd370338408ca4696f6a8c4728ddbf38f4c680304c78a2869cf1c18860acd08c",
   "notas": "Fotos en las comidas (adjuntar, spoiler en la lista y en el PDF) y sistema de auto-actualización.",
   "check_horas": 24
 }

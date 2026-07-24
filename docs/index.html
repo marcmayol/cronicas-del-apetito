@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Crónicas del Apetito</title>
+  <meta name="description" content="App Android para registrar lo que comes a lo largo del día. Sencilla, privada y sin cuentas." />
+  <style>
+    :root {
+      --bg: #fbf3e7; --card: #fffaf2; --ink: #2a1b0e; --muted: #7a6a58;
+      --brand: #7a4e2d; --accent: #b5651d; --line: #e7d8c4;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1a140d; --card: #241b12; --ink: #f2e7d8; --muted: #b6a78f;
+        --brand: #d7a06a; --accent: #e0975a; --line: #3a2c1d;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--bg); color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif; line-height: 1.6;
+    }
+    .wrap { max-width: 720px; margin: 0 auto; padding: 48px 20px 64px; }
+    header { text-align: center; margin-bottom: 40px; }
+    .mark { font-size: 44px; }
+    h1 { font-size: 2rem; margin: 8px 0 4px; color: var(--brand); }
+    .sub { color: var(--muted); margin: 0; font-style: italic; }
+    .card {
+      background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+      padding: 22px 24px; margin: 18px 0;
+    }
+    h2 { font-size: 1.15rem; color: var(--brand); margin: 0 0 10px; }
+    ul { margin: 0; padding-left: 1.2em; }
+    li { margin: 6px 0; }
+    .cta { text-align: center; margin: 32px 0 8px; }
+    .btn {
+      display: inline-block; background: var(--accent); color: #fff; text-decoration: none;
+      font-family: system-ui, sans-serif; font-weight: 600; padding: 14px 26px;
+      border-radius: 999px; font-size: 1.05rem;
+    }
+    .btn:hover { filter: brightness(1.05); }
+    .hint { color: var(--muted); font-size: .9rem; margin-top: 10px; font-family: system-ui, sans-serif; }
+    footer { text-align: center; color: var(--muted); font-size: .85rem; margin-top: 40px;
+             font-family: system-ui, sans-serif; }
+    a { color: var(--accent); }
+    code { background: var(--bg); padding: 1px 6px; border-radius: 6px;
+           font-size: .9em; border: 1px solid var(--line); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="mark">🍽️</div>
+      <h1>Crónicas del Apetito</h1>
+      <p class="sub">Registra lo que comes, a tu ritmo. Privado y sin cuentas.</p>
+    </header>
+
+    <div class="card">
+      <h2>Qué hace</h2>
+      <ul>
+        <li>Un recordatorio suave cada hora para anotar qué has comido.</li>
+        <li>Historial ordenado por día y hora, con foto opcional del plato.</li>
+        <li>Exporta todo (o un rango de fechas) a PDF para compartir.</li>
+        <li>Todo se guarda <strong>solo en tu móvil</strong>. Sin nube, sin cuentas.</li>
+      </ul>
+    </div>
+
+    <div class="cta">
+      <a class="btn" href="https://github.com/marcmayol/cronicas-del-apetito/releases/latest">
+        Descargar la app (APK)
+      </a>
+      <p class="hint">
+        Android. Al instalar, permite «instalar apps de orígenes desconocidos».
+        La app se <strong>actualiza sola</strong> desde aquí.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>Cómo instalar</h2>
+      <ul>
+        <li>Descarga el <code>.apk</code> desde el botón de arriba.</li>
+        <li>Ábrelo en el móvil y acepta instalar de orígenes desconocidos si lo pide.</li>
+        <li>Concede el permiso de notificaciones para los recordatorios.</li>
+      </ul>
+    </div>
+
+    <footer>
+      Proyecto personal · <a href="https://github.com/marcmayol/cronicas-del-apetito">Código en GitHub</a>
+    </footer>
+  </div>
+</body>
+</html>

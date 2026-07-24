@@ -17,7 +17,7 @@ class CronicasApp : Application() {
         Actualizador(
             app = this,
             config = ActualizadorConfig(
-                manifiestoUrl = "https://marcmayol.github.io/cronicas-del-apetito/updates.json",
+                manifiestoUrl = "https://marcmayol.com/cronicas-del-apetito/updates.json",
                 versionCodeActual = BuildConfig.VERSION_CODE,
                 checkHorasPorDefecto = 24,
             ),
