@@ -17,5 +17,6 @@ data class MealEntry(
     val timestampMillis: Long,
     val content: String,
     @ColumnInfo(name = "kind", defaultValue = EntryKind.FOOD) val kind: String = EntryKind.FOOD,
-    @ColumnInfo(name = "minutes") val minutes: Int? = null
+    @ColumnInfo(name = "minutes") val minutes: Int? = null,
+    @ColumnInfo(name = "photoPath") val photoPath: String? = null
 )

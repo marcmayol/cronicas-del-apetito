@@ -5,20 +5,27 @@ import android.app.TimePickerDialog
 import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.PhotoCamera
+import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -35,9 +42,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -46,8 +55,10 @@ import androidx.lifecycle.lifecycleScope
 import com.marcm.cronicasapetito.CronicasApp
 import com.marcm.cronicasapetito.R
 import com.marcm.cronicasapetito.data.MealRepository
+import com.marcm.cronicasapetito.data.PhotoStore
 import com.marcm.cronicasapetito.notifications.MealNotifier
 import kotlinx.coroutines.launch
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -64,9 +75,9 @@ class EntryActivity : ComponentActivity() {
         setContent {
             CronicasTheme {
                 EntryScreen(
-                    onSave = { foodText, moodText, timestamp ->
+                    onSave = { foodText, moodText, timestamp, photoPath ->
                         lifecycleScope.launch {
-                            repo.addFood(foodText, timestamp)
+                            repo.addFood(foodText, timestamp, photoPath)
                             if (moodText.isNotBlank()) {
                                 repo.addMood(moodText.trim(), timestamp)
                             }
@@ -83,13 +94,51 @@ class EntryActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun EntryScreen(
-    onSave: (foodText: String, moodText: String, timestamp: Long) -> Unit,
+    onSave: (foodText: String, moodText: String, timestamp: Long, photoPath: String?) -> Unit,
     onCancel: () -> Unit
 ) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     var foodText by remember { mutableStateOf("") }
     var moodText by remember { mutableStateOf("") }
     var selectedTime by remember { mutableLongStateOf(System.currentTimeMillis()) }
+    var photoPath by remember { mutableStateOf<String?>(null) }
+    var cameraTemp by remember { mutableStateOf<File?>(null) }
     val scrollState = rememberScrollState()
+
+    // Selector de fotos del sistema (no requiere permisos).
+    val galleryLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        if (uri != null) scope.launch {
+            val previous = photoPath
+            val saved = PhotoStore.importFromUri(context, uri)
+            if (saved != null) {
+                photoPath = saved
+                PhotoStore.delete(previous)
+            }
+        }
+    }
+
+    // Cámara: escribe en un archivo temporal nuestro y luego lo importamos.
+    val cameraLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.TakePicture()
+    ) { success ->
+        val temp = cameraTemp
+        if (success && temp != null) scope.launch {
+            val previous = photoPath
+            val saved = PhotoStore.importFromFile(context, temp)
+            if (saved != null) {
+                photoPath = saved
+                PhotoStore.delete(previous)
+            }
+        }
+    }
+
+    val cancelAndClean = {
+        PhotoStore.delete(photoPath)
+        onCancel()
+    }
 
     Scaffold(
         topBar = { TopAppBar(title = { Text(stringResource(R.string.entry_title)) }) }
@@ -121,6 +170,60 @@ private fun EntryScreen(
             )
 
             Text(
+                text = "Foto del plato (opcional)",
+                style = MaterialTheme.typography.titleMedium
+            )
+            if (photoPath == null) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    OutlinedButton(
+                        onClick = {
+                            val file = PhotoStore.newCameraTempFile(context)
+                            cameraTemp = file
+                            cameraLauncher.launch(PhotoStore.uriFor(context, file))
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Icon(Icons.Filled.PhotoCamera, contentDescription = null)
+                        Text(" Cámara")
+                    }
+                    OutlinedButton(
+                        onClick = {
+                            galleryLauncher.launch(
+                                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                            )
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Icon(Icons.Filled.PhotoLibrary, contentDescription = null)
+                        Text(" Galería")
+                    }
+                }
+            } else {
+                PhotoThumb(
+                    path = photoPath,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = 240.dp),
+                    contentScale = ContentScale.Fit
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    TextButton(onClick = {
+                        PhotoStore.delete(photoPath)
+                        photoPath = null
+                    }) {
+                        Icon(Icons.Filled.Delete, contentDescription = null)
+                        Text(" Quitar foto")
+                    }
+                }
+            }
+
+            Text(
                 text = "¿Cómo te has sentido? (opcional)",
                 style = MaterialTheme.typography.titleMedium
             )
@@ -138,11 +241,11 @@ private fun EntryScreen(
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                TextButton(onClick = onCancel) { Text("Cancelar") }
+                TextButton(onClick = cancelAndClean) { Text("Cancelar") }
                 Spacer(Modifier.width(8.dp))
                 Button(
                     onClick = {
-                        if (foodText.isNotBlank()) onSave(foodText.trim(), moodText, selectedTime)
+                        if (foodText.isNotBlank()) onSave(foodText.trim(), moodText, selectedTime, photoPath)
                     },
                     enabled = foodText.isNotBlank()
                 ) {

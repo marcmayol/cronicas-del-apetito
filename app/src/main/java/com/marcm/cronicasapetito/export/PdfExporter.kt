@@ -1,17 +1,23 @@
 package com.marcm.cronicasapetito.export
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.Paint
+import android.graphics.Rect
+import android.graphics.RectF
 import android.graphics.Typeface
 import android.graphics.pdf.PdfDocument
 import com.marcm.cronicasapetito.data.EntryKind
 import com.marcm.cronicasapetito.data.MealEntry
+import com.marcm.cronicasapetito.data.PhotoStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlin.math.max
+import kotlin.math.min
 
 object PdfExporter {
 
@@ -19,6 +25,8 @@ object PdfExporter {
     private const val PAGE_HEIGHT = 842
     private const val MARGIN = 40f
     private const val LINE_HEIGHT = 16f
+    private const val IMG_SIZE = 96f     // lado de la miniatura en el PDF (pt)
+    private const val IMG_GAP = 10f      // separación entre texto y foto
 
     suspend fun export(
         context: Context,
@@ -52,6 +60,16 @@ object PdfExporter {
             color = 0xFF2A1B0E.toInt()
             textSize = 12f
             typeface = Typeface.DEFAULT
+        }
+        val imgPaint = Paint().apply {
+            isAntiAlias = true
+            isFilterBitmap = true
+        }
+        val imgBorderPaint = Paint().apply {
+            style = Paint.Style.STROKE
+            strokeWidth = 0.8f
+            color = 0xFFBBA78F.toInt()
+            isAntiAlias = true
         }
 
         val dayFormat = SimpleDateFormat("EEEE d 'de' MMMM yyyy", Locale("es"))
@@ -91,9 +109,18 @@ object PdfExporter {
                     val hour = hourFormat.format(Date(entry.timestampMillis))
                     val label = kindLabel(entry.kind)
                     val firstLine = "[$label] ${entry.content}"
-                    val lines = wrapText(firstLine, bodyPaint, PAGE_WIDTH - MARGIN * 2 - 60f)
-                    val needed = LINE_HEIGHT * lines.size + 6f
-                    if (y + needed > PAGE_HEIGHT - MARGIN) {
+
+                    // Foto a la derecha (si la hay): reservamos una columna cuadrada.
+                    val photo = entry.photoPath?.let { PhotoStore.decodeFile(it, 260) }
+                    val textLeft = MARGIN + 60f
+                    val textRight = if (photo != null) PAGE_WIDTH - MARGIN - IMG_SIZE - IMG_GAP
+                                    else PAGE_WIDTH - MARGIN
+
+                    val lines = wrapText(firstLine, bodyPaint, textRight - textLeft)
+                    val textHeight = LINE_HEIGHT * lines.size
+                    val rowHeight = max(textHeight, if (photo != null) IMG_SIZE else 0f) + 8f
+
+                    if (y + rowHeight > PAGE_HEIGHT - MARGIN) {
                         doc.finishPage(page)
                         pageNumber++
                         page = doc.startPage(PdfDocument.PageInfo.Builder(PAGE_WIDTH, PAGE_HEIGHT, pageNumber).create())
@@ -102,9 +129,16 @@ object PdfExporter {
                     }
                     canvas.drawText(hour, MARGIN, y, hourPaint)
                     lines.forEachIndexed { idx, line ->
-                        canvas.drawText(line, MARGIN + 60f, y + idx * LINE_HEIGHT, bodyPaint)
+                        canvas.drawText(line, textLeft, y + idx * LINE_HEIGHT, bodyPaint)
                     }
-                    y += LINE_HEIGHT * lines.size + 6f
+                    if (photo != null) {
+                        val left = PAGE_WIDTH - MARGIN - IMG_SIZE
+                        val top = y - 11f   // el borde superior queda a la altura de la 1ª línea
+                        val dst = RectF(left, top, left + IMG_SIZE, top + IMG_SIZE)
+                        canvas.drawBitmap(photo, centerCropSquare(photo), dst, imgPaint)
+                        canvas.drawRect(dst, imgBorderPaint)
+                    }
+                    y += rowHeight
                 }
                 y += 8f
             }
@@ -126,6 +160,14 @@ object PdfExporter {
         EntryKind.MOOD -> "Estado"
         EntryKind.GYM -> "Gimnasio"
         else -> kind
+    }
+
+    /** Rectángulo cuadrado centrado sobre el bitmap (recorte tipo "center-crop"). */
+    private fun centerCropSquare(bmp: Bitmap): Rect {
+        val side = min(bmp.width, bmp.height)
+        val left = (bmp.width - side) / 2
+        val top = (bmp.height - side) / 2
+        return Rect(left, top, left + side, top + side)
     }
 
     private fun wrapText(text: String, paint: Paint, maxWidth: Float): List<String> {
