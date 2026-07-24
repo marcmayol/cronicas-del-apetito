@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Intent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,6 +24,9 @@ class Actualizador(
     private val descargador: Descargador = Descargador(),
 ) {
     private val prefs = PrefsActualizador(app)
+
+    // Scope propio del módulo: una descarga no se cancela por recomposición de la UI.
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     private val _estado = MutableStateFlow<EstadoActualizacion>(EstadoActualizacion.Inactivo)
     val estado: StateFlow<EstadoActualizacion> = _estado.asStateFlow()
@@ -91,7 +95,7 @@ class Actualizador(
      * Si falta el permiso, manda al usuario a ajustes y espera a
      * [onPermisoQuizaConcedido]; el resto continúa en cuanto haya permiso.
      */
-    fun actualizarAhora(scope: CoroutineScope) {
+    fun actualizarAhora() {
         val info = infoDisponible() ?: return
 
         if (!Instalador.puedeInstalar(app)) {
@@ -136,9 +140,9 @@ class Actualizador(
     }
 
     /** Llamar en onResume tras volver de la pantalla de permiso: reanuda si se concedió. */
-    fun onPermisoQuizaConcedido(scope: CoroutineScope) {
+    fun onPermisoQuizaConcedido() {
         if (_estado.value == EstadoActualizacion.PidiendoPermiso && Instalador.puedeInstalar(app)) {
-            actualizarAhora(scope)
+            actualizarAhora()
         }
     }
 

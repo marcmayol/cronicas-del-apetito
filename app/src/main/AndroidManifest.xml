@@ -41,6 +41,13 @@
             android:theme="@style/Theme.CronicasDelApetito"
             android:launchMode="singleTop" />
 
+        <activity
+            android:name=".ui.AjustesActivity"
+            android:exported="false"
+            android:label="Ajustes"
+            android:theme="@style/Theme.CronicasDelApetito"
+            android:launchMode="singleTop" />
+
         <receiver
             android:name=".notifications.MealAlarmReceiver"
             android:exported="false" />

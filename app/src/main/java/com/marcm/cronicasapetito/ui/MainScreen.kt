@@ -26,6 +26,7 @@ import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Photo
 import androidx.compose.material.icons.filled.PictureAsPdf
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -55,6 +56,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.marcm.actualizador.Actualizador
 import com.marcm.cronicasapetito.R
 import com.marcm.cronicasapetito.data.EntryKind
 import com.marcm.cronicasapetito.data.MealEntry
@@ -90,10 +92,12 @@ private fun kindColor(kind: String): Color = when (kind) {
 @Composable
 fun MainScreen(
     repository: MealRepository,
+    actualizador: Actualizador,
     onRequestExactAlarmPermission: () -> Unit
 ) {
     val context = LocalContext.current
     val entries by repository.observeAll().collectAsState(initial = emptyList())
+    val estadoActualizacion by actualizador.estado.collectAsState()
     val scope = rememberCoroutineScope()
     var showExportDialog by remember { mutableStateOf(false) }
     var showAddPicker by remember { mutableStateOf(false) }
@@ -114,6 +118,14 @@ fun MainScreen(
             TopAppBar(
                 title = { Text(stringResource(R.string.app_name)) },
                 actions = {
+                    IconButton(onClick = {
+                        context.startActivity(Intent(context, AjustesActivity::class.java))
+                    }) {
+                        Icon(
+                            Icons.Filled.Settings,
+                            contentDescription = "Ajustes"
+                        )
+                    }
                     IconButton(onClick = { showSleepDialog = true }) {
                         Icon(
                             Icons.Filled.Bedtime,
@@ -140,6 +152,10 @@ fun MainScreen(
     ) { padding ->
         Box(modifier = Modifier.padding(padding).fillMaxSize()) {
             Column(modifier = Modifier.fillMaxSize()) {
+                BannerActualizacion(
+                    estado = estadoActualizacion,
+                    onActualizar = { actualizador.actualizarAhora() },
+                )
                 if (sleeping) {
                     Surface(
                         modifier = Modifier.fillMaxWidth(),

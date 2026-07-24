@@ -13,11 +13,15 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
+import com.marcm.actualizador.Modo
 import com.marcm.cronicasapetito.data.MealRepository
 import com.marcm.cronicasapetito.notifications.MealAlarmScheduler
 import com.marcm.cronicasapetito.notifications.MealNotifier
 import com.marcm.cronicasapetito.ui.CronicasTheme
 import com.marcm.cronicasapetito.ui.MainScreen
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
@@ -33,15 +37,29 @@ class MainActivity : ComponentActivity() {
         MealAlarmScheduler.scheduleNext(this)
 
         val repo = MealRepository((application as CronicasApp).database.mealDao())
+        val actualizador = (application as CronicasApp).actualizador
+
+        // Comprobación al abrir: en segundo plano, con un pequeño retardo. Silenciosa.
+        lifecycleScope.launch {
+            delay(3000)
+            actualizador.comprobar(Modo.AUTOMATICO)
+        }
 
         setContent {
             CronicasTheme {
                 MainScreen(
                     repository = repo,
+                    actualizador = actualizador,
                     onRequestExactAlarmPermission = { openExactAlarmSettings() }
                 )
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Si el usuario volvió de conceder el permiso de instalación, reanuda el flujo.
+        (application as CronicasApp).actualizador.onPermisoQuizaConcedido()
     }
 
     private fun ensureNotificationPermission() {
