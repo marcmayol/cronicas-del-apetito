@@ -25,6 +25,7 @@ android {
         targetSdk = 34
         versionCode = 4
         versionName = "1.3"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     signingConfigs {
@@ -90,6 +91,11 @@ dependencies {
     ksp("androidx.room:room-compiler:2.6.1")
 
     implementation(project(":actualizador"))
+
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test:runner:1.5.2")
+    androidTestImplementation("androidx.test:core-ktx:1.5.0")
+    androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
 
     debugImplementation("androidx.compose.ui:ui-tooling")
 }

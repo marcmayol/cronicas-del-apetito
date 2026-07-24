@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.media.ExifInterface
 import android.net.Uri
+import android.util.Log
 import androidx.core.content.FileProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -22,6 +23,7 @@ object PhotoStore {
 
     private const val MAX_STORE_PX = 1280   // lado máximo al guardar
     private const val JPEG_QUALITY = 85
+    private const val TAG = "PhotoStore"
 
     private fun photosDir(context: Context): File =
         File(context.filesDir, "photos").apply { mkdirs() }
@@ -43,20 +45,21 @@ object PhotoStore {
      */
     suspend fun importFromUri(context: Context, uri: Uri): String? = withContext(Dispatchers.IO) {
         runCatching {
-            val bounds = { context.contentResolver.openInputStream(uri) }
-            val bmp = decodeSampled(bounds, MAX_STORE_PX) ?: return@runCatching null
+            val bmp = decodeSampled({ context.contentResolver.openInputStream(uri) }, MAX_STORE_PX)
+                ?: return@runCatching null
             val oriented = applyExif(bmp) { context.contentResolver.openInputStream(uri) }
             writeJpeg(context, oriented)
-        }.getOrNull()
+        }.onFailure { Log.e(TAG, "importFromUri falló", it) }.getOrNull()
     }
 
     /** Igual que [importFromUri] pero desde un [File] (foto recién hecha con la cámara). */
     suspend fun importFromFile(context: Context, file: File): String? = withContext(Dispatchers.IO) {
         runCatching {
-            val bmp = decodeSampled({ file.inputStream() }, MAX_STORE_PX) ?: return@runCatching null
+            val bmp = decodeSampled({ file.inputStream() }, MAX_STORE_PX)
+                ?: return@runCatching null
             val oriented = applyExif(bmp) { file.inputStream() }
             writeJpeg(context, oriented).also { file.delete() }
-        }.getOrNull()
+        }.onFailure { Log.e(TAG, "importFromFile falló", it) }.getOrNull()
     }
 
     fun delete(path: String?) {
@@ -81,13 +84,20 @@ object PhotoStore {
     }
 
     private fun decodeSampled(streamProvider: () -> InputStream?, maxPx: Int): Bitmap? {
+        // 1ª pasada: solo dimensiones. OJO: con inJustDecodeBounds, decodeStream
+        // SIEMPRE devuelve null (solo rellena opts); el guard debe ser sobre el
+        // stream, no sobre el bitmap.
         val opts = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-        streamProvider()?.use { BitmapFactory.decodeStream(it, null, opts) } ?: return null
+        (streamProvider() ?: return null).use { BitmapFactory.decodeStream(it, null, opts) }
+        if (opts.outWidth <= 0 || opts.outHeight <= 0) return null
+
         var sample = 1
         val maxDim = maxOf(opts.outWidth, opts.outHeight)
         while (maxDim / sample > maxPx) sample *= 2
+
+        // 2ª pasada: decodifica de verdad, submuestreado.
         val decodeOpts = BitmapFactory.Options().apply { inSampleSize = sample }
-        return streamProvider()?.use { BitmapFactory.decodeStream(it, null, decodeOpts) }
+        return (streamProvider() ?: return null).use { BitmapFactory.decodeStream(it, null, decodeOpts) }
     }
 
     private fun applyExif(bmp: Bitmap, streamProvider: () -> InputStream?): Bitmap {
