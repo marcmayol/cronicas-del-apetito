@@ -21,3 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "CronicasDelApetito"
 include(":app")
+include(":actualizador")
