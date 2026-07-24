@@ -4,6 +4,7 @@ import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Context
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -28,6 +30,7 @@ import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -43,6 +46,7 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -99,23 +103,31 @@ private fun EntryScreen(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    var foodText by remember { mutableStateOf("") }
-    var moodText by remember { mutableStateOf("") }
-    var selectedTime by remember { mutableLongStateOf(System.currentTimeMillis()) }
-    var photoPath by remember { mutableStateOf<String?>(null) }
-    var cameraTemp by remember { mutableStateOf<File?>(null) }
+    var foodText by rememberSaveable { mutableStateOf("") }
+    var moodText by rememberSaveable { mutableStateOf("") }
+    var selectedTime by rememberSaveable { mutableLongStateOf(System.currentTimeMillis()) }
+    // rememberSaveable: sobreviven si Android recrea la Activity al volver de la cámara.
+    var photoPath by rememberSaveable { mutableStateOf<String?>(null) }
+    var cameraTempPath by rememberSaveable { mutableStateOf<String?>(null) }
+    var processingPhoto by rememberSaveable { mutableStateOf(false) }
     val scrollState = rememberScrollState()
 
     // Selector de fotos del sistema (no requiere permisos).
     val galleryLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.PickVisualMedia()
     ) { uri ->
-        if (uri != null) scope.launch {
-            val previous = photoPath
-            val saved = PhotoStore.importFromUri(context, uri)
-            if (saved != null) {
-                photoPath = saved
-                PhotoStore.delete(previous)
+        if (uri != null) {
+            processingPhoto = true
+            scope.launch {
+                val previous = photoPath
+                val saved = PhotoStore.importFromUri(context, uri)
+                processingPhoto = false
+                if (saved != null) {
+                    photoPath = saved
+                    PhotoStore.delete(previous)
+                } else {
+                    Toast.makeText(context, "No se pudo guardar la foto", Toast.LENGTH_LONG).show()
+                }
             }
         }
     }
@@ -124,14 +136,23 @@ private fun EntryScreen(
     val cameraLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.TakePicture()
     ) { success ->
-        val temp = cameraTemp
-        if (success && temp != null) scope.launch {
-            val previous = photoPath
-            val saved = PhotoStore.importFromFile(context, temp)
-            if (saved != null) {
-                photoPath = saved
-                PhotoStore.delete(previous)
+        val temp = cameraTempPath?.let { File(it) }
+        if (success && temp != null) {
+            processingPhoto = true
+            scope.launch {
+                val previous = photoPath
+                val saved = PhotoStore.importFromFile(context, temp)
+                processingPhoto = false
+                if (saved != null) {
+                    photoPath = saved
+                    PhotoStore.delete(previous)
+                } else {
+                    Toast.makeText(context, "No se pudo guardar la foto", Toast.LENGTH_LONG).show()
+                }
             }
+        } else if (!success) {
+            // La cámara se canceló: limpiamos el temporal.
+            temp?.delete()
         }
     }
 
@@ -173,7 +194,16 @@ private fun EntryScreen(
                 text = "Foto del plato (opcional)",
                 style = MaterialTheme.typography.titleMedium
             )
-            if (photoPath == null) {
+            if (processingPhoto) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    CircularProgressIndicator(modifier = Modifier.size(20.dp))
+                    Spacer(Modifier.width(12.dp))
+                    Text("Guardando foto…", style = MaterialTheme.typography.bodyMedium)
+                }
+            } else if (photoPath == null) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -181,7 +211,7 @@ private fun EntryScreen(
                     OutlinedButton(
                         onClick = {
                             val file = PhotoStore.newCameraTempFile(context)
-                            cameraTemp = file
+                            cameraTempPath = file.absolutePath
                             cameraLauncher.launch(PhotoStore.uriFor(context, file))
                         },
                         modifier = Modifier.weight(1f)
@@ -247,7 +277,7 @@ private fun EntryScreen(
                     onClick = {
                         if (foodText.isNotBlank()) onSave(foodText.trim(), moodText, selectedTime, photoPath)
                     },
-                    enabled = foodText.isNotBlank()
+                    enabled = foodText.isNotBlank() && !processingPhoto
                 ) {
                     Text(stringResource(R.string.save))
                 }
