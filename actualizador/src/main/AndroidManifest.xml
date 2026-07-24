@@ -7,4 +7,10 @@
     <!-- Instalar el APK descargado (orígenes desconocidos) -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
+    <application>
+        <receiver
+            android:name=".InstallResultReceiver"
+            android:exported="false" />
+    </application>
+
 </manifest>
