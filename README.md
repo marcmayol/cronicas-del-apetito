@@ -12,6 +12,15 @@ App Android personal para registrar lo que comes a lo largo del día, pensada pa
 
 Todo se guarda en local en el móvil. Sin nube ni cuentas.
 
+## Auto-actualización
+
+La app se distribuye fuera de Play Store y se **actualiza sola** desde GitHub
+Releases: comprueba un manifiesto en GitHub Pages (al abrir, periódicamente y a mano
+desde Ajustes), descarga el APK, **verifica su SHA-256** e instala por
+`PackageInstaller`. La lógica vive en el módulo reutilizable
+[`actualizador`](actualizador/README.md). Para publicar una versión, ver
+[PUBLICAR.md](PUBLICAR.md).
+
 ## Cómo instalarlo en tu móvil
 
 ### 1. Compilar el APK
