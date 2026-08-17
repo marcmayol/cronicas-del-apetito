@@ -1,8 +1,8 @@
 {
-  "versionCode": 7,
-  "versionName": "1.6",
-  "url": "https://github.com/marcmayol/cronicas-del-apetito/releases/download/v1.6/cronicas-del-apetito-v1.6.apk",
-  "sha256": "651083af082b7907dd5ffab9c18ea1ed88cfa9c591fed4413c9e626954cf4c40",
-  "notas": "Prueba de actualizacion desde la tienda DracApps.",
+  "versionCode": 8,
+  "versionName": "2.0",
+  "url": "https://github.com/marcmayol/cronicas-del-apetito/releases/download/v2.0/cronicas-del-apetito-v2.0.apk",
+  "sha256": "1ab9151cd0be953fc033ecaeca68a19cbd02c1881f9e796101e3c91ee4eadc97",
+  "notas": "Tres formas de mirar el registro: Día, Semana y Mes. Filtro por rango de fechas que se combina con las tres vistas. Compartir lo que estás viendo, como imagen o PDF, con los cuatro tipos distinguibles también en blanco y negro. Rediseño completo de la app.",
   "check_horas": 24
 }
