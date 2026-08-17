@@ -23,8 +23,8 @@ android {
         applicationId = "com.marcm.cronicasapetito"
         minSdk = 26
         targetSdk = 34
-        versionCode = 7
-        versionName = "1.6"
+        versionCode = 8
+        versionName = "2.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -91,6 +91,8 @@ dependencies {
     ksp("androidx.room:room-compiler:2.6.1")
 
     implementation(project(":actualizador"))
+
+    testImplementation("junit:junit:4.13.2")
 
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test:runner:1.5.2")

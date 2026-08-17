@@ -16,6 +16,10 @@ interface MealEntryDao {
     @Query("SELECT * FROM meal_entries WHERE timestampMillis BETWEEN :from AND :to ORDER BY timestampMillis ASC")
     suspend fun getInRange(from: Long, to: Long): List<MealEntry>
 
+    /** Como [getInRange], pero observable: es lo que alimenta las tres vistas. */
+    @Query("SELECT * FROM meal_entries WHERE timestampMillis BETWEEN :from AND :to ORDER BY timestampMillis DESC")
+    fun observeInRange(from: Long, to: Long): Flow<List<MealEntry>>
+
     @Query("SELECT * FROM meal_entries ORDER BY timestampMillis ASC")
     suspend fun getAll(): List<MealEntry>
 

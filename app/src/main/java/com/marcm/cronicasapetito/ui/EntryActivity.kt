@@ -10,36 +10,46 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.PhotoCamera
-import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
@@ -53,11 +63,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import com.marcm.cronicasapetito.CronicasApp
 import com.marcm.cronicasapetito.R
+import com.marcm.cronicasapetito.data.EntryKind
 import com.marcm.cronicasapetito.data.MealRepository
 import com.marcm.cronicasapetito.data.PhotoStore
 import com.marcm.cronicasapetito.notifications.MealNotifier
@@ -111,6 +123,7 @@ private fun EntryScreen(
     var cameraTempPath by rememberSaveable { mutableStateOf<String?>(null) }
     var processingPhoto by rememberSaveable { mutableStateOf(false) }
     val scrollState = rememberScrollState()
+    val visualComida = visualDe(EntryKind.FOOD)
 
     // Selector de fotos del sistema (no requiere permisos).
     val galleryLauncher = rememberLauncherForActivityResult(
@@ -162,176 +175,313 @@ private fun EntryScreen(
     }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text(stringResource(R.string.entry_title)) }) }
+        containerColor = MaterialTheme.colorScheme.background,
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.entry_title)) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                ),
+                navigationIcon = {
+                    IconButton(onClick = cancelAndClean) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                    }
+                },
+                actions = { SelloTipo(EntryKind.FOOD) },
+            )
+        },
+        bottomBar = {
+            BarraGuardar(
+                habilitado = foodText.isNotBlank() && !processingPhoto,
+                onCancelar = cancelAndClean,
+                onGuardar = { onSave(foodText.trim(), moodText, selectedTime, photoPath) },
+            )
+        },
     ) { padding ->
         Column(
             modifier = Modifier
                 .padding(padding)
-                .padding(16.dp)
+                .padding(horizontal = 16.dp)
                 .fillMaxSize()
                 .verticalScroll(scrollState),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            DateTimeRow(
+            FilaFechaHora(
                 selectedTime = selectedTime,
-                onPicked = { selectedTime = it }
+                tinte = visualComida.color,
+                onPicked = { selectedTime = it },
             )
 
-            Text(
-                text = "¿Qué has comido?",
-                style = MaterialTheme.typography.titleMedium
-            )
-            OutlinedTextField(
-                value = foodText,
-                onValueChange = { foodText = it },
-                modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text(stringResource(R.string.input_hint)) },
-                minLines = 4,
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Default)
-            )
+            Column {
+                EtiquetaCampo("¿Qué has comido?")
+                OutlinedTextField(
+                    value = foodText,
+                    onValueChange = { foodText = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    placeholder = { Text(stringResource(R.string.input_hint)) },
+                    minLines = 4,
+                    shape = RoundedCornerShape(14.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = visualComida.color,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                        focusedContainerColor = MaterialTheme.colorScheme.surface,
+                    ),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Default),
+                )
+            }
 
-            Text(
-                text = "Foto del plato (opcional)",
-                style = MaterialTheme.typography.titleMedium
-            )
-            if (processingPhoto) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    CircularProgressIndicator(modifier = Modifier.size(20.dp))
-                    Spacer(Modifier.width(12.dp))
-                    Text("Guardando foto…", style = MaterialTheme.typography.bodyMedium)
-                }
-            } else if (photoPath == null) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    OutlinedButton(
-                        onClick = {
+            Column {
+                EtiquetaCampo("Foto del plato", opcional = true)
+                when {
+                    processingPhoto -> Row(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        CircularProgressIndicator(modifier = Modifier.size(20.dp))
+                        Spacer(Modifier.width(12.dp))
+                        Text("Guardando foto…", style = MaterialTheme.typography.bodyMedium)
+                    }
+
+                    photoPath == null -> Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    ) {
+                        BotonFoto(
+                            icono = Icons.Filled.PhotoCamera,
+                            texto = "Cámara",
+                            modifier = Modifier.weight(1f),
+                        ) {
                             val file = PhotoStore.newCameraTempFile(context)
                             cameraTempPath = file.absolutePath
                             cameraLauncher.launch(PhotoStore.uriFor(context, file))
-                        },
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Icon(Icons.Filled.PhotoCamera, contentDescription = null)
-                        Text(" Cámara")
-                    }
-                    OutlinedButton(
-                        onClick = {
+                        }
+                        BotonFoto(
+                            icono = Icons.Filled.Image,
+                            texto = "Galería",
+                            modifier = Modifier.weight(1f),
+                        ) {
                             galleryLauncher.launch(
                                 PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                             )
-                        },
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Icon(Icons.Filled.PhotoLibrary, contentDescription = null)
-                        Text(" Galería")
+                        }
                     }
-                }
-            } else {
-                PhotoThumb(
-                    path = photoPath,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(max = 240.dp),
-                    contentScale = ContentScale.Fit
-                )
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    TextButton(onClick = {
-                        PhotoStore.delete(photoPath)
-                        photoPath = null
-                    }) {
-                        Icon(Icons.Filled.Delete, contentDescription = null)
-                        Text(" Quitar foto")
+
+                    else -> Column {
+                        PhotoThumb(
+                            path = photoPath,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .heightIn(max = 240.dp),
+                            contentScale = ContentScale.Fit,
+                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.End,
+                        ) {
+                            TextButton(onClick = {
+                                PhotoStore.delete(photoPath)
+                                photoPath = null
+                            }) {
+                                Icon(Icons.Filled.Delete, contentDescription = null)
+                                Text(" Quitar foto")
+                            }
+                        }
                     }
                 }
             }
 
-            Text(
-                text = "¿Cómo te has sentido? (opcional)",
-                style = MaterialTheme.typography.titleMedium
-            )
-            OutlinedTextField(
-                value = moodText,
-                onValueChange = { moodText = it },
-                modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text("Puedes dejarlo en blanco si no quieres anotarlo") },
-                minLines = 3,
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Default)
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                TextButton(onClick = cancelAndClean) { Text("Cancelar") }
-                Spacer(Modifier.width(8.dp))
-                Button(
-                    onClick = {
-                        if (foodText.isNotBlank()) onSave(foodText.trim(), moodText, selectedTime, photoPath)
-                    },
-                    enabled = foodText.isNotBlank() && !processingPhoto
-                ) {
-                    Text(stringResource(R.string.save))
+            Column {
+                EtiquetaCampo("¿Cómo te has sentido?", opcional = true)
+                OutlinedTextField(
+                    value = moodText,
+                    onValueChange = { moodText = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    placeholder = { Text("Puedes dejarlo en blanco si no quieres anotarlo") },
+                    minLines = 3,
+                    shape = RoundedCornerShape(14.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = visualDe(EntryKind.MOOD).color,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                        focusedContainerColor = MaterialTheme.colorScheme.surface,
+                    ),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Default),
+                )
+                // Este comportamiento existía desde siempre pero era invisible.
+                Spacer(Modifier.height(6.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = visualDe(EntryKind.MOOD).glifo,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = visualDe(EntryKind.MOOD).color,
+                    )
+                    Spacer(Modifier.width(6.dp))
+                    Text(
+                        text = "Se guardará como nota de ánimo aparte, con la misma hora",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = colorsCronicas.tenue,
+                    )
                 }
+            }
+
+            Spacer(Modifier.height(8.dp))
+        }
+    }
+}
+
+/** Sello del tipo en la barra: sitúa en qué pantalla estás. */
+@Composable
+internal fun SelloTipo(kind: String) {
+    val visual = visualDe(kind)
+    Box(
+        modifier = Modifier
+            .padding(end = 12.dp)
+            .size(26.dp)
+            .background(visual.contenedor, RoundedCornerShape(8.dp)),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = visual.glifo,
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.Bold,
+            color = visual.color,
+        )
+    }
+}
+
+@Composable
+internal fun EtiquetaCampo(texto: String, opcional: Boolean = false) {
+    Row(modifier = Modifier.padding(bottom = 6.dp)) {
+        Text(
+            text = texto,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.SemiBold,
+        )
+        if (opcional) {
+            Text(
+                text = " (opcional)",
+                style = MaterialTheme.typography.bodyMedium,
+                color = colorsCronicas.tenue,
+            )
+        }
+    }
+}
+
+@Composable
+private fun BotonFoto(
+    icono: androidx.compose.ui.graphics.vector.ImageVector,
+    texto: String,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+) {
+    OutlinedButton(
+        onClick = onClick,
+        modifier = modifier,
+        shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+    ) {
+        Icon(icono, contentDescription = null, modifier = Modifier.size(17.dp))
+        Spacer(Modifier.width(8.dp))
+        Text(texto, fontWeight = FontWeight.SemiBold)
+    }
+}
+
+/** Botonera inferior fija: el camino rápido acaba siempre en el mismo sitio. */
+@Composable
+internal fun BarraGuardar(
+    habilitado: Boolean,
+    onCancelar: () -> Unit,
+    onGuardar: () -> Unit,
+    textoGuardar: String = "Guardar",
+    textoCancelar: String = "Cancelar",
+    alineadoAlInicio: Boolean = false,
+) {
+    Surface(color = MaterialTheme.colorScheme.background) {
+        Column {
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(MaterialTheme.colorScheme.outlineVariant)
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = if (alineadoAlInicio) Arrangement.SpaceBetween
+                else Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                TextButton(onClick = onCancelar) { Text(textoCancelar) }
+                if (!alineadoAlInicio) Spacer(Modifier.width(8.dp))
+                Button(
+                    onClick = onGuardar,
+                    enabled = habilitado,
+                    shape = RoundedCornerShape(999.dp),
+                ) { Text(textoGuardar) }
             }
         }
     }
 }
 
 /**
- * Fila "Fecha y hora" con botón para cambiarla. La usan tanto la pantalla de comida
- * como la de caminata, para poder anotar algo que se olvidó en su momento.
+ * Fila «Fecha y hora» con botón para cambiarla. La usan la pantalla de comida y
+ * la de caminata, para poder anotar algo que se olvidó en su momento.
  */
 @Composable
-internal fun DateTimeRow(selectedTime: Long, onPicked: (Long) -> Unit) {
+internal fun FilaFechaHora(
+    selectedTime: Long,
+    tinte: androidx.compose.ui.graphics.Color,
+    onPicked: (Long) -> Unit,
+) {
     val context = LocalContext.current
-    val dateTimeFormat = remember {
-        SimpleDateFormat("EEEE d 'de' MMMM, HH:mm", Locale("es"))
-    }
-    Row(
+    val formato = remember { SimpleDateFormat("EEEE d 'de' MMMM, HH:mm", Locale("es")) }
+
+    Surface(
         modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
+        shape = RoundedCornerShape(14.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
     ) {
-        Icon(
-            Icons.Filled.Schedule,
-            contentDescription = null,
-            modifier = Modifier.padding(end = 8.dp)
-        )
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = "Fecha y hora",
-                style = MaterialTheme.typography.labelMedium
-            )
-            Text(
-                text = dateTimeFormat.format(Date(selectedTime))
-                    .replaceFirstChar { it.uppercase() },
-                style = MaterialTheme.typography.bodyMedium
-            )
-        }
-        OutlinedButton(
-            onClick = { pickDateTime(context, selectedTime, onPicked) }
+        Row(
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
-                Icons.Filled.Edit,
+                Icons.Filled.Schedule,
                 contentDescription = null,
-                modifier = Modifier.padding(end = 4.dp)
+                modifier = Modifier.size(19.dp),
+                tint = tinte,
             )
-            Text("Cambiar")
+            Spacer(Modifier.width(12.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "FECHA Y HORA",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = colorsCronicas.tenue,
+                )
+                Spacer(Modifier.height(1.dp))
+                Text(
+                    text = formato.format(Date(selectedTime)).replaceFirstChar { it.uppercase() },
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Medium,
+                )
+            }
+            OutlinedButton(
+                onClick = { pickDateTime(context, selectedTime, onPicked) },
+                shape = RoundedCornerShape(999.dp),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+            ) {
+                Icon(Icons.Filled.Edit, contentDescription = null, modifier = Modifier.size(15.dp))
+                Spacer(Modifier.width(6.dp))
+                Text("Cambiar", fontWeight = FontWeight.SemiBold)
+            }
         }
     }
 }
 
 /**
- * Abre el selector de fecha y, al confirmar, el de hora. Devuelve en [onPicked] el
- * timestamp resultante (con segundos a 0). [initial] preselecciona ambos diálogos.
+ * Abre el selector de fecha y, al confirmar, el de hora. Devuelve en [onPicked]
+ * el timestamp resultante (con segundos a 0).
  */
 private fun pickDateTime(context: Context, initial: Long, onPicked: (Long) -> Unit) {
     val cal = Calendar.getInstance().apply { timeInMillis = initial }

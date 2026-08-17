@@ -6,6 +6,8 @@ import java.util.Calendar
 class MealRepository(private val dao: MealEntryDao) {
     fun observeAll(): Flow<List<MealEntry>> = dao.observeAll()
 
+    fun observeInRange(from: Long, to: Long): Flow<List<MealEntry>> = dao.observeInRange(from, to)
+
     suspend fun addFood(
         content: String,
         timestampMillis: Long = System.currentTimeMillis(),

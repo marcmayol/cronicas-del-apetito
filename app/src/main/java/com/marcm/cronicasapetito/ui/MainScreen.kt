@@ -4,43 +4,43 @@ import android.app.AlarmManager
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import androidx.compose.animation.AnimatedVisibility
+import android.widget.Toast
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Bedtime
-import androidx.compose.material.icons.filled.ExpandLess
-import androidx.compose.material.icons.filled.ExpandMore
-import androidx.compose.material.icons.filled.Photo
-import androidx.compose.material.icons.filled.PictureAsPdf
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -51,61 +51,43 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.marcm.actualizador.Actualizador
 import com.marcm.cronicasapetito.R
-import com.marcm.cronicasapetito.data.EntryKind
-import com.marcm.cronicasapetito.data.MealEntry
 import com.marcm.cronicasapetito.data.MealRepository
+import com.marcm.cronicasapetito.data.Periodos
+import com.marcm.cronicasapetito.export.ImagenExporter
 import com.marcm.cronicasapetito.export.PdfExporter
 import com.marcm.cronicasapetito.export.shareFile
 import com.marcm.cronicasapetito.notifications.MealAlarmScheduler
 import com.marcm.cronicasapetito.notifications.SleepPrefs
-import android.widget.Toast
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-import androidx.compose.ui.graphics.Color
-
-private fun kindLabel(kind: String): String = when (kind) {
-    EntryKind.FOOD -> "Comida"
-    EntryKind.WALK -> "Caminata"
-    EntryKind.MOOD -> "Estado de ánimo"
-    EntryKind.GYM -> "Gimnasio"
-    else -> kind
-}
-
-private fun kindColor(kind: String): Color = when (kind) {
-    EntryKind.FOOD -> Color(0xFF7A4E2D)
-    EntryKind.WALK -> Color(0xFF2E7D32)
-    EntryKind.MOOD -> Color(0xFF6A1B9A)
-    EntryKind.GYM -> Color(0xFF1565C0)
-    else -> Color.DarkGray
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
     repository: MealRepository,
     actualizador: Actualizador,
-    onRequestExactAlarmPermission: () -> Unit
+    onRequestExactAlarmPermission: () -> Unit,
 ) {
     val context = LocalContext.current
-    val entries by repository.observeAll().collectAsState(initial = emptyList())
-    val estadoActualizacion by actualizador.estado.collectAsState()
     val scope = rememberCoroutineScope()
-    var showExportDialog by remember { mutableStateOf(false) }
-    var showAddPicker by remember { mutableStateOf(false) }
-    var showGymDialog by remember { mutableStateOf(false) }
-    var showSleepDialog by remember { mutableStateOf(false) }
-    var sleeping by remember { mutableStateOf(SleepPrefs.isSleeping(context)) }
+    val viewModel: MainViewModel = viewModel(factory = MainViewModel.factory(repository))
+    val estado by viewModel.estado.collectAsState()
+    val registros by viewModel.registrosFiltrados.collectAsState()
+    val estadoActualizacion by actualizador.estado.collectAsState()
 
-    // Aviso si Android 12+ no concedió alarmas exactas
+    var mostrarFiltro by remember { mutableStateOf(false) }
+    var mostrarCompartir by remember { mutableStateOf(false) }
+    var mostrarMenu by remember { mutableStateOf(false) }
+    var mostrarAnotar by remember { mutableStateOf(false) }
+    var mostrarGimnasio by remember { mutableStateOf(false) }
+    var mostrarDormir by remember { mutableStateOf(false) }
+    var durmiendo by remember { mutableStateOf(SleepPrefs.isSleeping(context)) }
+
     LaunchedEffect(Unit) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             val am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
@@ -114,275 +96,390 @@ fun MainScreen(
     }
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.app_name)) },
+                title = {
+                    Text(
+                        text = stringResource(R.string.app_name),
+                        style = MaterialTheme.typography.titleLarge,
+                    )
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                ),
                 actions = {
-                    IconButton(onClick = {
-                        context.startActivity(Intent(context, AjustesActivity::class.java))
-                    }) {
-                        Icon(
-                            Icons.Filled.Settings,
-                            contentDescription = "Ajustes"
-                        )
+                    IconButton(onClick = { mostrarDormir = true }) {
+                        Icon(Icons.Filled.Bedtime, stringResource(R.string.sleep_button))
                     }
-                    IconButton(onClick = { showSleepDialog = true }) {
-                        Icon(
-                            Icons.Filled.Bedtime,
-                            contentDescription = stringResource(R.string.sleep_button)
-                        )
+                    IconButton(onClick = { mostrarCompartir = true }) {
+                        Icon(Icons.Filled.Share, "Compartir")
                     }
-                    OutlinedButton(onClick = { showExportDialog = true }) {
-                        Icon(Icons.Filled.PictureAsPdf, contentDescription = null)
-                        Text(
-                            text = " " + stringResource(R.string.export_pdf),
-                            modifier = Modifier.padding(start = 4.dp)
-                        )
+                    Box {
+                        IconButton(onClick = { mostrarMenu = true }) {
+                            Icon(Icons.Filled.MoreVert, "Más opciones")
+                        }
+                        DropdownMenu(
+                            expanded = mostrarMenu,
+                            onDismissRequest = { mostrarMenu = false },
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("Ajustes") },
+                                onClick = {
+                                    mostrarMenu = false
+                                    context.startActivity(
+                                        Intent(context, AjustesActivity::class.java)
+                                    )
+                                },
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Exportar todo el historial (PDF)") },
+                                onClick = {
+                                    mostrarMenu = false
+                                    scope.launch {
+                                        val todo = repository.getAll()
+                                        val file = PdfExporter.export(
+                                            context, todo, titulo = "Historial completo"
+                                        )
+                                        shareFile(context, file)
+                                    }
+                                },
+                            )
+                        }
                     }
-                }
+                },
             )
         },
         floatingActionButton = {
             ExtendedFloatingActionButton(
-                onClick = { showAddPicker = true },
+                onClick = { mostrarAnotar = true },
                 icon = { Icon(Icons.Filled.Add, contentDescription = null) },
-                text = { Text("Anotar") }
+                text = { Text("Anotar") },
+                shape = RoundedCornerShape(16.dp),
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
             )
-        }
+        },
     ) { padding ->
-        Box(modifier = Modifier.padding(padding).fillMaxSize()) {
-            Column(modifier = Modifier.fillMaxSize()) {
-                BannerActualizacion(
-                    estado = estadoActualizacion,
-                    onActualizar = { actualizador.actualizarAhora() },
+        Column(
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxSize(),
+        ) {
+            BannerActualizacion(
+                estado = estadoActualizacion,
+                onActualizar = { actualizador.actualizarAhora() },
+            )
+
+            if (durmiendo) {
+                BannerDormir(
+                    onDespertar = {
+                        MealAlarmScheduler.wakeUp(context)
+                        durmiendo = false
+                        Toast.makeText(
+                            context, context.getString(R.string.wake_toast), Toast.LENGTH_LONG
+                        ).show()
+                    }
                 )
-                if (sleeping) {
-                    Surface(
-                        modifier = Modifier.fillMaxWidth(),
-                        color = MaterialTheme.colorScheme.secondaryContainer
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 10.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                Icons.Filled.Bedtime,
-                                contentDescription = null,
-                                modifier = Modifier.padding(end = 8.dp),
-                                tint = MaterialTheme.colorScheme.onSecondaryContainer
+            }
+
+            // Zona de control: selector de vista + filtro. Siempre visible, para
+            // que nunca haya duda de qué se está mirando.
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 6.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                SelectorVista(
+                    vista = estado.vista,
+                    onCambiar = viewModel::cambiarVista,
+                    modifier = Modifier.weight(1f),
+                )
+                Spacer(Modifier.width(8.dp))
+                BotonFiltro(
+                    activo = estado.hayFiltro,
+                    onClick = { mostrarFiltro = true },
+                )
+            }
+
+            estado.filtro?.let { rango ->
+                ChipFiltro(
+                    rango = rango,
+                    registros = registros,
+                    onQuitar = viewModel::quitarFiltro,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                )
+            }
+
+            if (estado.vista != Vista.DIA) {
+                NavegadorPeriodo(
+                    titulo = when (estado.vista) {
+                        Vista.SEMANA -> Fechas.semana(Periodos.lunesDe(estado.ancla))
+                        else -> Fechas.mes(estado.mes)
+                    },
+                    onAnterior = viewModel::periodoAnterior,
+                    onSiguiente = viewModel::periodoSiguiente,
+                    modifier = Modifier.padding(horizontal = 4.dp),
+                )
+            }
+
+            Box(modifier = Modifier.fillMaxSize()) {
+                when {
+                    estado.entradasVisibles.isEmpty() && estado.vista == Vista.DIA ->
+                        VacioSegunFiltro(estado, viewModel::quitarFiltro)
+
+                    estado.vista == Vista.DIA -> VistaDia(estado)
+
+                    estado.vista == Vista.SEMANA -> VistaSemana(
+                        estado = estado,
+                        onAbrirDia = viewModel::abrirDia,
+                    )
+
+                    else -> VistaMes(
+                        estado = estado,
+                        onSeleccionarDia = viewModel::seleccionarDia,
+                        onAbrirDia = viewModel::abrirDia,
+                    )
+                }
+            }
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // Hojas y diálogos
+    // -----------------------------------------------------------------------
+
+    if (mostrarFiltro) {
+        FiltroSheet(
+            filtroActual = estado.filtro,
+            onCerrar = { mostrarFiltro = false },
+            onAplicar = {
+                mostrarFiltro = false
+                viewModel.aplicarFiltro(it)
+            },
+        )
+    }
+
+    if (mostrarCompartir) {
+        CompartirSheet(
+            contexto = contextoDeCompartir(estado),
+            formatoSugerido = if (estado.vista == Vista.DIA) FormatoCompartir.PDF
+            else FormatoCompartir.IMAGEN,
+            onCerrar = { mostrarCompartir = false },
+            onCompartir = { formato ->
+                mostrarCompartir = false
+                scope.launch {
+                    val file = when (formato) {
+                        FormatoCompartir.PDF -> PdfExporter.export(
+                            context = context,
+                            entries = estado.entradasVisibles.sortedByDescending { it.timestampMillis },
+                            titulo = contextoDeCompartir(estado),
+                        )
+                        FormatoCompartir.IMAGEN -> when (estado.vista) {
+                            Vista.SEMANA -> ImagenExporter.semana(
+                                context,
+                                Periodos.lunesDe(estado.ancla),
+                                estado.resumenPorDia,
+                                estado.resumenPeriodo,
+                                estado.filtro,
                             )
-                            Text(
-                                text = stringResource(R.string.sleep_banner),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSecondaryContainer,
-                                modifier = Modifier.weight(1f)
+                            Vista.MES -> ImagenExporter.mes(
+                                context,
+                                estado.mes,
+                                estado.resumenPorDia,
+                                estado.resumenPeriodo,
+                                estado.filtro,
                             )
-                            TextButton(onClick = {
-                                MealAlarmScheduler.wakeUp(context)
-                                sleeping = false
-                                Toast.makeText(
-                                    context,
-                                    context.getString(R.string.wake_toast),
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            }) {
-                                Text(stringResource(R.string.wake_button))
-                            }
+                            // La vista Día es una lista: como imagen se cortaría.
+                            Vista.DIA -> PdfExporter.export(
+                                context = context,
+                                entries = estado.entradasVisibles.sortedByDescending { it.timestampMillis },
+                                titulo = contextoDeCompartir(estado),
+                            )
                         }
                     }
-                }
-                Box(modifier = Modifier.fillMaxSize()) {
-                    if (entries.isEmpty()) {
-                        Text(
-                            text = stringResource(R.string.empty_history),
-                            modifier = Modifier
-                                .align(Alignment.Center)
-                                .padding(32.dp),
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-                    } else {
-                        HistoryList(entries)
-                    }
-                }
-            }
-        }
-    }
-
-    if (showSleepDialog) {
-        AlertDialog(
-            onDismissRequest = { showSleepDialog = false },
-            icon = { Icon(Icons.Filled.Bedtime, contentDescription = null) },
-            title = { Text(stringResource(R.string.sleep_dialog_title)) },
-            text = { Text(stringResource(R.string.sleep_dialog_text)) },
-            confirmButton = {
-                TextButton(onClick = {
-                    showSleepDialog = false
-                    MealAlarmScheduler.goToSleep(context)
-                    sleeping = true
-                    Toast.makeText(
-                        context,
-                        context.getString(R.string.sleep_toast),
-                        Toast.LENGTH_LONG
-                    ).show()
-                }) {
-                    Text(stringResource(R.string.sleep_confirm))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showSleepDialog = false }) {
-                    Text(stringResource(R.string.sleep_cancel))
-                }
-            }
-        )
-    }
-
-    if (showExportDialog) {
-        ExportDialog(
-            onDismiss = { showExportDialog = false },
-            onExport = { from, to ->
-                showExportDialog = false
-                scope.launch {
-                    val list = if (from == null || to == null) repository.getAll()
-                    else repository.getInRange(from, to)
-                    val file = PdfExporter.export(context, list, from, to)
                     shareFile(context, file)
                 }
-            }
+            },
         )
     }
 
-    if (showAddPicker) {
+    if (mostrarAnotar) {
         AddEntryPickerDialog(
-            onDismiss = { showAddPicker = false },
+            onDismiss = { mostrarAnotar = false },
             onPickFood = {
-                showAddPicker = false
+                mostrarAnotar = false
                 context.startActivity(Intent(context, EntryActivity::class.java))
             },
             onPickWalk = {
-                showAddPicker = false
-                val walkIntent = Intent(context, WalkMoodActivity::class.java).apply {
-                    putExtra(WalkMoodActivity.EXTRA_START_AT_MINUTES, true)
-                }
-                context.startActivity(walkIntent)
+                mostrarAnotar = false
+                context.startActivity(
+                    Intent(context, WalkMoodActivity::class.java).apply {
+                        putExtra(WalkMoodActivity.EXTRA_START_AT_MINUTES, true)
+                    }
+                )
             },
             onPickGym = {
-                showAddPicker = false
-                showGymDialog = true
-            }
+                mostrarAnotar = false
+                mostrarGimnasio = true
+            },
         )
     }
 
-    if (showGymDialog) {
+    if (mostrarGimnasio) {
         GymQuestionDialog(
-            onDismiss = { showGymDialog = false },
-            onAnswer = { went ->
-                showGymDialog = false
-                scope.launch { repository.addGym(went) }
-            }
+            onDismiss = { mostrarGimnasio = false },
+            onAnswer = { fue ->
+                mostrarGimnasio = false
+                scope.launch { repository.addGym(fue) }
+            },
+        )
+    }
+
+    if (mostrarDormir) {
+        DialogoDormir(
+            onCerrar = { mostrarDormir = false },
+            onConfirmar = {
+                mostrarDormir = false
+                MealAlarmScheduler.goToSleep(context)
+                durmiendo = true
+                Toast.makeText(
+                    context, context.getString(R.string.sleep_toast), Toast.LENGTH_LONG
+                ).show()
+            },
+        )
+    }
+}
+
+/** Lo que dice la cabecera de lo compartido: vista + periodo + filtro. */
+private fun contextoDeCompartir(estado: EstadoPrincipal): String = when (estado.vista) {
+    Vista.SEMANA -> Fechas.semana(Periodos.lunesDe(estado.ancla)) +
+        (estado.filtro?.let { " · filtrado ${Fechas.rango(it).lowercase()}" } ?: "")
+    Vista.MES -> Fechas.mes(estado.mes) +
+        (estado.filtro?.let { " · filtrado ${Fechas.rango(it).lowercase()}" } ?: "")
+    Vista.DIA -> estado.filtro?.let { Fechas.rangoConAnio(it) } ?: "Historial completo"
+}
+
+@Composable
+private fun BotonFiltro(activo: Boolean, onClick: () -> Unit) {
+    Box(contentAlignment = Alignment.TopEnd) {
+        Box(
+            modifier = Modifier
+                .size(width = 48.dp, height = 40.dp)
+                .background(
+                    if (activo) MaterialTheme.colorScheme.secondaryContainer
+                    else MaterialTheme.colorScheme.surface,
+                    CircleShape
+                )
+                .border(
+                    1.dp,
+                    if (activo) MaterialTheme.colorScheme.primary
+                    else MaterialTheme.colorScheme.outline,
+                    CircleShape
+                )
+                .clickable(onClick = onClick),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                Icons.Filled.Tune,
+                contentDescription = "Filtrar por fechas",
+                modifier = Modifier.size(18.dp),
+                tint = if (activo) MaterialTheme.colorScheme.onSecondaryContainer
+                else MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        if (activo) {
+            Box(
+                Modifier
+                    .padding(top = 2.dp, end = 4.dp)
+                    .size(8.dp)
+                    .background(MaterialTheme.colorScheme.primary, CircleShape)
+            )
+        }
+    }
+}
+
+/** Dos vacíos distintos: no es lo mismo no tener nada que estar filtrando. */
+@Composable
+private fun VacioSegunFiltro(estado: EstadoPrincipal, onQuitarFiltro: () -> Unit) {
+    val filtro = estado.filtro
+    if (filtro == null) {
+        EstadoVacio(
+            icono = IconoCuaderno,
+            mensaje = stringResource(R.string.empty_history),
+        )
+    } else {
+        EstadoVacio(
+            icono = IconoCalendario,
+            mensaje = "No hay nada anotado ${Fechas.rango(filtro).lowercase()}.",
+            accion = {
+                TextButton(onClick = onQuitarFiltro) { Text("Quitar filtro") }
+            },
         )
     }
 }
 
 @Composable
-private fun HistoryList(entries: List<MealEntry>) {
-    val grouped = remember(entries) {
-        val dayFormat = SimpleDateFormat("EEEE d 'de' MMMM yyyy", Locale("es"))
-        entries.groupBy { dayFormat.format(Date(it.timestampMillis)) }
-            .toList() // mantiene orden de inserción (DESC por timestamp)
-    }
-    val hourFormat = remember { SimpleDateFormat("HH:mm", Locale("es")) }
-
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(12.dp, 12.dp, 12.dp, 96.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+private fun BannerDormir(onDespertar: () -> Unit) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        color = MaterialTheme.colorScheme.secondaryContainer,
     ) {
-        grouped.forEach { (day, dayEntries) ->
-            item(key = "header-$day") {
-                Text(
-                    text = day.replaceFirstChar { it.uppercase() },
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(vertical = 8.dp)
-                )
-            }
-            items(dayEntries, key = { it.id }) { entry ->
-                var photoExpanded by remember(entry.id) { mutableStateOf(false) }
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surface
-                    )
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp),
-                        verticalAlignment = Alignment.Top
-                    ) {
-                        Text(
-                            text = hourFormat.format(Date(entry.timestampMillis)),
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(end = 12.dp)
-                        )
-                        Column(modifier = Modifier.fillMaxWidth()) {
-                            Text(
-                                text = kindLabel(entry.kind),
-                                style = MaterialTheme.typography.labelMedium,
-                                color = kindColor(entry.kind),
-                                fontWeight = FontWeight.SemiBold
-                            )
-                            Text(
-                                text = entry.content,
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-
-                            if (!entry.photoPath.isNullOrBlank()) {
-                                Spacer(Modifier.height(6.dp))
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clickable { photoExpanded = !photoExpanded }
-                                        .padding(vertical = 4.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Icon(
-                                        Icons.Filled.Photo,
-                                        contentDescription = null,
-                                        tint = kindColor(entry.kind),
-                                        modifier = Modifier.padding(end = 6.dp)
-                                    )
-                                    Text(
-                                        text = if (photoExpanded) "Ocultar foto" else "Ver foto",
-                                        style = MaterialTheme.typography.labelLarge,
-                                        color = kindColor(entry.kind),
-                                        fontWeight = FontWeight.SemiBold,
-                                        modifier = Modifier.weight(1f)
-                                    )
-                                    Icon(
-                                        if (photoExpanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
-                                        contentDescription = null,
-                                        tint = kindColor(entry.kind)
-                                    )
-                                }
-                                AnimatedVisibility(visible = photoExpanded) {
-                                    PhotoThumb(
-                                        path = entry.photoPath,
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .heightIn(max = 280.dp)
-                                            .padding(top = 4.dp),
-                                        contentScale = ContentScale.Fit
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                Icons.Filled.Bedtime,
+                contentDescription = null,
+                modifier = Modifier.size(18.dp),
+                tint = MaterialTheme.colorScheme.onSecondaryContainer,
+            )
+            Spacer(Modifier.width(8.dp))
+            Text(
+                text = stringResource(R.string.sleep_banner),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                modifier = Modifier.weight(1f),
+            )
+            TextButton(onClick = onDespertar) {
+                Text(stringResource(R.string.wake_button))
             }
         }
     }
+}
+
+@Composable
+private fun DialogoDormir(onCerrar: () -> Unit, onConfirmar: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onCerrar,
+        icon = {
+            Box(
+                Modifier
+                    .size(46.dp)
+                    .background(MaterialTheme.colorScheme.secondaryContainer, CircleShape),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    Icons.Filled.Bedtime,
+                    contentDescription = null,
+                    modifier = Modifier.size(23.dp),
+                    tint = MaterialTheme.colorScheme.primary,
+                )
+            }
+        },
+        title = { Text(stringResource(R.string.sleep_dialog_title)) },
+        text = { Text(stringResource(R.string.sleep_dialog_text)) },
+        shape = RoundedCornerShape(20.dp),
+        containerColor = MaterialTheme.colorScheme.background,
+        confirmButton = {
+            TextButton(onClick = onConfirmar) { Text(stringResource(R.string.sleep_confirm)) }
+        },
+        dismissButton = {
+            TextButton(onClick = onCerrar) { Text(stringResource(R.string.sleep_cancel)) }
+        },
+    )
 }

@@ -1,0 +1,803 @@
+<title>Rediseño de Crónicas del Apetito</title>
+<style>
+  :root {
+    --paper:      #F6F7F9;
+    --card:       #FFFFFF;
+    --wash:       #EDF0F5;
+    --ink:        #191E26;
+    --ink-soft:   #57616F;
+    --ink-faint:  #8A94A3;
+    --rule:       #D9DEE7;
+    --accent:     #24478D;
+    --accent-soft:#5E7FC0;
+    --flag:       #8A4B12;
+    --flag-wash:  #F6EDE3;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:      #12151A;
+      --card:       #191D24;
+      --wash:       #1F242C;
+      --ink:        #E7EBF1;
+      --ink-soft:   #A6B0BF;
+      --ink-faint:  #737E8D;
+      --rule:       #2C333D;
+      --accent:     #8FADE4;
+      --accent-soft:#6E8AC0;
+      --flag:       #E0A26A;
+      --flag-wash:  #241C13;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper:      #12151A;
+    --card:       #191D24;
+    --wash:       #1F242C;
+    --ink:        #E7EBF1;
+    --ink-soft:   #A6B0BF;
+    --ink-faint:  #737E8D;
+    --rule:       #2C333D;
+    --accent:     #8FADE4;
+    --accent-soft:#6E8AC0;
+    --flag:       #E0A26A;
+    --flag-wash:  #241C13;
+  }
+
+  :root {
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --mono: ui-monospace, "Cascadia Mono", "SF Mono", Consolas, "Liberation Mono", monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 17px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .doc {
+    max-width: 78ch;
+    margin: 0 auto;
+    padding: clamp(1.5rem, 5vw, 4.5rem) clamp(1.1rem, 4vw, 2.5rem) 6rem;
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin: 0 0 1.1rem;
+  }
+
+  h1 {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: clamp(2.1rem, 6.5vw, 3.4rem);
+    line-height: 1.08;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+    margin: 0 0 1rem;
+  }
+
+  .standfirst {
+    font-family: var(--serif);
+    font-size: clamp(1.05rem, 2.6vw, 1.3rem);
+    line-height: 1.5;
+    color: var(--ink-soft);
+    max-width: 58ch;
+    margin: 0 0 2.5rem;
+  }
+
+  .ficha {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+    gap: 1.1rem 1.5rem;
+    padding: 1.25rem 0 1.5rem;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 3.5rem;
+  }
+  .ficha dt {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 0.3rem;
+  }
+  .ficha dd {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--ink);
+  }
+
+  nav.indice { margin-bottom: 4rem; }
+  nav.indice ol {
+    list-style: none;
+    counter-reset: sec;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  nav.indice li { counter-increment: sec; margin: 0; }
+  nav.indice a {
+    display: flex;
+    gap: 1rem;
+    align-items: baseline;
+    padding: 0.65rem 0;
+    border-bottom: 1px solid var(--rule);
+    text-decoration: none;
+    color: var(--ink);
+  }
+  nav.indice a::before {
+    content: counter(sec, decimal-leading-zero);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--accent-soft);
+    flex: none;
+  }
+  nav.indice a:hover { color: var(--accent); }
+  nav.indice a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  section { margin-bottom: 4rem; scroll-margin-top: 1.5rem; }
+
+  h2 {
+    font-family: var(--serif);
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    margin: 0 0 0.4rem;
+    padding-top: 1.4rem;
+    border-top: 2px solid var(--ink);
+  }
+  h2 .num {
+    display: block;
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    font-weight: 400;
+    letter-spacing: 0.16em;
+    color: var(--accent);
+    margin-bottom: 0.55rem;
+  }
+
+  h3 {
+    font-family: var(--sans);
+    font-size: 1.02rem;
+    font-weight: 650;
+    margin: 2.4rem 0 0.6rem;
+  }
+
+  h4 {
+    font-family: var(--mono);
+    font-size: 0.73rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    font-weight: 500;
+    margin: 1.5rem 0 0.4rem;
+  }
+
+  p { margin: 0 0 1.05rem; max-width: 68ch; }
+  ul, ol { max-width: 68ch; padding-left: 1.3rem; margin: 0 0 1.15rem; }
+  li { margin-bottom: 0.45rem; }
+  li::marker { color: var(--ink-faint); }
+
+  strong { font-weight: 650; }
+  em { color: var(--ink-soft); }
+
+  code {
+    font-family: var(--mono);
+    font-size: 0.86em;
+    background: var(--wash);
+    padding: 0.1em 0.35em;
+    border-radius: 3px;
+  }
+
+  a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .pantalla {
+    display: grid;
+    grid-template-columns: 4.5rem 1fr;
+    gap: 0 1.5rem;
+    padding: 1.6rem 0;
+    border-top: 1px solid var(--rule);
+  }
+  .pantalla > .codigo {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--accent);
+    padding-top: 0.15rem;
+  }
+  .pantalla > .cuerpo { min-width: 0; }
+  .pantalla h3 { margin-top: 0; font-size: 1.15rem; }
+  .pantalla > .cuerpo > :last-child { margin-bottom: 0; }
+
+  @media (max-width: 34rem) {
+    .pantalla { grid-template-columns: 1fr; gap: 0.35rem; }
+  }
+
+  .tabla-scroll {
+    overflow-x: auto;
+    margin: 0 0 1.4rem;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    background: var(--card);
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 0.92rem;
+    font-variant-numeric: tabular-nums;
+  }
+  th, td {
+    text-align: left;
+    padding: 0.62rem 0.9rem;
+    border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+  }
+  th {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  tr:last-child td { border-bottom: none; }
+  td.hex { font-family: var(--mono); white-space: nowrap; }
+
+  .muestra {
+    display: inline-block;
+    width: 0.95rem;
+    height: 0.95rem;
+    border-radius: 2px;
+    border: 1px solid var(--rule);
+    margin-right: 0.5rem;
+    vertical-align: -0.15rem;
+  }
+
+  .nota {
+    background: var(--wash);
+    border-radius: 4px;
+    padding: 1.1rem 1.25rem;
+    margin: 0 0 1.4rem;
+    max-width: 68ch;
+  }
+  .nota .etiqueta {
+    display: block;
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 0.5rem;
+  }
+  .nota > :last-child { margin-bottom: 0; }
+
+  .nota.clave { background: var(--flag-wash); }
+  .nota.clave .etiqueta { color: var(--flag); }
+
+  .decision {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: inline-block;
+    margin-bottom: 0.3rem;
+  }
+
+  .cierre {
+    border-top: 2px solid var(--ink);
+    padding-top: 1.4rem;
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    color: var(--ink-soft);
+    max-width: 60ch;
+  }
+</style>
+
+<div class="doc">
+
+  <header>
+    <p class="eyebrow">Brief de diseño</p>
+    <h1>Rediseño de Crónicas del Apetito</h1>
+    <p class="standfirst">Una app Android personal de registro de comida y estado de ánimo, que ahora necesita
+      poder mirarse por semanas y por meses — y compartir lo que se está mirando.</p>
+
+    <dl class="ficha">
+      <div><dt>Para</dt><dd>El diseñador</dd></div>
+      <div><dt>De</dt><dd>Marc Mayol</dd></div>
+      <div><dt>Versión documentada</dt><dd>1.6 (versionCode 7)</dd></div>
+      <div><dt>Fecha</dt><dd>17 de agosto de 2026</dd></div>
+    </dl>
+  </header>
+
+  <nav class="indice" aria-label="Índice">
+    <ol>
+      <li><a href="#s1">Qué es la app y para quién</a></li>
+      <li><a href="#s2">Restricciones técnicas</a></li>
+      <li><a href="#s3">Sistema visual actual</a></li>
+      <li><a href="#s4">Inventario de pantallas</a></li>
+      <li><a href="#s5">Lo nuevo que hay que diseñar</a></li>
+      <li><a href="#s6">Reglas que el diseño no puede romper</a></li>
+      <li><a href="#s7">Qué necesito que me entregues</a></li>
+      <li><a href="#s8">Preguntas abiertas</a></li>
+    </ol>
+  </nav>
+
+  <section id="s1">
+    <h2><span class="num">Sección 01</span>Qué es la app y para quién</h2>
+    <p>Crónicas del Apetito es una app Android <strong>personal</strong>, no comercial. La uso yo, y su motivo
+      es concreto: acompañar el trabajo con mi psicóloga sobre ansiedad y comida. La app me pregunta a lo largo
+      del día si he comido algo, y voy dejando un registro de lo que como, cuánto camino, si voy al gimnasio y
+      cómo me siento.</p>
+    <p>Tres consecuencias de diseño que conviene tener claras desde el principio:</p>
+    <ul>
+      <li><strong>El registro se comparte con una profesional.</strong> Lo que se exporta lo lee otra persona,
+        a veces impreso. Tiene que ser legible fuera de la pantalla.</li>
+      <li><strong>No es una app de dieta ni de calorías.</strong> No hay objetivos, ni rachas, ni «te has
+        pasado». Nada de gamificación culpabilizadora. El tono es de cuaderno de notas tranquilo, no de
+        entrenador.</li>
+      <li><strong>Todo es local.</strong> No hay cuentas, no hay nube, no hay login. Se guarda en el móvil y
+        punto.</li>
+    </ul>
+    <p>El nombre y el tono actual («Crónicas», el icono de luna para irse a dormir, los mensajes tipo
+      <em>«Buenas noches. Te avisaré mañana a las 8:00 🌙»</em>) apuntan a un registro cálido y amable. Ese tono
+      me gusta y me gustaría conservarlo, pero el aspecto visual está sin trabajar: es Material 3 por defecto
+      con cuatro colores marrones encima. Ahí es donde entras tú.</p>
+  </section>
+
+  <section id="s2">
+    <h2><span class="num">Sección 02</span>Restricciones técnicas</h2>
+    <p>Esto no es negociable.</p>
+    <div class="tabla-scroll">
+      <table>
+        <tbody>
+          <tr><th scope="row">Plataforma</th><td>Android nativo, <strong>Jetpack Compose + Material 3</strong></td></tr>
+          <tr><th scope="row">Versión mínima</th><td>Android 8.0 (API 26); objetivo API 34</td></tr>
+          <tr><th scope="row">Formato</th><td>Solo móvil, <strong>solo vertical</strong>. No hay tablet ni horizontal.</td></tr>
+          <tr><th scope="row">Tema</th><td>Hoy solo hay <strong>tema claro</strong>. Si propones modo oscuro, dilo aparte: es trabajo extra, no lo des por hecho.</td></tr>
+          <tr><th scope="row">Conectividad</th><td><strong>Sin red</strong>. Todo offline: nada de avatares remotos, fuentes cargadas en caliente ni imágenes descargadas.</td></tr>
+          <tr><th scope="row">Fuentes</th><td>Si propones una tipografía, tiene que poder empaquetarse en el APK (licencia libre: OFL, Apache…).</td></tr>
+          <tr><th scope="row">Iconos</th><td>Ahora se usan los <code>Icons.Filled</code> de Material. Si quieres iconos propios, entrégalos como <strong>SVG/vector</strong>, no PNG.</td></tr>
+          <tr><th scope="row">Accesibilidad</th><td>La app tiene que aguantar el <strong>zoom de fuente del sistema a 1.3× y 1.5×</strong> sin romperse. Nada de alturas fijas que corten texto.</td></tr>
+          <tr><th scope="row">Táctil</th><td>Zonas tocables de 48&nbsp;dp mínimo.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="s3">
+    <h2><span class="num">Sección 03</span>Sistema visual actual</h2>
+    <p>El punto de partida. Colores del tema (Material 3 <code>lightColorScheme</code>):</p>
+    <div class="tabla-scroll">
+      <table>
+        <thead><tr><th>Rol</th><th>Hex</th><th>Uso</th></tr></thead>
+        <tbody>
+          <tr><td>primary</td><td class="hex"><span class="muestra" style="background:#7A4E2D"></span>#7A4E2D</td><td>Marrón, botones principales, cabeceras de día</td></tr>
+          <tr><td>onPrimary</td><td class="hex"><span class="muestra" style="background:#FFFFFF"></span>#FFFFFF</td><td>Texto sobre primary</td></tr>
+          <tr><td>secondary</td><td class="hex"><span class="muestra" style="background:#B7763D"></span>#B7763D</td><td>Marrón claro / tostado</td></tr>
+          <tr><td>background</td><td class="hex"><span class="muestra" style="background:#FFF8EE"></span>#FFF8EE</td><td>Crema de fondo</td></tr>
+          <tr><td>surface</td><td class="hex"><span class="muestra" style="background:#FFF1DC"></span>#FFF1DC</td><td>Crema más cálido, tarjetas</td></tr>
+          <tr><td>onBackground / onSurface</td><td class="hex"><span class="muestra" style="background:#2A1B0E"></span>#2A1B0E</td><td>Marrón muy oscuro, texto</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Colores por tipo de registro (hoy se usan solo en la etiqueta de texto de cada tarjeta):</p>
+    <div class="tabla-scroll">
+      <table>
+        <thead><tr><th>Tipo</th><th>Hex</th><th>Etiqueta</th></tr></thead>
+        <tbody>
+          <tr><td>Comida</td><td class="hex"><span class="muestra" style="background:#7A4E2D"></span>#7A4E2D</td><td>«Comida»</td></tr>
+          <tr><td>Caminata</td><td class="hex"><span class="muestra" style="background:#2E7D32"></span>#2E7D32</td><td>«Caminata»</td></tr>
+          <tr><td>Estado de ánimo</td><td class="hex"><span class="muestra" style="background:#6A1B9A"></span>#6A1B9A</td><td>«Estado de ánimo»</td></tr>
+          <tr><td>Gimnasio</td><td class="hex"><span class="muestra" style="background:#1565C0"></span>#1565C0</td><td>«Gimnasio»</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Tipografía: la de Material 3 por defecto (Roboto). Sin personalizar.</p>
+
+    <div class="nota">
+      <span class="etiqueta">Aviso sobre estos colores</span>
+      <p>Los cuatro colores de tipo son de la paleta de Material, elegidos deprisa, y no combinan especialmente
+        bien con el marrón/crema del tema. Tienes libertad total para rehacerlos. Solo pido que se mantenga
+        <strong>la distinción entre los cuatro tipos</strong> y que funcionen también <strong>impresos en blanco
+        y negro</strong> (ver §5.4), o sea que la diferencia no puede depender únicamente del color.</p>
+    </div>
+  </section>
+
+  <section id="s4">
+    <h2><span class="num">Sección 04</span>Inventario de pantallas</h2>
+    <p>Todas las pantallas que existen hoy, para que puedas rediseñarlas sin abrir el código. Los códigos
+      P1–P11 son la referencia que uso en el resto del documento.</p>
+
+    <div class="pantalla">
+      <div class="codigo">P1</div>
+      <div class="cuerpo">
+        <h3>Principal: el historial</h3>
+        <p>Es la pantalla que se abre al arrancar la app. Lo que hay hoy, de arriba abajo:</p>
+
+        <h4>Barra superior</h4>
+        <ul>
+          <li>Título: «Crónicas del Apetito»</li>
+          <li>Icono ⚙️ → abre Ajustes (P8)</li>
+          <li>Icono 🌙 (luna) → abre el diálogo «Me voy a dormir» (P6)</li>
+          <li>Botón contorneado con icono de PDF + texto «Exportar PDF» → abre el diálogo de exportación (P7)</li>
+        </ul>
+        <p>La barra va <strong>muy justa de espacio</strong>: tres acciones y un título largo. Es uno de los
+          puntos que peor está y, con las nuevas funciones (§5), va a tener que reorganizarse sí o sí.</p>
+
+        <h4>Banner de actualización (aparece solo a veces, encima de todo)</h4>
+        <p>La app se actualiza sola, sin Play Store, y avisa con un banner no bloqueante: «Nueva versión 1.7»
+          + notas de la versión + botón «Actualizar»; «Descargando actualización… 45%» con barra de progreso;
+          «Verificando la descarga…» / «Instalando…» con barra indeterminada.</p>
+
+        <h4>Banner de modo dormir (solo si está activo)</h4>
+        <p>Icono de luna + «Modo a dormir activo · los avisos volverán a las 8:00» + botón de texto «Ya estoy
+          despierto».</p>
+
+        <h4>Lista del historial</h4>
+        <p>Agrupada por día, con el día más reciente arriba. Cabecera de día: «Lunes 17 de agosto 2026». Debajo,
+          una tarjeta por registro, de más reciente a más antiguo:</p>
+        <ul>
+          <li>Hora en negrita a la izquierda: «14:30»</li>
+          <li>Etiqueta del tipo, en su color: «Comida»</li>
+          <li>Contenido del registro (ver P9 para saber qué contiene cada tipo)</li>
+          <li>Si hay foto: una fila pulsable «Ver foto» / «Ocultar foto» con una flecha, que despliega la
+            imagen dentro de la tarjeta (máximo 280&nbsp;dp de alto)</li>
+        </ul>
+
+        <h4>Estado vacío</h4>
+        <p>Texto centrado: <em>«Aún no has anotado nada. Cuando llegue una notificación, pulsa Sí para
+          empezar.»</em></p>
+
+        <h4>Botón flotante</h4>
+        <p>FAB extendido abajo a la derecha: icono + y texto «Anotar» → abre P2.</p>
+      </div>
+    </div>
+
+    <div class="pantalla">
+      <div class="codigo">P2</div>
+      <div class="cuerpo">
+        <h3>Diálogo «¿Qué quieres anotar?»</h3>
+        <p>Se abre al pulsar el FAB. Tres botones a ancho completo, apilados:</p>
+        <ul>
+          <li><strong>Comida</strong> (botón sólido, icono de plato) → P3</li>
+          <li><strong>Caminata</strong> (contorneado, icono de persona andando) → P4, entrando directamente en
+            el paso de los minutos</li>
+          <li><strong>Gimnasio</strong> (contorneado, icono de mancuerna) → P5</li>
+        </ul>
+        <p>Abajo: «Cancelar».</p>
+      </div>
+    </div>
+
+    <div class="pantalla">
+      <div class="codigo">P3</div>
+      <div class="cuerpo">
+        <h3>Anotar comida</h3>
+        <p>Pantalla completa, con barra superior «Anotar comida». Se llega desde P2 o desde la notificación
+          (P10). Contenido, en orden y con scroll:</p>
+        <ol>
+          <li><strong>Fila de fecha y hora</strong>: icono de reloj, «Fecha y hora» en pequeño, debajo «Lunes 17
+            de agosto, 14:30», y a la derecha un botón «Cambiar» que abre el selector de fecha y luego el de
+            hora. <em>No se permiten fechas futuras</em> (una comida olvidada siempre es de hoy o de antes).</li>
+          <li><strong>«¿Qué has comido?»</strong> — campo de texto de 4 líneas mínimo. Placeholder: <em>«¿Qué has
+            comido? Recuerda anotar la cantidad (ej.: 1 o 2 platos de macarrones)»</em>.</li>
+          <li><strong>«Foto del plato (opcional)»</strong> — tres estados: sin foto (dos botones al 50%, «Cámara»
+            y «Galería»), procesando (spinner + «Guardando foto…») y con foto (miniatura a ancho completo, máx.
+            240&nbsp;dp, y debajo a la derecha «Quitar foto»).</li>
+          <li><strong>«¿Cómo te has sentido? (opcional)»</strong> — campo de texto de 3 líneas. Placeholder:
+            <em>«Puedes dejarlo en blanco si no quieres anotarlo»</em>. Si se rellena, se guarda como un registro
+            <strong>aparte</strong> de tipo «Estado de ánimo» con la misma hora.</li>
+          <li>Abajo a la derecha: «Cancelar» y «Guardar». Guardar está deshabilitado si el campo de comida está
+            vacío o si la foto aún se está procesando.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="pantalla">
+      <div class="codigo">P4</div>
+      <div class="cuerpo">
+        <h3>Caminata y estado de ánimo</h3>
+        <p>Pantalla completa con barra superior «Seguimiento». Son <strong>tres pasos dentro de la misma
+          pantalla</strong> (no hay indicador de progreso, y quizá debería haberlo):</p>
+        <ul>
+          <li><strong>Paso 1 — «¿Has ido a caminar?»</strong> (solo si se entra desde la notificación): dos
+            botones al 50%, «Sí» y «No». Con «No» se cierra sin guardar nada.</li>
+          <li><strong>Paso 2 — «¿Cuánto tiempo has caminado?»</strong>: la misma fila de fecha y hora de P3, un
+            campo numérico «Minutos», y abajo «Atrás»/«Cancelar» + «Continuar» (deshabilitado si los minutos
+            son 0).</li>
+          <li><strong>Paso 3 — «¿Cómo te has sentido?»</strong>: texto explicativo <em>«Si quieres, anota cómo te
+            has sentido. Es opcional.»</em>, campo de 4 líneas con placeholder <em>«Describe cómo te sientes ahora
+            mismo»</em>, y abajo «Cancelar» + un botón que dice «Omitir» si el campo está vacío o «Guardar» si
+            tiene texto.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="pantalla">
+      <div class="codigo">P5</div>
+      <div class="cuerpo">
+        <h3>Diálogo de gimnasio</h3>
+        <p>«¿Has ido al gimnasio hoy?» con dos botones a ancho completo: «Sí» (sólido, icono de mancuerna) y
+          «No». Abajo, «Cancelar». Se guarda directamente, sin más pasos.</p>
+      </div>
+    </div>
+
+    <div class="pantalla">
+      <div class="codigo">P6</div>
+      <div class="cuerpo">
+        <h3>Diálogo «Me voy a dormir»</h3>
+        <p>Icono de luna, título «¿Te vas a dormir?», texto <em>«No recibirás más recordatorios de comida esta
+          noche. Volverán solos mañana a las 8:00.»</em>, y botones «Todavía no» / «Buenas noches». Al confirmar
+          sale un aviso emergente: <em>«Buenas noches. Te avisaré mañana a las 8:00 🌙»</em>.</p>
+      </div>
+    </div>
+
+    <div class="pantalla">
+      <div class="codigo">P7</div>
+      <div class="cuerpo">
+        <h3>Diálogo «Exportar PDF»</h3>
+        <p><strong>Esta pantalla se queda obsoleta con lo nuevo — ver §5.4.</strong> Hoy es un diálogo con dos
+          opciones excluyentes: «Todo el historial» y «Rango de fechas» (que al elegirlo muestra dos botones,
+          «Desde» y «Hasta», que abren sendos selectores de fecha).</p>
+        <p>Abajo: «Cancelar» y «Exportar PDF». Si el rango está incompleto o al revés, el botón simplemente no
+          hace nada — sin mensaje de error. Otro punto flojo.</p>
+      </div>
+    </div>
+
+    <div class="pantalla">
+      <div class="codigo">P8</div>
+      <div class="cuerpo">
+        <h3>Ajustes</h3>
+        <p>Pantalla completa con flecha de volver. Dos bloques.</p>
+        <h4>Actualizaciones</h4>
+        <ul>
+          <li>Fila con «Buscar actualizaciones» + «Comprueba automáticamente si hay una versión nueva.» y un
+            interruptor.</li>
+          <li>Botón «Buscar actualizaciones» con el estado al lado: spinner, «Estás al día ✓», «Hay una versión
+            nueva: 1.7», «Descargando… 45%», «Verificando…», «Instalando…», o un mensaje de error en rojo («Sin
+            conexión.», «Falló la descarga.», «La descarga estaba corrupta (se descartó).»…).</li>
+          <li>Si hay versión nueva, aparece un botón «Descargar e instalar».</li>
+        </ul>
+        <h4>Acerca de</h4>
+        <p>«Crónicas del Apetito» y «Versión 1.6 (7)».</p>
+      </div>
+    </div>
+
+    <div class="pantalla">
+      <div class="codigo">P9</div>
+      <div class="cuerpo">
+        <h3>Los cuatro tipos de registro</h3>
+        <p>Qué datos hay realmente. Esto es importante para diseñar las vistas nuevas: <strong>no hay más datos
+          que estos</strong>.</p>
+        <div class="tabla-scroll">
+          <table>
+            <thead><tr><th>Tipo</th><th>Qué guarda</th><th>Ejemplo</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Comida</strong></td><td>Texto libre + fecha/hora + foto opcional</td><td>«2 platos de macarrones»</td></tr>
+              <tr><td><strong>Caminata</strong></td><td>Un número de minutos + fecha/hora</td><td>«45 min»</td></tr>
+              <tr><td><strong>Estado de ánimo</strong></td><td>Texto libre + fecha/hora</td><td>«Ansioso después de comer»</td></tr>
+              <tr><td><strong>Gimnasio</strong></td><td>Solo «Sí» o «No» + fecha/hora</td><td>«Sí»</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>No hay calorías, ni peso, ni categorías de comida, ni escala numérica de ánimo. Si tu diseño necesita
+          alguno de esos datos para funcionar, dímelo antes de dibujarlo: es una decisión de producto, no de
+          maquetación.</p>
+      </div>
+    </div>
+
+    <div class="pantalla">
+      <div class="codigo">P10</div>
+      <div class="cuerpo">
+        <h3>Notificaciones</h3>
+        <p>No son pantallas, pero se ven mucho.</p>
+        <ul>
+          <li><strong>Recordatorio de comida</strong>, cada hora en punto de 8:00 a 00:00: «¿Has comido algo?» /
+            «Toca Sí para anotarlo, Caminar si sales a andar, o No para descartar», con tres acciones:
+            <strong>Sí</strong> (abre P3), <strong>Caminar</strong> (abre P4), <strong>No</strong> (descarta).</li>
+          <li><strong>Recordatorio de gimnasio</strong>, a las 22:00 entre semana: «¿Has ido al gimnasio hoy?»
+            con <strong>Sí</strong> / <strong>No</strong>, que registran sin abrir la app. No se pregunta los
+            fines de semana, ni si ya hay registro ese día, ni si ya se ha ido dos veces esa semana.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="pantalla">
+      <div class="codigo">P11</div>
+      <div class="cuerpo">
+        <h3>El PDF exportado</h3>
+        <p>También es un entregable visual, y hoy está feo. Es A4 generado a mano:</p>
+        <ul>
+          <li>Título «Crónicas del Apetito» en serif negrita.</li>
+          <li>Subtítulo en cursiva gris: «Historial completo» o «Rango: 01/08/2026 – 15/08/2026».</li>
+          <li>Por cada día: la fecha en marrón negrita, y debajo una línea por registro: hora en monoespaciada a
+            la izquierda, luego <code>[Comida] 2 platos de macarrones</code>.</li>
+          <li>Si el registro tiene foto, una miniatura cuadrada de 96&nbsp;pt a la derecha, con un borde fino.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="s5">
+    <h2><span class="num">Sección 05</span>Lo nuevo que hay que diseñar</h2>
+    <p>Aquí está el grueso del encargo. Hoy la app solo sabe hacer una cosa: <strong>enseñarme todo el historial
+      seguido, en una lista infinita</strong>. Cuando llevas meses registrando, eso deja de servir: no puedo
+      mirar «cómo fue la semana pasada» ni «qué pasó en julio» sin hacer scroll a ciegas.</p>
+    <p>Lo nuevo son <strong>tres piezas que se combinan entre sí</strong>: vistas, filtro y compartir.</p>
+
+    <h3>5.1 · Vistas: Día, Semana y Mes</h3>
+    <p>Hay que poder cambiar entre tres formas de mirar los mismos datos.</p>
+    <p><strong>Vista Día</strong> — es la que ya existe (P1): la lista cronológica agrupada por día, con todo el
+      detalle de cada registro. Se queda como está en concepto, aunque la rediseñes visualmente.</p>
+    <p><strong>Vista Semana</strong> — los siete días de una semana (lunes a domingo) de un vistazo. Tiene que
+      responder de golpe a: <em>¿qué días comí y cuántas veces? ¿qué días caminé y cuánto? ¿fui al gimnasio? ¿cómo
+      estuve de ánimo?</em> Debe permitir moverse a la semana anterior y a la siguiente. Y creo que pide un pequeño
+      resumen de la semana (número de comidas anotadas, minutos totales caminados, días de gimnasio), pero la
+      forma la decides tú.</p>
+    <p><strong>Vista Mes</strong> — el mes entero, previsiblemente como una rejilla de calendario. Cada día tiene
+      que mostrar de un vistazo si hubo actividad y de qué tipo, sin abrirlo. Al tocar un día, se ve el detalle
+      de ese día. Navegación entre meses. Aquí también encaja un resumen del mes.</p>
+    <p>El reto de la vista Mes es que hay <strong>cuatro tipos</strong> de registro y una casilla de calendario es
+      diminuta. Cuatro puntitos de colores es la solución obvia; probablemente haya otra mejor. Y tiene que
+      seguir funcionando con el zoom de fuente a 1.5×.</p>
+    <p><span class="decision">Decides tú</span><br>
+      <strong>Cómo se cambia de vista</strong>: pestañas, un selector segmentado, un desplegable en la barra…
+      Lo único que pido es que <strong>se vea en qué vista estoy sin tener que abrir nada</strong>, y que llegar
+      a otra vista cueste un toque.</p>
+
+    <h3>5.2 · Filtro por rango de fechas</h3>
+    <p>Un filtro «desde / hasta» que <strong>acota qué registros se ven</strong>. Hoy el rango de fechas solo
+      existe escondido dentro del diálogo de exportar (P7); pasa a ser algo de primera clase, visible en la
+      propia pantalla. Necesita:</p>
+    <ul>
+      <li>Elegir fecha de inicio y fecha de fin. Nunca fechas futuras.</li>
+      <li>Atajos rápidos, porque el 90% de las veces voy a querer lo mismo: «Últimos 7 días», «Últimos 30 días»,
+        «Este mes», «Todo». Los nombres exactos los podemos afinar.</li>
+      <li><strong>Que se vea que hay un filtro activo</strong> cuando lo hay — algo tipo etiqueta o chip con
+        «1 – 15 de agosto» y una forma rápida de quitarlo. Este punto me importa: la peor versión de esto es
+        mirar una pantalla medio vacía sin darme cuenta de que estoy filtrando.</li>
+      <li>Un estado vacío propio: no es lo mismo <em>«aún no has anotado nada»</em> que <em>«no hay nada anotado
+        en estas fechas»</em>.</li>
+    </ul>
+
+    <h3>5.3 · Y se combinan</h3>
+    <p><strong>Las vistas y el filtro no son alternativas: funcionan a la vez.</strong> Vista Semana con un rango
+      puesto, vista Mes con un rango puesto, vista Día con un rango puesto. Las seis combinaciones tienen que
+      tener sentido.</p>
+    <p>Eso abre preguntas que necesito que resuelvas tú en el diseño:</p>
+    <ul>
+      <li>En vista <strong>Mes</strong> con un rango del 1 al 15: ¿los días del 16 en adelante se ven atenuados,
+        vacíos, o se ocultan? Yo me inclino por atenuados —así el calendario sigue siendo un calendario—, pero
+        decídelo tú y déjalo dibujado.</li>
+      <li>Si el rango <strong>cruza varios meses o semanas</strong> (por ejemplo, del 20 de julio al 10 de
+        agosto) y estoy en vista Mes: ¿qué mes se muestra primero? ¿la navegación entre meses queda limitada al
+        rango o puedo salirme de él?</li>
+      <li>¿Cambiar de vista <strong>conserva</strong> el filtro? Mi respuesta: sí. Pero enséñame cómo se comunica
+        eso.</li>
+      <li>¿Navegar a la semana o mes anterior <strong>rompe</strong> el filtro, o lo mueve? Aquí no lo tengo
+        claro; propón algo.</li>
+    </ul>
+
+    <h3>5.4 · Compartir lo que estás viendo</h3>
+    <p>Hoy solo se puede exportar «todo» o «un rango», y siempre con la misma pinta de lista. Lo nuevo:
+      <strong>se comparte exactamente lo que estás mirando</strong>, con la vista y el filtro que tengas puestos
+      en ese momento.</p>
+    <ul>
+      <li>Vista Semana + semana del 10 al 16 de agosto → se comparte esa semana, con la pinta de la vista Semana.</li>
+      <li>Vista Mes + agosto → se comparte agosto, con la pinta del calendario mensual.</li>
+      <li>Vista Día + rango del 1 al 15 → se comparte esa lista, acotada.</li>
+    </ul>
+    <p>Esto quiere decir que <strong>cada vista nueva necesita también su versión «para compartir»</strong>, no
+      solo su versión en pantalla. No tienen por qué ser idénticas: en papel hay más sitio y no hay scroll ni
+      toques.</p>
+
+    <div class="nota clave">
+      <span class="etiqueta">Lo que más me importa de todo el encargo</span>
+      <p><strong>Legible impreso y en blanco y negro.</strong> Esto acaba en la consulta de la psicóloga. Si dos
+        tipos de registro solo se distinguen por el color, en una fotocopia son el mismo.</p>
+    </div>
+
+    <p>El resto de requisitos del documento que sale:</p>
+    <ul>
+      <li>Encabezado que diga <strong>qué se está mirando</strong>: «Semana del 10 al 16 de agosto de 2026»,
+        «Agosto 2026», «Del 1 al 15 de agosto de 2026». Quien lo recibe tiene que saber qué le ha llegado sin
+        preguntar.</li>
+      <li>Las fotos de los platos deben seguir apareciendo cuando las hay.</li>
+    </ul>
+    <p><span class="decision">Decides tú</span></p>
+    <ul>
+      <li>¿Se mantiene solo el PDF, o tiene sentido compartir <strong>una imagen</strong> para las vistas Semana
+        y Mes, que son visuales y caben en una pantalla? Un PDF de una semana por WhatsApp es incómodo; una
+        imagen se ve en la propia conversación.</li>
+      <li>El diálogo de exportar actual (P7) queda redundante en cuanto el filtro vive en la pantalla. ¿Lo
+        eliminamos y dejamos un solo botón «Compartir» que hereda vista + filtro, o hace falta conservar un
+        «compartir todo el historial» aparte?</li>
+    </ul>
+
+    <h3>5.5 · Y todo esto tiene que caber en la barra superior</h3>
+    <p>Recordatorio de lo que la barra ya sostiene hoy: título, ajustes, modo dormir y exportar. Ahora hay que
+      añadir el selector de vista, el filtro y compartir, más la navegación entre semanas y meses. <strong>No
+      cabe tal cual.</strong> Reorganizar la navegación de la pantalla principal es parte del encargo, no un
+      detalle: mueve lo que haga falta a un menú, a una barra inferior, a donde tenga sentido.</p>
+  </section>
+
+  <section id="s6">
+    <h2><span class="num">Sección 06</span>Reglas que el diseño no puede romper</h2>
+    <ol>
+      <li><strong>Nada de culpabilizar.</strong> Sin objetivos incumplidos, sin rojo de alarma, sin «llevas 3
+        días sin registrar». Un día vacío es un día vacío, no un fracaso.</li>
+      <li><strong>Los cuatro tipos siempre distinguibles</strong>, también en blanco y negro y también para
+        alguien que no distingue bien los colores.</li>
+      <li><strong>Anotar tiene que seguir siendo rapidísimo.</strong> El camino notificación → texto → guardar es
+        el corazón de la app. Si el rediseño mete un paso más ahí, no compensa.</li>
+      <li><strong>Se lee de un vistazo, con una mano, a menudo de pie.</strong> Texto legible, nada de
+        tipografías finas de 11&nbsp;sp.</li>
+      <li><strong>No inventes datos que no existen</strong> (ver P9).</li>
+    </ol>
+  </section>
+
+  <section id="s7">
+    <h2><span class="num">Sección 07</span>Qué necesito que me entregues</h2>
+    <ul>
+      <li>Las pantallas actuales rediseñadas: <strong>P1, P2, P3, P4, P7</strong> (o lo que la sustituya) y
+        <strong>P8</strong>, más los diálogos P5 y P6.</li>
+      <li>Las pantallas nuevas: <strong>vista Semana</strong>, <strong>vista Mes</strong>, <strong>el filtro por
+        rango</strong> —incluidos el estado con filtro activo y el vacío filtrado— y <strong>cómo se cambia de
+        vista</strong>.</li>
+      <li>Al menos un ejemplo de <strong>combinación</strong> vista + filtro (§5.3), con las decisiones
+        dibujadas, no descritas.</li>
+      <li>La versión <strong>para compartir</strong> de cada vista (§5.4).</li>
+      <li>El <strong>sistema</strong>: paleta completa con sus roles de Material 3, escala tipográfica,
+        tratamiento de los cuatro tipos, espaciados, radios, elevaciones. Necesito poder aplicarlo a pantallas
+        que tú no hayas dibujado.</li>
+      <li><strong>Estados</strong>: vacío, con pocos datos (2-3 registros) y con muchos (un mes cargado). Las
+        pantallas de portfolio siempre tienen la cantidad perfecta de datos; las reales, no.</li>
+    </ul>
+    <p>Formato: lo que te sea cómodo (Figma, un ZIP de assets, o los dos), pero <strong>los iconos y logos en
+      vector</strong>, y los colores con su hex escrito. Si la tipografía no es Roboto, dime cuál y con qué
+      licencia.</p>
+
+    <div class="nota">
+      <span class="etiqueta">Un aviso por experiencia</span>
+      <p>En cuanto tenga tu diseño lo voy a montar en Compose y lo voy a mirar en un móvil real con el zoom de
+        fuente a 1.3× y a 1.5×. Ahí es donde se rompen los diseños. Si ya has pensado qué pasa cuando el texto
+        crece, me ahorras una ronda entera.</p>
+    </div>
+  </section>
+
+  <section id="s8">
+    <h2><span class="num">Sección 08</span>Preguntas abiertas</h2>
+    <p>Resumen de las decisiones que te dejo a ti y que espero ver resueltas en el diseño:</p>
+    <ol>
+      <li>Cómo se cambia de vista Día / Semana / Mes <em>(§5.1)</em>.</li>
+      <li>Cómo se representan cuatro tipos de registro en una casilla de calendario <em>(§5.1)</em>.</li>
+      <li>Qué pasa con los días fuera del rango en las vistas Semana y Mes <em>(§5.3)</em>.</li>
+      <li>Si cambiar de vista o navegar entre semanas y meses conserva, mueve o rompe el filtro <em>(§5.3)</em>.</li>
+      <li>Si compartimos solo PDF o también imagen <em>(§5.4)</em>.</li>
+      <li>Si el diálogo de exportar actual desaparece del todo <em>(§5.4)</em>.</li>
+      <li>Cómo se reorganiza la barra superior para que quepa todo <em>(§5.5)</em>.</li>
+      <li>Si propones modo oscuro — y en tal caso, presupuestado aparte <em>(§2)</em>.</li>
+    </ol>
+
+    <p class="cierre">Cualquier cosa que no esté clara aquí, pregúntame antes de dibujarla. Es mucho más barato
+      que rehacerla.</p>
+  </section>
+
+</div>

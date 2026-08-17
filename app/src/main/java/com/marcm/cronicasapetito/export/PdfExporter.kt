@@ -7,6 +7,8 @@ import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.Typeface
 import android.graphics.pdf.PdfDocument
+import androidx.core.content.res.ResourcesCompat
+import com.marcm.cronicasapetito.R
 import com.marcm.cronicasapetito.data.EntryKind
 import com.marcm.cronicasapetito.data.MealEntry
 import com.marcm.cronicasapetito.data.PhotoStore
@@ -19,171 +21,235 @@ import java.util.Locale
 import kotlin.math.max
 import kotlin.math.min
 
+/**
+ * PDF A4 de lo que se está mirando.
+ *
+ * Requisito duro: esto acaba impreso o fotocopiado en la consulta, así que cada
+ * tipo lleva su **glifo** delante de la etiqueta y hay una leyenda al pie de cada
+ * página. En blanco y negro la información sigue estando toda.
+ */
 object PdfExporter {
 
     private const val PAGE_WIDTH = 595   // A4 a 72 dpi
     private const val PAGE_HEIGHT = 842
-    private const val MARGIN = 40f
-    private const val LINE_HEIGHT = 16f
-    private const val IMG_SIZE = 96f     // lado de la miniatura en el PDF (pt)
-    private const val IMG_GAP = 10f      // separación entre texto y foto
+    private const val MARGIN = 44f
+    private const val LINE_HEIGHT = 15f
+    private const val IMG_SIZE = 84f
+    private const val IMG_GAP = 10f
 
+    private const val TINTA = 0xFF2A2018.toInt()
+    private const val TINTA_SUAVE = 0xFF5A4A38.toInt()
+    private const val TENUE = 0xFFA19281.toInt()
+    private const val GRIS_ETIQUETA = 0xFF8A7A66.toInt()
+    private const val LINEA = 0xFFE4D6C1.toInt()
+    private const val LINEA_SUAVE = 0xFFF1E9DC.toInt()
+
+    private val glifos = mapOf(
+        EntryKind.FOOD to "●",
+        EntryKind.WALK to "▲",
+        EntryKind.MOOD to "◆",
+        EntryKind.GYM to "■",
+    )
+    private val colores = mapOf(
+        EntryKind.FOOD to 0xFF9A5B2F.toInt(),
+        EntryKind.WALK to 0xFF5C7549.toInt(),
+        EntryKind.MOOD to 0xFF7B5C90.toInt(),
+        EntryKind.GYM to 0xFF47698C.toInt(),
+    )
+    private const val LEYENDA = "● comida   ▲ caminata   ◆ ánimo   ■ gimnasio"
+
+    /**
+     * @param titulo lo que se está mirando, tal cual se lee en la app
+     *   («Semana del 10 al 16 de agosto», «Agosto 2026», «Historial completo»).
+     */
     suspend fun export(
         context: Context,
         entries: List<MealEntry>,
-        from: Long?,
-        to: Long?
+        titulo: String,
     ): File = withContext(Dispatchers.IO) {
         val doc = PdfDocument()
+        val p = Pinceles(context)
 
-        val titlePaint = Paint().apply {
-            color = 0xFF2A1B0E.toInt()
-            textSize = 18f
-            typeface = Typeface.create(Typeface.SERIF, Typeface.BOLD)
-        }
-        val subtitlePaint = Paint().apply {
-            color = 0xFF555555.toInt()
-            textSize = 11f
-            typeface = Typeface.create(Typeface.DEFAULT, Typeface.ITALIC)
-        }
-        val dayPaint = Paint().apply {
-            color = 0xFF7A4E2D.toInt()
-            textSize = 14f
-            typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
-        }
-        val hourPaint = Paint().apply {
-            color = 0xFF2A1B0E.toInt()
-            textSize = 12f
-            typeface = Typeface.create(Typeface.MONOSPACE, Typeface.BOLD)
-        }
-        val bodyPaint = Paint().apply {
-            color = 0xFF2A1B0E.toInt()
-            textSize = 12f
-            typeface = Typeface.DEFAULT
-        }
-        val imgPaint = Paint().apply {
-            isAntiAlias = true
-            isFilterBitmap = true
-        }
-        val imgBorderPaint = Paint().apply {
-            style = Paint.Style.STROKE
-            strokeWidth = 0.8f
-            color = 0xFFBBA78F.toInt()
-            isAntiAlias = true
-        }
+        val es = Locale("es")
+        val dayFormat = SimpleDateFormat("EEEE d 'de' MMMM yyyy", es)
+        val hourFormat = SimpleDateFormat("HH:mm", es)
+        val generado = SimpleDateFormat("dd/MM/yyyy", es).format(Date())
 
-        val dayFormat = SimpleDateFormat("EEEE d 'de' MMMM yyyy", Locale("es"))
-        val hourFormat = SimpleDateFormat("HH:mm", Locale("es"))
-        val rangeFormat = SimpleDateFormat("dd/MM/yyyy", Locale("es"))
-
-        var pageNumber = 1
-        var page = doc.startPage(PdfDocument.PageInfo.Builder(PAGE_WIDTH, PAGE_HEIGHT, pageNumber).create())
+        var pagina = 1
+        var page = doc.startPage(PdfDocument.PageInfo.Builder(PAGE_WIDTH, PAGE_HEIGHT, pagina).create())
         var canvas = page.canvas
-        var y = MARGIN + 20f
+        var y = cabecera(canvas, p, titulo, pagina)
 
-        // Cabecera
-        canvas.drawText("Crónicas del Apetito", MARGIN, y, titlePaint); y += 22f
-        val subtitle = if (from != null && to != null) {
-            "Rango: ${rangeFormat.format(Date(from))} – ${rangeFormat.format(Date(to))}"
-        } else {
-            "Historial completo"
+        fun nuevaPagina() {
+            pie(canvas, p, generado)
+            doc.finishPage(page)
+            pagina++
+            page = doc.startPage(
+                PdfDocument.PageInfo.Builder(PAGE_WIDTH, PAGE_HEIGHT, pagina).create()
+            )
+            canvas = page.canvas
+            y = cabecera(canvas, p, titulo, pagina)
         }
-        canvas.drawText(subtitle, MARGIN, y, subtitlePaint); y += 24f
 
         if (entries.isEmpty()) {
-            canvas.drawText("Sin registros en este rango.", MARGIN, y, bodyPaint)
+            canvas.drawText("Sin registros en este periodo.", MARGIN, y + 24f, p.cuerpo)
         } else {
-            val grouped = entries.groupBy { dayFormat.format(Date(it.timestampMillis)) }
-            for ((day, dayEntries) in grouped) {
-                if (y > PAGE_HEIGHT - MARGIN - 60f) {
-                    doc.finishPage(page)
-                    pageNumber++
-                    page = doc.startPage(PdfDocument.PageInfo.Builder(PAGE_WIDTH, PAGE_HEIGHT, pageNumber).create())
-                    canvas = page.canvas
-                    y = MARGIN + 20f
+            val porDia = entries.groupBy { dayFormat.format(Date(it.timestampMillis)) }
+            for ((dia, registros) in porDia) {
+                if (y > PAGE_HEIGHT - MARGIN - 80f) nuevaPagina()
+
+                y += 26f
+                canvas.drawText(dia.replaceFirstChar { it.uppercase() }, MARGIN, y, p.dia)
+                y += 6f
+                canvas.drawLine(MARGIN, y, PAGE_WIDTH - MARGIN, y, p.linea)
+                y += 6f
+
+                for (entry in registros) {
+                    val glifo = glifos[entry.kind] ?: "·"
+                    val etiqueta = "$glifo ${etiquetaDe(entry.kind)}"
+                    val foto = entry.photoPath?.let { PhotoStore.decodeFile(it, 240) }
+
+                    val textoIzquierda = MARGIN + 132f
+                    val textoDerecha =
+                        if (foto != null) PAGE_WIDTH - MARGIN - IMG_SIZE - IMG_GAP
+                        else PAGE_WIDTH - MARGIN
+                    val lineas = partir(contenidoDe(entry), p.cuerpo, textoDerecha - textoIzquierda)
+                    val alto = max(LINE_HEIGHT * lineas.size, if (foto != null) IMG_SIZE else 0f) + 10f
+
+                    if (y + alto > PAGE_HEIGHT - MARGIN - 40f) nuevaPagina()
+
+                    y += 14f
+                    canvas.drawText(hourFormat.format(Date(entry.timestampMillis)), MARGIN, y, p.hora)
+                    p.etiqueta.color = colores[entry.kind] ?: TINTA_SUAVE
+                    canvas.drawText(etiqueta, MARGIN + 44f, y, p.etiqueta)
+                    lineas.forEachIndexed { i, linea ->
+                        canvas.drawText(linea, textoIzquierda, y + i * LINE_HEIGHT, p.cuerpo)
+                    }
+                    if (foto != null) {
+                        val izquierda = PAGE_WIDTH - MARGIN - IMG_SIZE
+                        val arriba = y - 10f
+                        val destino = RectF(izquierda, arriba, izquierda + IMG_SIZE, arriba + IMG_SIZE)
+                        canvas.drawBitmap(foto, recorteCuadrado(foto), destino, p.imagen)
+                        canvas.drawRect(destino, p.bordeImagen)
+                    }
+                    y += alto - 6f
+                    canvas.drawLine(MARGIN, y, PAGE_WIDTH - MARGIN, y, p.lineaSuave)
                 }
-                canvas.drawText(day.replaceFirstChar { it.uppercase() }, MARGIN, y, dayPaint)
-                y += LINE_HEIGHT + 4f
-
-                for (entry in dayEntries) {
-                    val hour = hourFormat.format(Date(entry.timestampMillis))
-                    val label = kindLabel(entry.kind)
-                    val firstLine = "[$label] ${entry.content}"
-
-                    // Foto a la derecha (si la hay): reservamos una columna cuadrada.
-                    val photo = entry.photoPath?.let { PhotoStore.decodeFile(it, 260) }
-                    val textLeft = MARGIN + 60f
-                    val textRight = if (photo != null) PAGE_WIDTH - MARGIN - IMG_SIZE - IMG_GAP
-                                    else PAGE_WIDTH - MARGIN
-
-                    val lines = wrapText(firstLine, bodyPaint, textRight - textLeft)
-                    val textHeight = LINE_HEIGHT * lines.size
-                    val rowHeight = max(textHeight, if (photo != null) IMG_SIZE else 0f) + 8f
-
-                    if (y + rowHeight > PAGE_HEIGHT - MARGIN) {
-                        doc.finishPage(page)
-                        pageNumber++
-                        page = doc.startPage(PdfDocument.PageInfo.Builder(PAGE_WIDTH, PAGE_HEIGHT, pageNumber).create())
-                        canvas = page.canvas
-                        y = MARGIN + 20f
-                    }
-                    canvas.drawText(hour, MARGIN, y, hourPaint)
-                    lines.forEachIndexed { idx, line ->
-                        canvas.drawText(line, textLeft, y + idx * LINE_HEIGHT, bodyPaint)
-                    }
-                    if (photo != null) {
-                        val left = PAGE_WIDTH - MARGIN - IMG_SIZE
-                        val top = y - 11f   // el borde superior queda a la altura de la 1ª línea
-                        val dst = RectF(left, top, left + IMG_SIZE, top + IMG_SIZE)
-                        canvas.drawBitmap(photo, centerCropSquare(photo), dst, imgPaint)
-                        canvas.drawRect(dst, imgBorderPaint)
-                    }
-                    y += rowHeight
-                }
-                y += 8f
             }
         }
 
+        pie(canvas, p, generado)
         doc.finishPage(page)
 
-        val outDir = File(context.cacheDir, "exports").apply { mkdirs() }
-        val stamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
-        val outFile = File(outDir, "cronicas_apetito_$stamp.pdf")
-        outFile.outputStream().use { doc.writeTo(it) }
+        val dir = File(context.cacheDir, "exports").apply { mkdirs() }
+        val sello = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
+        val file = File(dir, "cronicas_apetito_$sello.pdf")
+        file.outputStream().use { doc.writeTo(it) }
         doc.close()
-        outFile
+        file
     }
 
-    private fun kindLabel(kind: String): String = when (kind) {
+    // -----------------------------------------------------------------------
+
+    private fun cabecera(
+        canvas: android.graphics.Canvas,
+        p: Pinceles,
+        titulo: String,
+        pagina: Int,
+    ): Float {
+        var y = MARGIN + 14f
+        canvas.drawText("CRÓNICAS DEL APETITO", MARGIN, y, p.sobretitulo)
+        y += 22f
+        canvas.drawText(titulo, MARGIN, y, p.titulo)
+        canvas.drawText("pág. $pagina", PAGE_WIDTH - MARGIN, y, p.paginaNum)
+        y += 10f
+        canvas.drawLine(MARGIN, y, PAGE_WIDTH - MARGIN, y, p.lineaFuerte)
+        return y
+    }
+
+    private fun pie(canvas: android.graphics.Canvas, p: Pinceles, generado: String) {
+        val y = PAGE_HEIGHT - MARGIN + 6f
+        canvas.drawLine(MARGIN, y - 14f, PAGE_WIDTH - MARGIN, y - 14f, p.linea)
+        canvas.drawText(LEYENDA, MARGIN, y, p.pie)
+        canvas.drawText("generado el $generado", PAGE_WIDTH - MARGIN, y, p.pieDerecha)
+    }
+
+    private fun etiquetaDe(kind: String): String = when (kind) {
         EntryKind.FOOD -> "Comida"
         EntryKind.WALK -> "Caminata"
-        EntryKind.MOOD -> "Estado"
+        EntryKind.MOOD -> "Ánimo"
         EntryKind.GYM -> "Gimnasio"
         else -> kind
     }
 
-    /** Rectángulo cuadrado centrado sobre el bitmap (recorte tipo "center-crop"). */
-    private fun centerCropSquare(bmp: Bitmap): Rect {
-        val side = min(bmp.width, bmp.height)
-        val left = (bmp.width - side) / 2
-        val top = (bmp.height - side) / 2
-        return Rect(left, top, left + side, top + side)
+    private fun contenidoDe(entry: MealEntry): String = when (entry.kind) {
+        EntryKind.WALK -> entry.minutes?.let { "$it minutos" } ?: entry.content
+        else -> entry.content
     }
 
-    private fun wrapText(text: String, paint: Paint, maxWidth: Float): List<String> {
-        val words = text.split(" ")
-        val lines = mutableListOf<String>()
-        var current = StringBuilder()
-        for (w in words) {
-            val candidate = if (current.isEmpty()) w else "$current $w"
-            if (paint.measureText(candidate) <= maxWidth) {
-                current = StringBuilder(candidate)
+    private fun recorteCuadrado(bmp: Bitmap): Rect {
+        val lado = min(bmp.width, bmp.height)
+        val izquierda = (bmp.width - lado) / 2
+        val arriba = (bmp.height - lado) / 2
+        return Rect(izquierda, arriba, izquierda + lado, arriba + lado)
+    }
+
+    private fun partir(texto: String, paint: Paint, anchoMax: Float): List<String> {
+        val palabras = texto.split(" ")
+        val lineas = mutableListOf<String>()
+        var actual = StringBuilder()
+        for (palabra in palabras) {
+            val candidata = if (actual.isEmpty()) palabra else "$actual $palabra"
+            if (paint.measureText(candidata) <= anchoMax) {
+                actual = StringBuilder(candidata)
             } else {
-                if (current.isNotEmpty()) lines += current.toString()
-                current = StringBuilder(w)
+                if (actual.isNotEmpty()) lineas += actual.toString()
+                actual = StringBuilder(palabra)
             }
         }
-        if (current.isNotEmpty()) lines += current.toString()
-        return lines.ifEmpty { listOf("") }
+        if (actual.isNotEmpty()) lineas += actual.toString()
+        return lineas.ifEmpty { listOf("") }
+    }
+
+    private class Pinceles(context: Context) {
+        private val lora: Typeface? = ResourcesCompat.getFont(context, R.font.lora)
+        private val serif = lora ?: Typeface.create(Typeface.SERIF, Typeface.BOLD)
+
+        val sobretitulo = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = GRIS_ETIQUETA; textSize = 8f
+            typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+            letterSpacing = 0.12f
+        }
+        val titulo = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = TINTA; textSize = 17f; typeface = serif
+        }
+        val paginaNum = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = TENUE; textSize = 9f; textAlign = Paint.Align.RIGHT
+        }
+        val dia = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = TINTA; textSize = 12f; typeface = serif
+        }
+        val hora = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = TINTA_SUAVE; textSize = 9.5f
+            typeface = Typeface.create(Typeface.MONOSPACE, Typeface.BOLD)
+        }
+        val etiqueta = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            textSize = 8.5f
+            typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+            letterSpacing = 0.05f
+        }
+        val cuerpo = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = TINTA; textSize = 10.5f }
+        val pie = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = TENUE; textSize = 8f }
+        val pieDerecha = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = TENUE; textSize = 8f; textAlign = Paint.Align.RIGHT
+        }
+        val linea = Paint().apply { color = LINEA; strokeWidth = 0.7f }
+        val lineaSuave = Paint().apply { color = LINEA_SUAVE; strokeWidth = 0.6f }
+        val lineaFuerte = Paint().apply { color = TINTA; strokeWidth = 1.6f }
+        val imagen = Paint().apply { isAntiAlias = true; isFilterBitmap = true }
+        val bordeImagen = Paint().apply {
+            style = Paint.Style.STROKE; strokeWidth = 0.8f
+            color = LINEA; isAntiAlias = true
+        }
     }
 }
