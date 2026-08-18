@@ -132,8 +132,42 @@ fun MainScreen(
                                     )
                                 },
                             )
+                            // Con un filtro puesto, «exportar» tiene que poder
+                            // significar «lo que estoy mirando»: si no, el menú
+                            // devuelve el historial entero sin avisar.
+                            estado.filtro?.let { rango ->
+                                DropdownMenuItem(
+                                    text = { Text("Exportar el rango filtrado (PDF)") },
+                                    onClick = {
+                                        mostrarMenu = false
+                                        scope.launch {
+                                            val file = PdfExporter.export(
+                                                context = context,
+                                                // estado.entradas ya viene acotado al
+                                                // rango: sale el filtro entero, aunque
+                                                // cruce varios meses.
+                                                entries = estado.entradas
+                                                    .sortedByDescending { it.timestampMillis },
+                                                titulo = Fechas.rangoConAnio(rango),
+                                            )
+                                            shareFile(context, file)
+                                        }
+                                    },
+                                )
+                            }
                             DropdownMenuItem(
-                                text = { Text("Exportar todo el historial (PDF)") },
+                                text = {
+                                    Column {
+                                        Text("Exportar todo el historial (PDF)")
+                                        if (estado.hayFiltro) {
+                                            Text(
+                                                text = "Ignora el filtro",
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = colorsCronicas.tenue,
+                                            )
+                                        }
+                                    }
+                                },
                                 onClick = {
                                     mostrarMenu = false
                                     scope.launch {
