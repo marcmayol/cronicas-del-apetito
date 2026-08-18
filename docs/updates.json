@@ -1,8 +1,8 @@
 {
-  "versionCode": 8,
-  "versionName": "2.0",
-  "url": "https://github.com/marcmayol/cronicas-del-apetito/releases/download/v2.0/cronicas-del-apetito-v2.0.apk",
-  "sha256": "1ab9151cd0be953fc033ecaeca68a19cbd02c1881f9e796101e3c91ee4eadc97",
-  "notas": "Tres formas de mirar el registro: Día, Semana y Mes. Filtro por rango de fechas que se combina con las tres vistas. Compartir lo que estás viendo, como imagen o PDF, con los cuatro tipos distinguibles también en blanco y negro. Rediseño completo de la app.",
+  "versionCode": 9,
+  "versionName": "2.0.1",
+  "url": "https://github.com/marcmayol/cronicas-del-apetito/releases/download/v2.0.1/cronicas-del-apetito-v2.0.1.apk",
+  "sha256": "db3558a9279a59330fcbd24f9f2a46f898ad4dc9e1af32909f3e1e8343b52ba6",
+  "notas": "Arreglo: exportar desde el menú ignoraba el filtro de fechas. Ahora, con un filtro activo, aparece «Exportar el rango filtrado (PDF)» y la opción de exportar todo avisa de que lo ignora.",
   "check_horas": 24
 }
