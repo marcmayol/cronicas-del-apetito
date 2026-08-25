@@ -1,6 +1,6 @@
 # Crónicas del Apetito
 
-App Android para registrar lo que comes a lo largo del día, pensada para acompañar el trabajo con la psicóloga sobre ansiedad y comida. Nació de un caso concreto, pero **todos los recordatorios se configuran**: la horquilla, la frecuencia y qué carriles quieres.
+App Android para registrar lo que comes a lo largo del día, pensada para acompañar el trabajo con la psicóloga sobre ansiedad y comida. Nació de un caso concreto, pero **todos los recordatorios se configuran** —la horquilla, la frecuencia y qué carriles quieres— y está **en español y en inglés**.
 
 ## Qué hace
 
@@ -13,8 +13,17 @@ App Android para registrar lo que comes a lo largo del día, pensada para acompa
 - Botón **Compartir**: manda exactamente lo que estás viendo —vista + periodo + filtro— como **imagen** (Semana y Mes) o **PDF** (Día y rangos largos).
 - **Modo "me voy a dormir"**: silencia los avisos hasta que vuelva a abrirse tu horquilla al día siguiente.
 - El **estado de ánimo se anota suelto** desde el botón Anotar, sin tener que pasar antes por una comida ni por una caminata.
+- La **primera vez** hay tres pasos —qué quieres llevar, a qué horas, permiso de avisos— y se sale de ahí con la app montada. Quien actualiza desde una versión anterior no los ve.
+- **Español e inglés**, según el idioma del móvil. En inglés la app se llama *Appetite Chronicles*.
 
 Todo se guarda en local en el móvil. Sin nube ni cuentas.
+
+## Dos cosas que no se pueden traducir
+
+Están señaladas en el código, pero conviene tenerlas presentes al tocar textos:
+
+- **`fmt_*` en strings.xml son patrones de fecha**, no frases. Al traducir se reordenan las letras (`EEEE d 'de' MMMM` → `EEEE d MMMM`); traducirlas rompe el formateo.
+- **La respuesta del gimnasio es un valor, no un texto.** Se guarda como `yes`/`no` en la base de datos y solo se traduce al mostrarla. Hasta la v2.1 se guardaba «Sí», y traducir eso habría dejado el contador semanal a cero para siempre sin dar ningún error: la migración 3→4 reescribe los registros viejos.
 
 ## Las tres vistas
 
