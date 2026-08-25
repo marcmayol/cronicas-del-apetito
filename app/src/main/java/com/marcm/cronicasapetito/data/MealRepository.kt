@@ -39,7 +39,7 @@ class MealRepository(private val dao: MealEntryDao) {
         dao.insert(
             MealEntry(
                 timestampMillis = timestampMillis,
-                content = if (went) "Sí" else "No",
+                content = if (went) GymAnswer.YES else GymAnswer.NO,
                 kind = EntryKind.GYM
             )
         )
@@ -64,7 +64,7 @@ class MealRepository(private val dao: MealEntryDao) {
     fun diaDeLaSemana(now: Long = System.currentTimeMillis()): Int =
         Calendar.getInstance().apply { timeInMillis = now }.get(Calendar.DAY_OF_WEEK)
 
-    /** Nº de veces que se ha respondido "Sí" al gimnasio en la semana (lun-dom) de [now]. */
+    /** Nº de veces que se ha ido al gimnasio en la semana (lun-dom) de [now]. */
     suspend fun gymYesCountThisWeek(now: Long = System.currentTimeMillis()): Int {
         val cal = Calendar.getInstance().apply {
             firstDayOfWeek = Calendar.MONDAY
@@ -77,7 +77,12 @@ class MealRepository(private val dao: MealEntryDao) {
         }
         val start = cal.timeInMillis
         val end = start + 7L * 24 * 60 * 60 * 1000 - 1
-        return dao.countByKindAndContentInRange(EntryKind.GYM, "Sí", start, end)
+        return dao.countByKindAndContentInRange(
+            EntryKind.GYM,
+            listOf(GymAnswer.YES, GymAnswer.LEGACY_SI),
+            start,
+            end,
+        )
     }
 
     /**

@@ -9,6 +9,7 @@ import android.graphics.Typeface
 import android.graphics.pdf.PdfDocument
 import androidx.core.content.res.ResourcesCompat
 import com.marcm.cronicasapetito.R
+import com.marcm.cronicasapetito.ui.contenidoLegible
 import com.marcm.cronicasapetito.data.EntryKind
 import com.marcm.cronicasapetito.data.MealEntry
 import com.marcm.cronicasapetito.data.PhotoStore
@@ -56,7 +57,6 @@ object PdfExporter {
         EntryKind.MOOD to 0xFF7B5C90.toInt(),
         EntryKind.GYM to 0xFF47698C.toInt(),
     )
-    private const val LEYENDA = "● comida   ▲ caminata   ◆ ánimo   ■ gimnasio"
 
     /**
      * @param titulo lo que se está mirando, tal cual se lee en la app
@@ -70,29 +70,31 @@ object PdfExporter {
         val doc = PdfDocument()
         val p = Pinceles(context)
 
-        val es = Locale("es")
-        val dayFormat = SimpleDateFormat("EEEE d 'de' MMMM yyyy", es)
-        val hourFormat = SimpleDateFormat("HH:mm", es)
-        val generado = SimpleDateFormat("dd/MM/yyyy", es).format(Date())
+        val idioma = Locale.getDefault()
+        val dayFormat = SimpleDateFormat(context.getString(R.string.fmt_export_day), idioma)
+        val hourFormat = SimpleDateFormat("HH:mm", idioma)
+        val generado = SimpleDateFormat(
+            context.getString(R.string.fmt_export_generated), idioma
+        ).format(Date())
 
         var pagina = 1
         var page = doc.startPage(PdfDocument.PageInfo.Builder(PAGE_WIDTH, PAGE_HEIGHT, pagina).create())
         var canvas = page.canvas
-        var y = cabecera(canvas, p, titulo, pagina)
+        var y = cabecera(context, canvas, p, titulo, pagina)
 
         fun nuevaPagina() {
-            pie(canvas, p, generado)
+            pie(context, canvas, p, generado)
             doc.finishPage(page)
             pagina++
             page = doc.startPage(
                 PdfDocument.PageInfo.Builder(PAGE_WIDTH, PAGE_HEIGHT, pagina).create()
             )
             canvas = page.canvas
-            y = cabecera(canvas, p, titulo, pagina)
+            y = cabecera(context, canvas, p, titulo, pagina)
         }
 
         if (entries.isEmpty()) {
-            canvas.drawText("Sin registros en este periodo.", MARGIN, y + 24f, p.cuerpo)
+            canvas.drawText(context.getString(R.string.export_empty), MARGIN, y + 24f, p.cuerpo)
         } else {
             val porDia = entries.groupBy { dayFormat.format(Date(it.timestampMillis)) }
             for ((dia, registros) in porDia) {
@@ -106,14 +108,14 @@ object PdfExporter {
 
                 for (entry in registros) {
                     val glifo = glifos[entry.kind] ?: "·"
-                    val etiqueta = "$glifo ${etiquetaDe(entry.kind)}"
+                    val etiqueta = "$glifo ${etiquetaDe(context, entry.kind)}"
                     val foto = entry.photoPath?.let { PhotoStore.decodeFile(it, 240) }
 
                     val textoIzquierda = MARGIN + 132f
                     val textoDerecha =
                         if (foto != null) PAGE_WIDTH - MARGIN - IMG_SIZE - IMG_GAP
                         else PAGE_WIDTH - MARGIN
-                    val lineas = partir(contenidoDe(entry), p.cuerpo, textoDerecha - textoIzquierda)
+                    val lineas = partir(contenidoLegible(context, entry), p.cuerpo, textoDerecha - textoIzquierda)
                     val alto = max(LINE_HEIGHT * lineas.size, if (foto != null) IMG_SIZE else 0f) + 10f
 
                     if (y + alto > PAGE_HEIGHT - MARGIN - 40f) nuevaPagina()
@@ -138,7 +140,7 @@ object PdfExporter {
             }
         }
 
-        pie(canvas, p, generado)
+        pie(context, canvas, p, generado)
         doc.finishPage(page)
 
         val dir = File(context.cacheDir, "exports").apply { mkdirs() }
@@ -152,40 +154,48 @@ object PdfExporter {
     // -----------------------------------------------------------------------
 
     private fun cabecera(
+        context: Context,
         canvas: android.graphics.Canvas,
         p: Pinceles,
         titulo: String,
         pagina: Int,
     ): Float {
         var y = MARGIN + 14f
-        canvas.drawText("CRÓNICAS DEL APETITO", MARGIN, y, p.sobretitulo)
+        canvas.drawText(context.getString(R.string.export_header), MARGIN, y, p.sobretitulo)
         y += 22f
         canvas.drawText(titulo, MARGIN, y, p.titulo)
-        canvas.drawText("pág. $pagina", PAGE_WIDTH - MARGIN, y, p.paginaNum)
+        canvas.drawText(
+            context.getString(R.string.export_page, pagina),
+            PAGE_WIDTH - MARGIN, y, p.paginaNum,
+        )
         y += 10f
         canvas.drawLine(MARGIN, y, PAGE_WIDTH - MARGIN, y, p.lineaFuerte)
         return y
     }
 
-    private fun pie(canvas: android.graphics.Canvas, p: Pinceles, generado: String) {
+    private fun pie(
+        context: Context,
+        canvas: android.graphics.Canvas,
+        p: Pinceles,
+        generado: String,
+    ) {
         val y = PAGE_HEIGHT - MARGIN + 6f
         canvas.drawLine(MARGIN, y - 14f, PAGE_WIDTH - MARGIN, y - 14f, p.linea)
-        canvas.drawText(LEYENDA, MARGIN, y, p.pie)
-        canvas.drawText("generado el $generado", PAGE_WIDTH - MARGIN, y, p.pieDerecha)
+        canvas.drawText(context.getString(R.string.export_legend), MARGIN, y, p.pie)
+        canvas.drawText(
+            context.getString(R.string.export_generated_on, generado),
+            PAGE_WIDTH - MARGIN, y, p.pieDerecha,
+        )
     }
 
-    private fun etiquetaDe(kind: String): String = when (kind) {
-        EntryKind.FOOD -> "Comida"
-        EntryKind.WALK -> "Caminata"
-        EntryKind.MOOD -> "Ánimo"
-        EntryKind.GYM -> "Gimnasio"
-        else -> kind
-    }
-
-    private fun contenidoDe(entry: MealEntry): String = when (entry.kind) {
-        EntryKind.WALK -> entry.minutes?.let { "$it minutos" } ?: entry.content
-        else -> entry.content
-    }
+    private fun etiquetaDe(context: Context, kind: String): String = context.getString(
+        when (kind) {
+            EntryKind.FOOD -> R.string.kind_food
+            EntryKind.WALK -> R.string.kind_walk
+            EntryKind.MOOD -> R.string.kind_mood_short
+            else -> R.string.kind_gym
+        }
+    )
 
     private fun recorteCuadrado(bmp: Bitmap): Rect {
         val lado = min(bmp.width, bmp.height)

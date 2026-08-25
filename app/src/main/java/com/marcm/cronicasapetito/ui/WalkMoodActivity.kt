@@ -44,12 +44,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import com.marcm.cronicasapetito.CronicasApp
+import com.marcm.cronicasapetito.R
 import com.marcm.cronicasapetito.data.EntryKind
 import com.marcm.cronicasapetito.data.MealRepository
 import com.marcm.cronicasapetito.notifications.MealNotifier
@@ -118,13 +120,13 @@ private fun FlujoCaminata(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
-                title = { Text(if (soloAnimo) "Estado de ánimo" else "Caminata") },
+                title = { Text(stringResource(if (soloAnimo) R.string.kind_mood else R.string.walk_title)) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background,
                 ),
                 navigationIcon = {
                     IconButton(onClick = onCancel) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.action_back))
                     }
                 },
                 actions = { SelloTipo(tipo) },
@@ -139,8 +141,11 @@ private fun FlujoCaminata(
                         if (pasoInicial == Paso.PREGUNTA) paso = Paso.PREGUNTA else onCancel()
                     },
                     onGuardar = { paso = Paso.ANIMO },
-                    textoGuardar = "Continuar",
-                    textoCancelar = if (pasoInicial == Paso.PREGUNTA) "Atrás" else "Cancelar",
+                    textoGuardar = stringResource(R.string.action_continue),
+                    textoCancelar = stringResource(
+                        if (pasoInicial == Paso.PREGUNTA) R.string.action_previous
+                        else R.string.action_cancel
+                    ),
                     alineadoAlInicio = true,
                 )
                 Paso.ANIMO -> BarraGuardar(
@@ -149,7 +154,10 @@ private fun FlujoCaminata(
                     habilitado = !soloAnimo || animo.isNotBlank(),
                     onCancelar = onCancel,
                     onGuardar = { onSave(if (soloAnimo) null else minutos, animo, momento) },
-                    textoGuardar = if (!soloAnimo && animo.isBlank()) "Omitir" else "Guardar",
+                    textoGuardar = stringResource(
+                        if (!soloAnimo && animo.isBlank()) R.string.action_skip
+                        else R.string.action_save
+                    ),
                 )
             }
         },
@@ -177,7 +185,7 @@ private fun FlujoCaminata(
 
             when (paso) {
                 Paso.PREGUNTA -> {
-                    Text("¿Has ido a caminar?", style = MaterialTheme.typography.headlineSmall)
+                    Text(stringResource(R.string.walk_did_you_walk), style = MaterialTheme.typography.headlineSmall)
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -186,19 +194,19 @@ private fun FlujoCaminata(
                             onClick = { paso = Paso.MINUTOS },
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(14.dp),
-                        ) { Text("Sí", fontWeight = FontWeight.SemiBold) }
+                        ) { Text(stringResource(R.string.action_yes), fontWeight = FontWeight.SemiBold) }
                         OutlinedButton(
                             onClick = { onSave(null, "", momento) },
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(14.dp),
                             border = BorderStroke(1.4.dp, MaterialTheme.colorScheme.outline),
-                        ) { Text("No", fontWeight = FontWeight.SemiBold) }
+                        ) { Text(stringResource(R.string.action_no), fontWeight = FontWeight.SemiBold) }
                     }
                 }
 
                 Paso.MINUTOS -> {
                     Text(
-                        "¿Cuánto tiempo has caminado?",
+                        stringResource(R.string.walk_how_long),
                         style = MaterialTheme.typography.titleMedium,
                     )
                     FilaFechaHora(
@@ -224,7 +232,7 @@ private fun FlujoCaminata(
                                 )
                                 Spacer(Modifier.width(8.dp))
                                 Text(
-                                    text = "minutos",
+                                    text = stringResource(R.string.walk_minutes_unit),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
@@ -253,7 +261,7 @@ private fun FlujoCaminata(
                             minutos = texto.filter { it.isDigit() }.take(3).toIntOrNull() ?: 0
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        label = { Text("Otra cantidad") },
+                        label = { Text(stringResource(R.string.walk_other_amount)) },
                         shape = RoundedCornerShape(14.dp),
                         singleLine = true,
                         colors = OutlinedTextFieldDefaults.colors(
@@ -270,13 +278,17 @@ private fun FlujoCaminata(
 
                 Paso.ANIMO -> {
                     Text(
-                        text = if (soloAnimo) "¿Cómo te sientes?" else "¿Cómo te has sentido?",
+                        text = stringResource(
+                            if (soloAnimo) R.string.mood_how_do_you_feel
+                            else R.string.entry_how_did_you_feel
+                        ),
                         style = MaterialTheme.typography.headlineSmall,
                     )
                     Text(
-                        text = if (soloAnimo)
-                            "Escribe cómo te sientes ahora mismo. No hace falta que hayas comido ni caminado."
-                        else "Si quieres, anota cómo te has sentido. Es opcional.",
+                        text = stringResource(
+                            if (soloAnimo) R.string.mood_standalone_hint
+                            else R.string.mood_optional_hint
+                        ),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -291,7 +303,7 @@ private fun FlujoCaminata(
                         value = animo,
                         onValueChange = { animo = it },
                         modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text("Describe cómo te sientes ahora mismo") },
+                        placeholder = { Text(stringResource(R.string.mood_placeholder)) },
                         minLines = 4,
                         shape = RoundedCornerShape(14.dp),
                         colors = OutlinedTextFieldDefaults.colors(

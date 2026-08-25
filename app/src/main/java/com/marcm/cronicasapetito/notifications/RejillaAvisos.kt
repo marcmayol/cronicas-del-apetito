@@ -1,16 +1,26 @@
 package com.marcm.cronicasapetito.notifications
 
+import android.content.Context
+import com.marcm.cronicasapetito.R
 import java.util.Calendar
+import java.util.Locale
 
 /** «08:00» a partir de los minutos desde medianoche. */
 fun horaTexto(minutosDelDia: Int): String =
-    String.format("%02d:%02d", minutosDelDia / 60, minutosDelDia % 60)
+    String.format(Locale.getDefault(), "%02d:%02d", minutosDelDia / 60, minutosDelDia % 60)
 
 /** «cada 1 h 30 min» a partir de los minutos de separación entre avisos. */
-fun frecuenciaTexto(cadaMin: Int): String = when {
-    cadaMin < 60 -> "cada $cadaMin min"
-    cadaMin % 60 == 0 -> "cada ${cadaMin / 60} h"
-    else -> "cada ${cadaMin / 60} h ${cadaMin % 60} min"
+fun frecuenciaTexto(context: Context, cadaMin: Int): String = when {
+    cadaMin < 60 -> context.getString(R.string.freq_minutes, cadaMin)
+    cadaMin % 60 == 0 -> context.getString(R.string.freq_hours, cadaMin / 60)
+    else -> context.getString(R.string.freq_hours_minutes, cadaMin / 60, cadaMin % 60)
+}
+
+/** Lo mismo sin el «cada»: es lo que va dentro de los chips de Ajustes. */
+fun frecuenciaCorta(context: Context, cadaMin: Int): String = when {
+    cadaMin < 60 -> context.getString(R.string.freq_minutes_short, cadaMin)
+    cadaMin % 60 == 0 -> context.getString(R.string.freq_hours_short, cadaMin / 60)
+    else -> context.getString(R.string.freq_hours_minutes_short, cadaMin / 60, cadaMin % 60)
 }
 
 /**

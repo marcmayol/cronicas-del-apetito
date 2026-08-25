@@ -16,12 +16,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.marcm.cronicasapetito.R
 import com.marcm.actualizador.EstadoActualizacion
 
 /**
  * Banner no bloqueante en la parte alta de la pantalla principal. Solo se muestra
- * para los estados accionables o en progreso; los errores y el "estás al día" se
+ * para los estados accionables o en progreso; los errores y el stringResource(R.string.update_up_to_date_short) se
  * reservan para la pantalla de Ajustes (comprobación manual).
  */
 @Composable
@@ -61,7 +63,7 @@ fun BannerActualizacion(
                     }
                 }
                 Button(onClick = onActualizar, modifier = Modifier.padding(start = 8.dp)) {
-                    Text("Actualizar")
+                    Text(stringResource(R.string.update_action))
                 }
             }
         }
@@ -71,8 +73,8 @@ fun BannerActualizacion(
             progreso = estado.porcentaje / 100f,
         )
 
-        EstadoActualizacion.Verificando -> BannerProgreso("Verificando la descarga…", null)
-        EstadoActualizacion.Instalando -> BannerProgreso("Instalando…", null)
+        EstadoActualizacion.Verificando -> BannerProgreso(stringResource(R.string.update_verifying_download), null)
+        EstadoActualizacion.Instalando -> BannerProgreso(stringResource(R.string.update_installing), null)
 
         else -> Unit // Inactivo, Comprobando, AlDia, PidiendoPermiso, Error: sin banner
     }

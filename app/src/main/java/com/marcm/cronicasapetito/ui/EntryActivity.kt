@@ -139,7 +139,11 @@ private fun EntryScreen(
                     photoPath = saved
                     PhotoStore.delete(previous)
                 } else {
-                    Toast.makeText(context, "No se pudo guardar la foto", Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.photo_save_failed),
+                        Toast.LENGTH_LONG,
+                    ).show()
                 }
             }
         }
@@ -160,7 +164,11 @@ private fun EntryScreen(
                     photoPath = saved
                     PhotoStore.delete(previous)
                 } else {
-                    Toast.makeText(context, "No se pudo guardar la foto", Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.photo_save_failed),
+                        Toast.LENGTH_LONG,
+                    ).show()
                 }
             }
         } else if (!success) {
@@ -184,7 +192,7 @@ private fun EntryScreen(
                 ),
                 navigationIcon = {
                     IconButton(onClick = cancelAndClean) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.action_back))
                     }
                 },
                 actions = { SelloTipo(EntryKind.FOOD) },
@@ -213,7 +221,7 @@ private fun EntryScreen(
             )
 
             Column {
-                EtiquetaCampo("¿Qué has comido?")
+                EtiquetaCampo(stringResource(R.string.entry_what_did_you_eat))
                 OutlinedTextField(
                     value = foodText,
                     onValueChange = { foodText = it },
@@ -231,7 +239,7 @@ private fun EntryScreen(
             }
 
             Column {
-                EtiquetaCampo("Foto del plato", opcional = true)
+                EtiquetaCampo(stringResource(R.string.entry_photo_label), opcional = true)
                 when {
                     processingPhoto -> Row(
                         modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
@@ -239,7 +247,7 @@ private fun EntryScreen(
                     ) {
                         CircularProgressIndicator(modifier = Modifier.size(20.dp))
                         Spacer(Modifier.width(12.dp))
-                        Text("Guardando foto…", style = MaterialTheme.typography.bodyMedium)
+                        Text(stringResource(R.string.entry_photo_saving), style = MaterialTheme.typography.bodyMedium)
                     }
 
                     photoPath == null -> Row(
@@ -248,7 +256,7 @@ private fun EntryScreen(
                     ) {
                         BotonFoto(
                             icono = Icons.Filled.PhotoCamera,
-                            texto = "Cámara",
+                            texto = stringResource(R.string.entry_camera),
                             modifier = Modifier.weight(1f),
                         ) {
                             val file = PhotoStore.newCameraTempFile(context)
@@ -257,7 +265,7 @@ private fun EntryScreen(
                         }
                         BotonFoto(
                             icono = Icons.Filled.Image,
-                            texto = "Galería",
+                            texto = stringResource(R.string.entry_gallery),
                             modifier = Modifier.weight(1f),
                         ) {
                             galleryLauncher.launch(
@@ -283,7 +291,7 @@ private fun EntryScreen(
                                 photoPath = null
                             }) {
                                 Icon(Icons.Filled.Delete, contentDescription = null)
-                                Text(" Quitar foto")
+                                Text(stringResource(R.string.entry_photo_remove))
                             }
                         }
                     }
@@ -291,12 +299,12 @@ private fun EntryScreen(
             }
 
             Column {
-                EtiquetaCampo("¿Cómo te has sentido?", opcional = true)
+                EtiquetaCampo(stringResource(R.string.entry_how_did_you_feel), opcional = true)
                 OutlinedTextField(
                     value = moodText,
                     onValueChange = { moodText = it },
                     modifier = Modifier.fillMaxWidth(),
-                    placeholder = { Text("Puedes dejarlo en blanco si no quieres anotarlo") },
+                    placeholder = { Text(stringResource(R.string.entry_mood_blank_ok)) },
                     minLines = 3,
                     shape = RoundedCornerShape(14.dp),
                     colors = OutlinedTextFieldDefaults.colors(
@@ -316,7 +324,7 @@ private fun EntryScreen(
                     )
                     Spacer(Modifier.width(6.dp))
                     Text(
-                        text = "Se guardará como nota de ánimo aparte, con la misma hora",
+                        text = stringResource(R.string.entry_mood_saved_apart),
                         style = MaterialTheme.typography.bodySmall,
                         color = colorsCronicas.tenue,
                     )
@@ -358,7 +366,7 @@ internal fun EtiquetaCampo(texto: String, opcional: Boolean = false) {
         )
         if (opcional) {
             Text(
-                text = " (opcional)",
+                text = stringResource(R.string.field_optional),
                 style = MaterialTheme.typography.bodyMedium,
                 color = colorsCronicas.tenue,
             )
@@ -391,8 +399,8 @@ internal fun BarraGuardar(
     habilitado: Boolean,
     onCancelar: () -> Unit,
     onGuardar: () -> Unit,
-    textoGuardar: String = "Guardar",
-    textoCancelar: String = "Cancelar",
+    textoGuardar: String = stringResource(R.string.action_save),
+    textoCancelar: String = stringResource(R.string.action_cancel),
     alineadoAlInicio: Boolean = false,
 ) {
     Surface(color = MaterialTheme.colorScheme.background) {
@@ -434,7 +442,7 @@ internal fun FilaFechaHora(
     onPicked: (Long) -> Unit,
 ) {
     val context = LocalContext.current
-    val formato = remember { SimpleDateFormat("EEEE d 'de' MMMM, HH:mm", Locale("es")) }
+    val formato = remember { SimpleDateFormat(context.getString(R.string.fmt_day_time), Locale.getDefault()) }
 
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -455,7 +463,7 @@ internal fun FilaFechaHora(
             Spacer(Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "FECHA Y HORA",
+                    text = stringResource(R.string.field_datetime),
                     style = MaterialTheme.typography.labelSmall,
                     color = colorsCronicas.tenue,
                 )
@@ -473,7 +481,7 @@ internal fun FilaFechaHora(
             ) {
                 Icon(Icons.Filled.Edit, contentDescription = null, modifier = Modifier.size(15.dp))
                 Spacer(Modifier.width(6.dp))
-                Text("Cambiar", fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.action_change), fontWeight = FontWeight.SemiBold)
             }
         }
     }

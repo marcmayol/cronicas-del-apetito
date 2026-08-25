@@ -8,6 +8,7 @@ import com.marcm.cronicasapetito.notifications.GymAlarmScheduler
 import com.marcm.cronicasapetito.notifications.GymNotifier
 import com.marcm.cronicasapetito.notifications.MealAlarmScheduler
 import com.marcm.cronicasapetito.notifications.MealNotifier
+import com.marcm.cronicasapetito.ui.Fechas
 
 class CronicasApp : Application() {
 
@@ -26,6 +27,9 @@ class CronicasApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        // Los formatos de fecha salen de recursos: hay que darles el contexto
+        // antes de que cualquier pantalla los pida.
+        Fechas.init(this)
         MealNotifier.ensureChannel(this)
         GymNotifier.ensureChannel(this)
         MealAlarmScheduler.scheduleNext(this)

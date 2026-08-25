@@ -34,8 +34,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.marcm.cronicasapetito.R
 
 enum class FormatoCompartir { IMAGEN, PDF }
 
@@ -60,7 +62,7 @@ fun CompartirSheet(
         containerColor = MaterialTheme.colorScheme.background,
     ) {
         Column(modifier = Modifier.padding(horizontal = 20.dp).padding(bottom = 24.dp)) {
-            Text("Compartir", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.action_share), style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(4.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
@@ -80,16 +82,16 @@ fun CompartirSheet(
             Spacer(Modifier.height(14.dp))
             OpcionFormato(
                 icono = Icons.Filled.Image,
-                titulo = "Imagen",
-                descripcion = "Se ve directamente en el chat. Recomendada para Semana y Mes.",
+                titulo = stringResource(R.string.share_image),
+                descripcion = stringResource(R.string.share_image_desc),
                 elegida = formato == FormatoCompartir.IMAGEN,
                 onClick = { formato = FormatoCompartir.IMAGEN },
             )
             Spacer(Modifier.height(9.dp))
             OpcionFormato(
                 icono = Icons.Filled.Description,
-                titulo = "PDF",
-                descripcion = "Para imprimir o llevar a consulta. Incluye las fotos.",
+                titulo = stringResource(R.string.share_pdf),
+                descripcion = stringResource(R.string.share_pdf_desc),
                 elegida = formato == FormatoCompartir.PDF,
                 onClick = { formato = FormatoCompartir.PDF },
             )
@@ -107,12 +109,12 @@ fun CompartirSheet(
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                TextButton(onClick = onCerrar) { Text("Cancelar") }
+                TextButton(onClick = onCerrar) { Text(stringResource(R.string.action_cancel)) }
                 Spacer(Modifier.width(8.dp))
                 Button(
                     onClick = { onCompartir(formato) },
                     shape = RoundedCornerShape(999.dp),
-                ) { Text("Compartir") }
+                ) { Text(stringResource(R.string.action_share)) }
             }
         }
     }

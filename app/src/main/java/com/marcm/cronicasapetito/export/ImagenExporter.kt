@@ -7,6 +7,8 @@ import android.graphics.Paint
 import android.graphics.Typeface
 import androidx.core.content.res.ResourcesCompat
 import com.marcm.cronicasapetito.R
+import com.marcm.cronicasapetito.ui.Fechas
+import com.marcm.cronicasapetito.ui.inicialDia
 import com.marcm.cronicasapetito.data.EntryKind
 import com.marcm.cronicasapetito.data.Periodos
 import com.marcm.cronicasapetito.data.RangoFechas
@@ -60,8 +62,11 @@ object ImagenExporter {
         EntryKind.GYM to 0xFF47698C.toInt(),
     )
 
-    private val es = Locale("es")
-    private val generado = DateTimeFormatter.ofPattern("dd/MM/yyyy", es)
+    private val idioma: Locale get() = Locale.getDefault()
+
+    private fun generado(context: Context): String = DateTimeFormatter
+        .ofPattern(context.getString(R.string.fmt_export_generated), idioma)
+        .format(LocalDate.now())
 
     suspend fun semana(
         context: Context,
@@ -79,12 +84,12 @@ object ImagenExporter {
         val p = Pinceles(context)
 
         var y = cabecera(
-            canvas, p,
-            titulo = tituloSemana(lunes),
+            context, canvas, p,
+            titulo = tituloSemana(context, lunes),
             aclaracion = filtro?.let { "del ${it.desde.dayOfMonth} al ${it.hasta.dayOfMonth}\n(filtro activo)" },
         )
 
-        y = filaCifras(canvas, p, total, y)
+        y = filaCifras(context, canvas, p, total, y)
 
         val dias = Periodos.semanaDe(lunes)
         for (dia in dias) {
@@ -93,19 +98,24 @@ object ImagenExporter {
             y += 52f
             p.diaEtiqueta.alpha = if (fuera) 100 else 255
             canvas.drawText(
-                "${inicial(dia)} ${dia.dayOfMonth}",
+                "${inicial(context, dia)} ${dia.dayOfMonth}",
                 MARGEN, y, p.diaEtiqueta
             )
             if (resumen.vacio) {
-                canvas.drawText("Sin anotaciones", MARGEN + 130f, y, p.cuerpoTenue)
+                canvas.drawText(
+                    context.getString(R.string.summary_none), MARGEN + 130f, y, p.cuerpoTenue
+                )
             } else {
-                dibujarPiezas(canvas, p, resumen, MARGEN + 130f, y, fuera)
+                dibujarPiezas(context, canvas, p, resumen, MARGEN + 130f, y, fuera)
             }
             y += 18f
             canvas.drawLine(MARGEN, y, ANCHO - MARGEN, y, p.lineaSuave)
         }
 
-        pie(canvas, p, alto - 46f, "generado el ${generado.format(LocalDate.now())}")
+        pie(
+            context, canvas, p, alto - 46f,
+            context.getString(R.string.export_generated_on, generado(context)),
+        )
 
         guardar(context, bitmap, "semana")
     }
@@ -127,8 +137,8 @@ object ImagenExporter {
         val p = Pinceles(context)
 
         var y = cabecera(
-            canvas, p,
-            titulo = mesEnPalabras(mes),
+            context, canvas, p,
+            titulo = mesEnPalabras(context, mes),
             aclaracion = filtro?.let {
                 "del ${it.desde.dayOfMonth} al ${it.hasta.dayOfMonth}\n(filtro activo)"
             },
@@ -137,8 +147,8 @@ object ImagenExporter {
         // Cabecera de días de la semana
         val ancho = (ANCHO - MARGEN * 2) / 7f
         y += 34f
-        listOf("L", "M", "X", "J", "V", "S", "D").forEachIndexed { i, inicial ->
-            canvas.drawText(inicial, MARGEN + ancho * i + ancho / 2, y, p.inicialDia)
+        context.getString(R.string.weekday_initials).forEachIndexed { i, inicial ->
+            canvas.drawText(inicial.toString(), MARGEN + ancho * i + ancho / 2, y, p.inicialDia)
         }
 
         val casillas = Periodos.casillasDe(mes)
@@ -158,12 +168,17 @@ object ImagenExporter {
 
         val finRejilla = y + fila * (altoCasilla + 8f) + 10f
         canvas.drawLine(MARGEN, finRejilla, ANCHO - MARGEN, finRejilla, p.linea)
-        filaCifras(canvas, p, total, finRejilla + 4f)
+        filaCifras(context, canvas, p, total, finRejilla + 4f)
 
         pie(
-            canvas, p, alto - 46f,
-            filtro?.let { "del ${it.desde.dayOfMonth} al ${Fecha.corta(it.hasta)}" }
-                ?: mesEnPalabras(mes).lowercase(es)
+            context, canvas, p, alto - 46f,
+            filtro?.let {
+                context.getString(
+                    R.string.date_range_same_month,
+                    it.desde.dayOfMonth,
+                    Fecha.corta(context, it.hasta),
+                ).lowercase(idioma)
+            } ?: mesEnPalabras(context, mes).lowercase(idioma)
         )
 
         guardar(context, bitmap, "mes")
@@ -173,9 +188,15 @@ object ImagenExporter {
 
     private const val MARGEN = 64f
 
-    private fun cabecera(canvas: Canvas, p: Pinceles, titulo: String, aclaracion: String?): Float {
+    private fun cabecera(
+        context: Context,
+        canvas: Canvas,
+        p: Pinceles,
+        titulo: String,
+        aclaracion: String?,
+    ): Float {
         var y = 96f
-        canvas.drawText("CRÓNICAS DEL APETITO", MARGEN, y, p.sobretitulo)
+        canvas.drawText(context.getString(R.string.export_header), MARGEN, y, p.sobretitulo)
         y += 44f
         canvas.drawText(titulo, MARGEN, y, p.titulo)
         if (aclaracion != null) {
@@ -190,16 +211,23 @@ object ImagenExporter {
         return y
     }
 
-    private fun filaCifras(canvas: Canvas, p: Pinceles, total: ResumenPeriodo, desdeY: Float): Float {
+    private fun filaCifras(
+        context: Context,
+        canvas: Canvas,
+        p: Pinceles,
+        total: ResumenPeriodo,
+        desdeY: Float,
+    ): Float {
         val y = desdeY + 54f
         val cifras = listOf(
-            Triple(EntryKind.FOOD, total.comidas.toString(), "comidas"),
-            Triple(EntryKind.WALK, total.minutosCaminados.toString(), "min"),
-            Triple(EntryKind.MOOD, total.notasAnimo.toString(), "notas"),
-            Triple(EntryKind.GYM, total.diasGimnasio.toString(), "gym"),
+            Triple(EntryKind.FOOD, total.comidas.toString(), R.string.summary_label_meals),
+            Triple(EntryKind.WALK, total.minutosCaminados.toString(), R.string.summary_label_minutes),
+            Triple(EntryKind.MOOD, total.notasAnimo.toString(), R.string.summary_label_notes),
+            Triple(EntryKind.GYM, total.diasGimnasio.toString(), R.string.summary_label_gym),
         )
         var x = MARGEN
-        cifras.forEach { (kind, valor, etiqueta) ->
+        cifras.forEach { (kind, valor, etiquetaRes) ->
+            val etiqueta = context.getString(etiquetaRes)
             p.cifra.color = colores[kind] ?: TINTA
             canvas.drawText(valor, x, y, p.cifra)
             val ancho = p.cifra.measureText(valor)
@@ -212,6 +240,7 @@ object ImagenExporter {
     }
 
     private fun dibujarPiezas(
+        context: Context,
         canvas: Canvas,
         p: Pinceles,
         resumen: ResumenDia,
@@ -221,14 +250,22 @@ object ImagenExporter {
     ) {
         var x = desdeX
         val piezas = buildList {
+            val res = context.resources
             if (resumen.comidas > 0) add(
-                EntryKind.FOOD to "${resumen.comidas} ${if (resumen.comidas == 1) "comida" else "comidas"}"
+                EntryKind.FOOD to
+                    res.getQuantityString(R.plurals.summary_meals, resumen.comidas, resumen.comidas)
             )
-            if (resumen.minutosCaminados > 0) add(EntryKind.WALK to "${resumen.minutosCaminados} min")
+            if (resumen.minutosCaminados > 0) add(
+                EntryKind.WALK to
+                    context.getString(R.string.summary_minutes, resumen.minutosCaminados)
+            )
             if (resumen.notasAnimo > 0) add(
-                EntryKind.MOOD to "${resumen.notasAnimo} ${if (resumen.notasAnimo == 1) "nota" else "notas"}"
+                EntryKind.MOOD to
+                    res.getQuantityString(R.plurals.summary_notes, resumen.notasAnimo, resumen.notasAnimo)
             )
-            if (resumen.gimnasio == true) add(EntryKind.GYM to "gimnasio")
+            if (resumen.gimnasio == true) add(
+                EntryKind.GYM to context.getString(R.string.summary_gym_went)
+            )
         }
         piezas.forEach { (kind, texto) ->
             val glifo = glifos[kind] ?: "·"
@@ -270,9 +307,9 @@ object ImagenExporter {
         }
     }
 
-    private fun pie(canvas: Canvas, p: Pinceles, y: Float, derecha: String) {
+    private fun pie(context: Context, canvas: Canvas, p: Pinceles, y: Float, derecha: String) {
         canvas.drawLine(MARGEN, y - 28f, ANCHO - MARGEN, y - 28f, p.linea)
-        canvas.drawText("● comida   ▲ caminata   ◆ ánimo   ■ gimnasio", MARGEN, y, p.pie)
+        canvas.drawText(context.getString(R.string.export_legend), MARGEN, y, p.pie)
         canvas.drawText(derecha, ANCHO - MARGEN, y, p.pieDerecha)
     }
 
@@ -285,28 +322,26 @@ object ImagenExporter {
         return file
     }
 
-    private fun inicial(d: LocalDate) = when (d.dayOfWeek.value) {
-        1 -> "L"; 2 -> "M"; 3 -> "X"; 4 -> "J"; 5 -> "V"; 6 -> "S"; else -> "D"
-    }
+    private fun inicial(context: Context, d: LocalDate): String =
+        inicialDia(context, d)
 
-    private fun tituloSemana(lunes: LocalDate): String {
-        val domingo = lunes.plusDays(6)
-        val mesFin = DateTimeFormatter.ofPattern("MMMM", es).format(domingo)
-        return if (lunes.month == domingo.month) {
-            "Semana del ${lunes.dayOfMonth} al ${domingo.dayOfMonth} de $mesFin de ${domingo.year}"
-        } else {
-            val mesInicio = DateTimeFormatter.ofPattern("MMMM", es).format(lunes)
-            "Semana del ${lunes.dayOfMonth} de $mesInicio al ${domingo.dayOfMonth} de $mesFin de ${domingo.year}"
-        }
-    }
+    /** El mismo título que enseña la app, para que lo compartido no lo contradiga. */
+    private fun tituloSemana(context: Context, lunes: LocalDate): String =
+        context.getString(
+            R.string.date_range_with_year,
+            Fechas.semana(lunes),
+            lunes.plusDays(6).year,
+        )
 
-    private fun mesEnPalabras(mes: YearMonth): String =
-        DateTimeFormatter.ofPattern("MMMM yyyy", es).format(mes.atDay(1))
-            .replaceFirstChar { it.uppercase() }
+    private fun mesEnPalabras(context: Context, mes: YearMonth): String =
+        DateTimeFormatter.ofPattern(context.getString(R.string.fmt_month_year), idioma)
+            .format(mes.atDay(1))
+            .replaceFirstChar { it.uppercase(idioma) }
 
     private object Fecha {
-        private val corto = DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy", Locale("es"))
-        fun corta(d: LocalDate): String = corto.format(d)
+        fun corta(context: Context, d: LocalDate): String = DateTimeFormatter
+            .ofPattern(context.getString(R.string.fmt_day_month_year_long), Locale.getDefault())
+            .format(d)
     }
 
     /** Todos los pinceles del documento, creados una vez por exportación. */

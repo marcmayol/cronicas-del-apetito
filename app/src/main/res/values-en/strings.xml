@@ -1,0 +1,210 @@
+<resources>
+    <!--
+      English translation.
+
+      Two things here are not free text:
+      · fmt_* are SimpleDateFormat/DateTimeFormatter patterns. Reorder the
+        letters for the language, never translate them.
+      · weekday_initials is one letter per day, Monday first.
+    -->
+
+    <string name="entry_title">Log a meal</string>
+    <string name="notif_channel_name">Meal reminders</string>
+    <string name="notif_channel_desc">Asks every so often whether you have eaten</string>
+    <string name="notif_text_sin_caminata">Tap Yes to log it, or No to dismiss</string>
+    <string name="notif_title">Have you eaten?</string>
+    <string name="notif_text">Tap Yes to log it, Walk if you are going out, or No to dismiss</string>
+    <string name="action_yes">Yes</string>
+    <string name="action_no">No</string>
+    <string name="action_walk">Walk</string>
+    <string name="input_hint">What did you eat? Remember to note how much (e.g. 1 or 2 plates of pasta)</string>
+    <string name="save">Save</string>
+    <string name="empty_history">Nothing logged yet. Tap Add, or wait for the next reminder.</string>
+    <string name="gym_notif_channel_name">Gym reminder</string>
+    <string name="gym_notif_channel_desc">Asks whether you went to the gym on the days you choose</string>
+    <string name="gym_notif_title">Did you go to the gym today?</string>
+    <string name="gym_notif_text">Tap Yes or No to log it</string>
+    <string name="sleep_button">Going to bed</string>
+    <string name="sleep_dialog_title">Off to bed?</string>
+    <string name="sleep_dialog_text">You will get no more meal reminders tonight. They come back on their own tomorrow at %1$s.</string>
+    <string name="sleep_confirm">Good night</string>
+    <string name="sleep_cancel">Not yet</string>
+    <string name="sleep_toast">Good night. I will nudge you tomorrow at %1$s 🌙</string>
+    <string name="sleep_banner">Sleep mode on · reminders return at %1$s</string>
+    <string name="wake_button">I am up</string>
+    <string name="wake_toast">Good morning. Reminders are back ☀️</string>
+
+    <!-- The four kinds of entry -->
+    <string name="kind_food">Food</string>
+    <string name="kind_walk">Walk</string>
+    <string name="kind_mood">Mood</string>
+    <string name="kind_mood_short">Mood</string>
+    <string name="kind_gym">Gym</string>
+
+    <!-- How an entry reads -->
+    <string name="content_walk_minutes">%1$d minutes</string>
+    <string name="content_gym_yes">Yes, I went</string>
+    <string name="content_gym_no">I did not go</string>
+
+    <!-- Date patterns, not prose -->
+    <string name="fmt_day_long">"EEEE d MMMM"</string>
+    <string name="fmt_day_long_year">"EEEE d MMMM yyyy"</string>
+    <string name="fmt_day_month">"d MMMM"</string>
+    <string name="fmt_day_month_short_year">d MMM yyyy</string>
+    <string name="fmt_month_year">MMMM yyyy</string>
+    <string name="fmt_day_time">"EEEE d MMMM, HH:mm"</string>
+    <string name="fmt_day_month_year_long">"d MMMM yyyy"</string>
+
+    <!-- One letter per weekday, Monday first -->
+    <string name="weekday_initials">MTWTFSS</string>
+
+    <string name="week_range_same_month">Week of %1$d to %2$s</string>
+    <string name="week_range_cross_month">Week of %1$s to %2$s</string>
+    <string name="date_range_same_month">%1$d to %2$s</string>
+    <string name="date_range_cross_month">%1$s to %2$s</string>
+    <string name="date_range_with_year">%1$s, %2$d</string>
+
+    <!-- Exports (PDF and image) -->
+    <string name="export_legend">● food   ▲ walk   ◆ mood   ■ gym</string>
+    <string name="export_empty">Nothing logged in this period.</string>
+    <string name="export_generated_on">generated on %1$s</string>
+    <string name="fmt_export_day">"EEEE d MMMM yyyy"</string>
+    <string name="fmt_export_generated">dd/MM/yyyy</string>
+    <string name="export_page">p. %1$d</string>
+
+    <!-- Period summary -->
+    <string name="summary_none">Nothing logged</string>
+    <string name="summary_label_meals">meals</string>
+    <string name="summary_label_minutes">min</string>
+    <string name="summary_label_notes">notes</string>
+    <string name="summary_label_gym">gym</string>
+    <string name="summary_gym_went">gym</string>
+    <string name="summary_minutes">%1$d min</string>
+    <string name="filter_hint_lines">%1$d to %2$d\n(filter on)</string>
+
+    <!-- Interface -->
+    <string name="action_share">Share</string>
+    <string name="action_more">More options</string>
+    <string name="menu_settings">Settings</string>
+    <string name="menu_export_filtered">Export the filtered range (PDF)</string>
+    <string name="menu_export_all">Export the whole history (PDF)</string>
+    <string name="menu_export_all_note">Ignores the filter</string>
+    <string name="history_all">Full history</string>
+    <string name="action_add">Add</string>
+    <string name="filter_by_dates">Filter by date</string>
+    <string name="filter_clear">Clear filter</string>
+    <string name="day_end">That is everything for today.</string>
+    <string name="filter_note_week">Days outside the filter are dimmed and do not count towards the summary or what you share.</string>
+    <string name="filter_note_month">Outside the range: dimmed days keep their marks, but do not count towards the summary or what you share.</string>
+    <string name="open_full_day">See the full day ›</string>
+    <string name="view_day">Day</string>
+    <string name="view_week">Week</string>
+    <string name="view_month">Month</string>
+    <string name="photo_hide">Hide photo</string>
+    <string name="photo_show">See photo</string>
+    <string name="period_previous">Previous period</string>
+    <string name="period_next">Next period</string>
+    <string name="filter_last_7">Last 7 days</string>
+    <string name="filter_last_30">Last 30 days</string>
+    <string name="filter_this_month">This month</string>
+    <string name="filter_all">All</string>
+    <string name="filter_subtitle">Narrows what you see in all three views. It changes nothing that is saved.</string>
+    <string name="filter_from">From</string>
+    <string name="filter_to">To</string>
+    <string name="filter_no_future">Future dates cannot be picked.</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_apply">Apply</string>
+    <string name="share_image">Image</string>
+    <string name="share_image_desc">Shows up straight away in a chat. Best for Week and Month.</string>
+    <string name="share_pdf">PDF</string>
+    <string name="share_pdf_desc">To print or take to an appointment. Includes the photos.</string>
+    <string name="update_up_to_date_short">up to date</string>
+    <string name="update_action">Update</string>
+    <string name="update_verifying_download">Checking the download…</string>
+    <string name="update_installing">Installing…</string>
+    <string name="update_checking">Checking…</string>
+    <string name="update_verifying">Verifying…</string>
+    <string name="update_error_network">No connection.</string>
+    <string name="update_error_http">Could not reach the server.</string>
+    <string name="update_error_manifest">The update information is not valid.</string>
+    <string name="update_error_download">The download failed.</string>
+    <string name="update_error_hash">The download was corrupt (discarded).</string>
+    <string name="update_error_install">Could not install</string>
+    <string name="photo_save_failed">Could not save the photo</string>
+    <string name="action_back">Back</string>
+    <string name="entry_what_did_you_eat">What did you eat?</string>
+    <string name="entry_photo_label">Photo of the plate</string>
+    <string name="entry_photo_saving">Saving photo…</string>
+    <string name="entry_camera">Camera</string>
+    <string name="entry_gallery">Gallery</string>
+    <string name="entry_photo_remove">" Remove photo"</string>
+    <string name="entry_how_did_you_feel">How did you feel?</string>
+    <string name="entry_mood_blank_ok">You can leave this blank if you would rather not note it</string>
+    <string name="entry_mood_saved_apart">Saved as a separate mood note, with the same time</string>
+    <string name="field_optional">" (optional)"</string>
+    <string name="action_save">Save</string>
+    <string name="field_datetime">DATE AND TIME</string>
+    <string name="action_change">Change</string>
+    <string name="add_what">What do you want to log?</string>
+    <string name="gym_asked_today">Did you go to the gym today?</string>
+    <string name="walk_title">Walk</string>
+    <string name="walk_did_you_walk">Did you go for a walk?</string>
+    <string name="walk_how_long">How long did you walk for?</string>
+    <string name="walk_minutes_unit">minutes</string>
+    <string name="walk_other_amount">Another amount</string>
+    <string name="mood_how_do_you_feel">How do you feel?</string>
+    <string name="mood_standalone_hint">Write how you feel right now. You do not need to have eaten or walked.</string>
+    <string name="mood_optional_hint">Note how you felt, if you like. It is optional.</string>
+    <string name="mood_placeholder">Describe how you feel right now</string>
+    <string name="action_continue">Continue</string>
+    <string name="action_previous">Back</string>
+    <string name="action_skip">Skip</string>
+    <string name="settings_title">Settings</string>
+    <string name="settings_updates">Updates</string>
+    <string name="settings_auto_check">Check automatically</string>
+    <string name="settings_auto_check_desc">Looks for a newer version</string>
+    <string name="settings_check_now">Check now</string>
+    <string name="settings_check">Check</string>
+    <string name="settings_download_install">Download and install</string>
+    <string name="settings_about">About</string>
+    <string name="settings_local_only">· data stays on this phone</string>
+    <string name="reminders_meal_section">Meal reminders</string>
+    <string name="reminders_meal_switch">Ask me whether I have eaten</string>
+    <string name="reminders_meal_off">Off: no reminders will arrive</string>
+    <string name="reminders_start_at">Start at</string>
+    <string name="reminders_end_at">Stop at</string>
+    <string name="reminders_all_day">All day</string>
+    <string name="reminders_next_day">The next day</string>
+    <string name="reminders_how_often">How often</string>
+    <string name="reminders_walk_switch">Offer “Walk” in the reminder</string>
+    <string name="reminders_walk_on">The meal reminder also carries the walk button</string>
+    <string name="reminders_walk_off">The reminder only asks about food</string>
+    <string name="reminders_gym_section">Gym reminder</string>
+    <string name="reminders_gym_switch">Ask me about the gym</string>
+    <string name="reminders_gym_off">Off: you will never be asked</string>
+    <string name="reminders_gym_at">At</string>
+    <string name="reminders_gym_days">Which days</string>
+    <string name="reminders_gym_no_days">With no days picked, you will not be asked.</string>
+    <string name="reminders_gym_goal">Stop asking once I reach</string>
+    <string name="reminders_gym_goal_note">Times a week. Once you have been that many times, the week counts as done.</string>
+    <string name="reminders_no_cap">No cap</string>
+    <string name="reminders_summary_meal">%1$s → %2$s · %3$s · %4$s</string>
+    <string name="reminders_summary_gym">%1$s · %2$s · %3$s</string>
+    <string name="reminders_no_days_short">no days</string>
+    <string name="reminders_every_day">every day</string>
+    <string name="reminders_no_cap_short">no cap</string>
+    <string name="reminders_cap_short">up to %1$d a week</string>
+    <string name="freq_minutes">every %1$d min</string>
+    <string name="freq_hours">every %1$d h</string>
+    <string name="freq_hours_minutes">every %1$d h %2$d min</string>
+    <string name="freq_minutes_short">%1$d min</string>
+    <string name="freq_hours_short">%1$d h</string>
+    <string name="freq_hours_minutes_short">%1$d h %2$d min</string>
+    <string name="update_up_to_date">Up to date · %1$s (%2$d)</string>
+    <string name="update_available">There is a new version: %1$s</string>
+    <string name="update_downloading">Downloading… %1$d%%</string>
+    <string name="update_last_known">Last known version: %1$s</string>
+    <string name="settings_version">Version %1$s (%2$d) %3$s</string>
+    <string name="label_today">today</string>
+    <string name="photo_of_meal">Photo of the meal</string>
+</resources>

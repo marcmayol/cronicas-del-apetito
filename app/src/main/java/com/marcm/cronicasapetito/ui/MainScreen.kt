@@ -129,18 +129,18 @@ fun MainScreen(
                         }
                     }
                     IconButton(onClick = { mostrarCompartir = true }) {
-                        Icon(Icons.Filled.Share, "Compartir")
+                        Icon(Icons.Filled.Share, stringResource(R.string.action_share))
                     }
                     Box {
                         IconButton(onClick = { mostrarMenu = true }) {
-                            Icon(Icons.Filled.MoreVert, "Más opciones")
+                            Icon(Icons.Filled.MoreVert, stringResource(R.string.action_more))
                         }
                         DropdownMenu(
                             expanded = mostrarMenu,
                             onDismissRequest = { mostrarMenu = false },
                         ) {
                             DropdownMenuItem(
-                                text = { Text("Ajustes") },
+                                text = { Text(stringResource(R.string.menu_settings)) },
                                 onClick = {
                                     mostrarMenu = false
                                     context.startActivity(
@@ -153,7 +153,7 @@ fun MainScreen(
                             // devuelve el historial entero sin avisar.
                             estado.filtro?.let { rango ->
                                 DropdownMenuItem(
-                                    text = { Text("Exportar el rango filtrado (PDF)") },
+                                    text = { Text(stringResource(R.string.menu_export_filtered)) },
                                     onClick = {
                                         mostrarMenu = false
                                         scope.launch {
@@ -174,10 +174,10 @@ fun MainScreen(
                             DropdownMenuItem(
                                 text = {
                                     Column {
-                                        Text("Exportar todo el historial (PDF)")
+                                        Text(stringResource(R.string.menu_export_all))
                                         if (estado.hayFiltro) {
                                             Text(
-                                                text = "Ignora el filtro",
+                                                text = stringResource(R.string.menu_export_all_note),
                                                 style = MaterialTheme.typography.bodySmall,
                                                 color = colorsCronicas.tenue,
                                             )
@@ -189,7 +189,7 @@ fun MainScreen(
                                     scope.launch {
                                         val todo = repository.getAll()
                                         val file = PdfExporter.export(
-                                            context, todo, titulo = "Historial completo"
+                                            context, todo, titulo = context.getString(R.string.history_all)
                                         )
                                         shareFile(context, file)
                                     }
@@ -204,7 +204,7 @@ fun MainScreen(
             ExtendedFloatingActionButton(
                 onClick = { mostrarAnotar = true },
                 icon = { Icon(Icons.Filled.Add, contentDescription = null) },
-                text = { Text("Anotar") },
+                text = { Text(stringResource(R.string.action_add)) },
                 shape = RoundedCornerShape(16.dp),
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
@@ -445,7 +445,7 @@ private fun BotonFiltro(activo: Boolean, onClick: () -> Unit) {
         ) {
             Icon(
                 Icons.Filled.Tune,
-                contentDescription = "Filtrar por fechas",
+                contentDescription = stringResource(R.string.filter_by_dates),
                 modifier = Modifier.size(18.dp),
                 tint = if (activo) MaterialTheme.colorScheme.onSecondaryContainer
                 else MaterialTheme.colorScheme.onSurfaceVariant,
@@ -476,7 +476,7 @@ private fun VacioSegunFiltro(estado: EstadoPrincipal, onQuitarFiltro: () -> Unit
             icono = IconoCalendario,
             mensaje = "No hay nada anotado ${Fechas.rango(filtro).lowercase()}.",
             accion = {
-                TextButton(onClick = onQuitarFiltro) { Text("Quitar filtro") }
+                TextButton(onClick = onQuitarFiltro) { Text(stringResource(R.string.filter_clear)) }
             },
         )
     }

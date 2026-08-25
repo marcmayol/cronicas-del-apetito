@@ -85,6 +85,6 @@ object Resumenes {
     }
 }
 
-/** «Sí» es la respuesta afirmativa que guarda [MealRepository.addGym]. */
+/** Un registro de gimnasio con respuesta afirmativa, en cualquiera de sus formatos. */
 val MealEntry.fueAlGimnasio: Boolean
-    get() = kind == EntryKind.GYM && content.trim().equals("Sí", ignoreCase = true)
+    get() = kind == EntryKind.GYM && GymAnswer.esAfirmativo(content)

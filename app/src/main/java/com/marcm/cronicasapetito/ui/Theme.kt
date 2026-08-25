@@ -1,5 +1,6 @@
 package com.marcm.cronicasapetito.ui
 
+import androidx.annotation.StringRes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.material3.lightColorScheme
@@ -80,24 +81,29 @@ val colorsCronicas: ColoresCronicas
 // ---------------------------------------------------------------------------
 
 data class VisualTipo(
-    val etiqueta: String,
+    /** Nombre del tipo, como recurso: la app se lee en más de un idioma. */
+    @StringRes val etiqueta: Int,
     val color: Color,
     val contenedor: Color,
     /** Glifo con forma propia: se distingue sin color. */
     val glifo: String,
 )
 
-private val VisualComida = VisualTipo("Comida", Color(0xFF9A5B2F), Color(0xFFF5E7D8), "●")
-private val VisualCaminata = VisualTipo("Caminata", Color(0xFF5C7549), Color(0xFFE8EFDF), "▲")
-private val VisualAnimo = VisualTipo("Estado de ánimo", Color(0xFF7B5C90), Color(0xFFEFE7F4), "◆")
-private val VisualGimnasio = VisualTipo("Gimnasio", Color(0xFF47698C), Color(0xFFE3EBF2), "■")
+private val VisualComida =
+    VisualTipo(R.string.kind_food, Color(0xFF9A5B2F), Color(0xFFF5E7D8), "●")
+private val VisualCaminata =
+    VisualTipo(R.string.kind_walk, Color(0xFF5C7549), Color(0xFFE8EFDF), "▲")
+private val VisualAnimo =
+    VisualTipo(R.string.kind_mood, Color(0xFF7B5C90), Color(0xFFEFE7F4), "◆")
+private val VisualGimnasio =
+    VisualTipo(R.string.kind_gym, Color(0xFF47698C), Color(0xFFE3EBF2), "■")
 
 fun visualDe(kind: String): VisualTipo = when (kind) {
     EntryKind.FOOD -> VisualComida
     EntryKind.WALK -> VisualCaminata
     EntryKind.MOOD -> VisualAnimo
     EntryKind.GYM -> VisualGimnasio
-    else -> VisualTipo(kind, TintaSuave, Pergamino, "·")
+    else -> VisualComida
 }
 
 // ---------------------------------------------------------------------------

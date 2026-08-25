@@ -44,6 +44,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.marcm.actualizador.Actualizador
@@ -52,6 +53,7 @@ import com.marcm.actualizador.Modo
 import com.marcm.actualizador.TipoError
 import com.marcm.cronicasapetito.BuildConfig
 import com.marcm.cronicasapetito.CronicasApp
+import com.marcm.cronicasapetito.R
 import kotlinx.coroutines.launch
 
 /** Ajustes y «Acerca de»: versión, autobúsqueda y comprobación manual. */
@@ -84,13 +86,13 @@ private fun AjustesScreen(actualizador: Actualizador, onBack: () -> Unit) {
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
-                title = { Text("Ajustes") },
+                title = { Text(stringResource(R.string.settings_title)) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background,
                 ),
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.action_back))
                     }
                 },
             )
@@ -106,7 +108,7 @@ private fun AjustesScreen(actualizador: Actualizador, onBack: () -> Unit) {
             // Lo primero, porque es lo que cada persona necesita ajustar a su vida.
             SeccionRecordatorios()
 
-            TituloSeccion("Actualizaciones")
+            TituloSeccion(stringResource(R.string.settings_updates))
             Bloque {
                 Row(
                     modifier = Modifier.padding(14.dp),
@@ -114,12 +116,12 @@ private fun AjustesScreen(actualizador: Actualizador, onBack: () -> Unit) {
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "Buscar automáticamente",
+                            text = stringResource(R.string.settings_auto_check),
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Medium,
                         )
                         Text(
-                            text = "Comprueba si hay una versión nueva",
+                            text = stringResource(R.string.settings_auto_check_desc),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -139,7 +141,7 @@ private fun AjustesScreen(actualizador: Actualizador, onBack: () -> Unit) {
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "Buscar ahora",
+                            text = stringResource(R.string.settings_check_now),
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Medium,
                         )
@@ -150,7 +152,7 @@ private fun AjustesScreen(actualizador: Actualizador, onBack: () -> Unit) {
                         onClick = { scope.launch { actualizador.comprobar(Modo.MANUAL) } },
                         shape = RoundedCornerShape(999.dp),
                         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
-                    ) { Text("Buscar", fontWeight = FontWeight.SemiBold) }
+                    ) { Text(stringResource(R.string.settings_check), fontWeight = FontWeight.SemiBold) }
                 }
             }
 
@@ -160,10 +162,10 @@ private fun AjustesScreen(actualizador: Actualizador, onBack: () -> Unit) {
                     onClick = { actualizador.actualizarAhora() },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(14.dp),
-                ) { Text("Descargar e instalar") }
+                ) { Text(stringResource(R.string.settings_download_install)) }
             }
 
-            TituloSeccion("Acerca de")
+            TituloSeccion(stringResource(R.string.settings_about))
             Bloque {
                 Row(
                     modifier = Modifier.padding(14.dp),
@@ -187,12 +189,16 @@ private fun AjustesScreen(actualizador: Actualizador, onBack: () -> Unit) {
                     Spacer(Modifier.width(12.dp))
                     Column {
                         Text(
-                            text = "Crónicas del Apetito",
+                            text = stringResource(R.string.app_name),
                             style = MaterialTheme.typography.titleMedium,
                         )
                         Text(
-                            text = "Versión ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE}) " +
-                                "· datos solo en este móvil",
+                            text = stringResource(
+                                R.string.settings_version,
+                                BuildConfig.VERSION_NAME,
+                                BuildConfig.VERSION_CODE,
+                                stringResource(R.string.settings_local_only),
+                            ),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -244,7 +250,7 @@ private fun LineaEstado(estado: EstadoActualizacion) {
         EstadoActualizacion.Comprobando -> Row(verticalAlignment = Alignment.CenterVertically) {
             CircularProgressIndicator(modifier = Modifier.size(14.dp), strokeWidth = 2.dp)
             Spacer(Modifier.width(8.dp))
-            Texto("Comprobando…")
+            Texto(stringResource(R.string.update_checking))
         }
 
         EstadoActualizacion.AlDia -> Row(verticalAlignment = Alignment.CenterVertically) {
@@ -256,22 +262,29 @@ private fun LineaEstado(estado: EstadoActualizacion) {
             )
             Spacer(Modifier.width(6.dp))
             Texto(
-                "Estás al día · ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
+                stringResource(
+                    R.string.update_up_to_date,
+                    BuildConfig.VERSION_NAME,
+                    BuildConfig.VERSION_CODE,
+                ),
                 color = visualDe(com.marcm.cronicasapetito.data.EntryKind.WALK).color,
             )
         }
 
-        is EstadoActualizacion.Disponible -> Texto("Hay una versión nueva: ${estado.info.versionName}")
-        is EstadoActualizacion.Descargando -> Texto("Descargando… ${estado.porcentaje}%")
-        EstadoActualizacion.Verificando -> Texto("Verificando…")
-        EstadoActualizacion.Instalando -> Texto("Instalando…")
+        is EstadoActualizacion.Disponible ->
+            Texto(stringResource(R.string.update_available, estado.info.versionName))
+
+        is EstadoActualizacion.Descargando ->
+            Texto(stringResource(R.string.update_downloading, estado.porcentaje))
+        EstadoActualizacion.Verificando -> Texto(stringResource(R.string.update_verifying))
+        EstadoActualizacion.Instalando -> Texto(stringResource(R.string.update_installing))
         is EstadoActualizacion.Error -> Texto(
             mensajeError(estado),
             color = MaterialTheme.colorScheme.error,
         )
 
         else -> Texto(
-            "Última versión conocida: ${BuildConfig.VERSION_NAME}",
+            stringResource(R.string.update_last_known, BuildConfig.VERSION_NAME),
             color = colorsCronicas.tenue,
         )
     }
@@ -287,11 +300,13 @@ private fun Texto(texto: String, color: androidx.compose.ui.graphics.Color = and
     )
 }
 
+@Composable
 private fun mensajeError(e: EstadoActualizacion.Error): String = when (e.tipo) {
-    TipoError.SIN_RED -> "Sin conexión."
-    TipoError.HTTP -> "No se pudo contactar con el servidor."
-    TipoError.MANIFIESTO -> "La información de actualización no es válida."
-    TipoError.DESCARGA -> "Falló la descarga."
-    TipoError.HASH -> "La descarga estaba corrupta (se descartó)."
-    TipoError.INSTALACION -> "No se pudo instalar" + (e.mensaje?.let { ": $it" } ?: ".")
+    TipoError.SIN_RED -> stringResource(R.string.update_error_network)
+    TipoError.HTTP -> stringResource(R.string.update_error_http)
+    TipoError.MANIFIESTO -> stringResource(R.string.update_error_manifest)
+    TipoError.DESCARGA -> stringResource(R.string.update_error_download)
+    TipoError.HASH -> stringResource(R.string.update_error_hash)
+    TipoError.INSTALACION ->
+        stringResource(R.string.update_error_install) + (e.mensaje?.let { ": $it" } ?: ".")
 }

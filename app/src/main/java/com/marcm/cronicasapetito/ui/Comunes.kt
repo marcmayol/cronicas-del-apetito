@@ -1,5 +1,7 @@
 package com.marcm.cronicasapetito.ui
 
+import android.content.Context
+import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -44,10 +46,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.marcm.cronicasapetito.R
 import com.marcm.cronicasapetito.data.EntryKind
+import com.marcm.cronicasapetito.data.GymAnswer
 import com.marcm.cronicasapetito.data.MealEntry
 import com.marcm.cronicasapetito.data.Periodos
 import com.marcm.cronicasapetito.data.RangoFechas
@@ -58,19 +65,39 @@ import java.util.Date
 import java.util.Locale
 
 // ---------------------------------------------------------------------------
-// Fechas en español
+// Fechas
+//
+// Los patrones viven en strings.xml porque cada idioma ordena la fecha a su
+// manera: «lunes 17 de agosto» y «Monday, August 17» no son el mismo formato
+// con otras palabras. [init] lo llama CronicasApp al arrancar.
 // ---------------------------------------------------------------------------
 
 object Fechas {
-    private val es = Locale("es")
 
-    private val diaLargo = DateTimeFormatter.ofPattern("EEEE d 'de' MMMM", es)
-    private val diaConAnio = DateTimeFormatter.ofPattern("EEEE d 'de' MMMM 'de' yyyy", es)
-    private val diaYMes = DateTimeFormatter.ofPattern("d 'de' MMMM", es)
-    private val diaCorto = DateTimeFormatter.ofPattern("d MMM yyyy", es)
-    private val mesYAnio = DateTimeFormatter.ofPattern("MMMM yyyy", es)
+    private var contexto: Context? = null
 
-    private fun capitalizar(texto: String) = texto.replaceFirstChar { it.uppercase() }
+    fun init(context: Context) {
+        contexto = context.applicationContext
+    }
+
+    private fun patron(@StringRes res: Int, pordefecto: String): String =
+        contexto?.getString(res) ?: pordefecto
+
+    private val locale: Locale get() = Locale.getDefault()
+
+    private fun formato(@StringRes res: Int, pordefecto: String) =
+        DateTimeFormatter.ofPattern(patron(res, pordefecto), locale)
+
+    private val diaLargo get() = formato(R.string.fmt_day_long, "EEEE d 'de' MMMM")
+    private val diaConAnio get() = formato(R.string.fmt_day_long_year, "EEEE d 'de' MMMM 'de' yyyy")
+    private val diaYMes get() = formato(R.string.fmt_day_month, "d 'de' MMMM")
+    private val diaCorto get() = formato(R.string.fmt_day_month_short_year, "d MMM yyyy")
+    private val mesYAnio get() = formato(R.string.fmt_month_year, "MMMM yyyy")
+
+    private fun capitalizar(texto: String) = texto.replaceFirstChar { it.uppercase(locale) }
+
+    private fun texto(@StringRes res: Int, vararg args: Any): String =
+        contexto?.getString(res, *args) ?: args.joinToString(" ")
 
     fun dia(d: LocalDate): String = capitalizar(diaLargo.format(d))
     fun diaCompleto(d: LocalDate): String = capitalizar(diaConAnio.format(d))
@@ -81,9 +108,13 @@ object Fechas {
     fun semana(lunes: LocalDate): String {
         val domingo = lunes.plusDays(6)
         return if (lunes.month == domingo.month) {
-            "Semana del ${lunes.dayOfMonth} al ${diaYMes.format(domingo)}"
+            texto(R.string.week_range_same_month, lunes.dayOfMonth, diaYMes.format(domingo))
         } else {
-            "Semana del ${diaYMes.format(lunes)} al ${diaYMes.format(domingo)}"
+            texto(
+                R.string.week_range_cross_month,
+                diaYMes.format(lunes),
+                diaYMes.format(domingo),
+            )
         }
     }
 
@@ -91,21 +122,26 @@ object Fechas {
     fun rango(r: RangoFechas): String = when {
         r.desde == r.hasta -> capitalizar(diaYMes.format(r.desde))
         r.desde.month == r.hasta.month && r.desde.year == r.hasta.year ->
-            "Del ${r.desde.dayOfMonth} al ${diaYMes.format(r.hasta)}"
-        else -> "Del ${diaYMes.format(r.desde)} al ${diaYMes.format(r.hasta)}"
+            texto(R.string.date_range_same_month, r.desde.dayOfMonth, diaYMes.format(r.hasta))
+        else -> texto(
+            R.string.date_range_cross_month,
+            diaYMes.format(r.desde),
+            diaYMes.format(r.hasta),
+        )
     }
 
     /** Igual pero con año: es lo que viaja en lo que se comparte. */
-    fun rangoConAnio(r: RangoFechas): String = "${rango(r)} de ${r.hasta.year}"
+    fun rangoConAnio(r: RangoFechas): String =
+        texto(R.string.date_range_with_year, rango(r), r.hasta.year)
 
-    fun hora(millis: Long): String = horaFormato.format(Date(millis))
-
-    private val horaFormato = java.text.SimpleDateFormat("HH:mm", es)
+    fun hora(millis: Long): String =
+        java.text.SimpleDateFormat("HH:mm", locale).format(Date(millis))
 }
 
 /** Inicial del día de la semana como se pinta en el calendario: L M X J V S D. */
-fun inicialDia(d: LocalDate): String = when (d.dayOfWeek.value) {
-    1 -> "L"; 2 -> "M"; 3 -> "X"; 4 -> "J"; 5 -> "V"; 6 -> "S"; else -> "D"
+fun inicialDia(context: Context, d: LocalDate): String {
+    val iniciales = context.getString(R.string.weekday_initials)
+    return iniciales.getOrNull(d.dayOfWeek.value - 1)?.toString() ?: "?"
 }
 
 fun iconoDe(kind: String): ImageVector = when (kind) {
@@ -115,10 +151,18 @@ fun iconoDe(kind: String): ImageVector = when (kind) {
     else -> Icons.Filled.FitnessCenter
 }
 
-/** Cómo se lee un registro en la lista: los minutos se dicen en palabras. */
-fun contenidoLegible(entry: MealEntry): String = when (entry.kind) {
-    EntryKind.WALK -> entry.minutes?.let { "$it minutos" } ?: entry.content
-    EntryKind.GYM -> if (entry.content.trim().equals("Sí", true)) "Sí, he ido" else "No he ido"
+/**
+ * Cómo se lee un registro: los minutos se dicen en palabras y la respuesta del
+ * gimnasio, que por dentro es un valor, vuelve a ser una frase. La usan la lista
+ * y también el PDF, para que digan exactamente lo mismo.
+ */
+fun contenidoLegible(context: Context, entry: MealEntry): String = when (entry.kind) {
+    EntryKind.WALK -> entry.minutes?.let { context.getString(R.string.content_walk_minutes, it) }
+        ?: entry.content
+    EntryKind.GYM -> context.getString(
+        if (GymAnswer.esAfirmativo(entry.content)) R.string.content_gym_yes
+        else R.string.content_gym_no
+    )
     else -> entry.content
 }
 
@@ -174,9 +218,9 @@ fun SelectorVista(
                 }
                 Text(
                     text = when (opcion) {
-                        Vista.DIA -> "Día"
-                        Vista.SEMANA -> "Semana"
-                        Vista.MES -> "Mes"
+                        Vista.DIA -> stringResource(R.string.view_day)
+                        Vista.SEMANA -> stringResource(R.string.view_week)
+                        Vista.MES -> stringResource(R.string.view_month)
                     },
                     style = MaterialTheme.typography.labelLarge,
                     fontWeight = if (activa) FontWeight.SemiBold else FontWeight.Medium,
@@ -223,7 +267,7 @@ fun ChipFiltro(
             ) {
                 Icon(
                     Icons.Filled.Close,
-                    contentDescription = "Quitar filtro",
+                    contentDescription = stringResource(R.string.filter_clear),
                     modifier = Modifier.size(12.dp),
                     tint = MaterialTheme.colorScheme.onPrimary,
                 )
@@ -231,7 +275,7 @@ fun ChipFiltro(
         }
         Spacer(Modifier.width(8.dp))
         Text(
-            text = if (registros == 1) "1 registro" else "$registros registros",
+            text = pluralStringResource(R.plurals.entry_count, registros, registros),
             style = MaterialTheme.typography.bodySmall,
             color = colorsCronicas.tenue,
         )
@@ -251,7 +295,7 @@ fun CabeceraDia(dia: LocalDate, modifier: Modifier = Modifier) {
             if (dia == LocalDate.now()) {
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    text = "hoy",
+                    text = stringResource(R.string.label_today),
                     style = MaterialTheme.typography.bodySmall,
                     color = colorsCronicas.tenue,
                 )
@@ -301,7 +345,7 @@ fun TarjetaRegistro(entry: MealEntry, modifier: Modifier = Modifier) {
             Column(modifier = Modifier.weight(1f)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = "${visual.glifo} ${visual.etiqueta.uppercase(Locale("es"))}",
+                        text = "${visual.glifo} ${stringResource(visual.etiqueta).uppercase(Locale.getDefault())}",
                         style = MaterialTheme.typography.labelSmall,
                         color = visual.color,
                         modifier = Modifier.weight(1f),
@@ -315,7 +359,7 @@ fun TarjetaRegistro(entry: MealEntry, modifier: Modifier = Modifier) {
                 }
                 Spacer(Modifier.height(2.dp))
                 Text(
-                    text = contenidoLegible(entry),
+                    text = contenidoLegible(LocalContext.current, entry),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurface,
                 )
@@ -337,7 +381,7 @@ fun TarjetaRegistro(entry: MealEntry, modifier: Modifier = Modifier) {
                         )
                         Spacer(Modifier.width(6.dp))
                         Text(
-                            text = if (fotoAbierta) "Ocultar foto" else "Ver foto",
+                            text = stringResource(if (fotoAbierta) R.string.photo_hide else R.string.photo_show),
                             style = MaterialTheme.typography.labelLarge,
                             fontWeight = FontWeight.SemiBold,
                             color = visual.color,
@@ -389,7 +433,7 @@ fun ResumenEnLinea(
 
     if (piezas.isEmpty()) {
         Text(
-            text = "Sin anotaciones",
+            text = stringResource(R.string.summary_none),
             style = MaterialTheme.typography.bodyMedium,
             color = colorsCronicas.tenue,
             modifier = modifier,
@@ -459,7 +503,7 @@ fun NavegadorPeriodo(
     ) {
         BotonNavegacion(
             icono = Icons.Filled.KeyboardArrowLeft,
-            descripcion = "Periodo anterior",
+            descripcion = stringResource(R.string.period_previous),
             onClick = onAnterior,
         )
         Text(
@@ -471,7 +515,7 @@ fun NavegadorPeriodo(
         )
         BotonNavegacion(
             icono = Icons.Filled.KeyboardArrowRight,
-            descripcion = "Periodo siguiente",
+            descripcion = stringResource(R.string.period_next),
             onClick = onSiguiente,
         )
     }

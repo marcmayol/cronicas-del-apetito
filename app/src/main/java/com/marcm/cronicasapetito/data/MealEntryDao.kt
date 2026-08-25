@@ -26,6 +26,19 @@ interface MealEntryDao {
     @Query("SELECT COUNT(*) FROM meal_entries WHERE kind = :kind AND timestampMillis BETWEEN :from AND :to")
     suspend fun countByKindInRange(kind: String, from: Long, to: Long): Int
 
-    @Query("SELECT COUNT(*) FROM meal_entries WHERE kind = :kind AND content = :content AND timestampMillis BETWEEN :from AND :to")
-    suspend fun countByKindAndContentInRange(kind: String, content: String, from: Long, to: Long): Int
+    /**
+     * Cuenta los registros de [kind] cuyo contenido esté en [contents]. Es una
+     * lista y no un valor único porque el gimnasio tuvo dos formatos: «Sí» hasta
+     * la v2.1 y «yes» desde entonces, y ambos cuentan igual.
+     */
+    @Query(
+        "SELECT COUNT(*) FROM meal_entries WHERE kind = :kind AND content IN (:contents) " +
+            "AND timestampMillis BETWEEN :from AND :to"
+    )
+    suspend fun countByKindAndContentInRange(
+        kind: String,
+        contents: List<String>,
+        from: Long,
+        to: Long,
+    ): Int
 }

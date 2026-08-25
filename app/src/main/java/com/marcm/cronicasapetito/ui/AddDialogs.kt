@@ -22,8 +22,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.marcm.cronicasapetito.R
 import com.marcm.cronicasapetito.data.EntryKind
 
 /**
@@ -41,38 +43,38 @@ fun AddEntryPickerDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("¿Qué quieres anotar?") },
+        title = { Text(stringResource(R.string.add_what)) },
         shape = RoundedCornerShape(20.dp),
         containerColor = MaterialTheme.colorScheme.background,
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(9.dp)) {
                 BotonTipoPrincipal(
                     kind = EntryKind.FOOD,
-                    texto = "Comida",
+                    texto = stringResource(R.string.kind_food),
                     onClick = onPickFood,
                 )
                 BotonTipoSecundario(
                     kind = EntryKind.WALK,
-                    texto = "Caminata",
+                    texto = stringResource(R.string.kind_walk),
                     onClick = onPickWalk,
                 )
                 BotonTipoSecundario(
                     kind = EntryKind.GYM,
-                    texto = "Gimnasio",
+                    texto = stringResource(R.string.kind_gym),
                     onClick = onPickGym,
                 )
                 // El ánimo ya no cuelga de la caminata: hay días en que lo único
                 // que hay que anotar es cómo estás.
                 BotonTipoSecundario(
                     kind = EntryKind.MOOD,
-                    texto = "Estado de ánimo",
+                    texto = stringResource(R.string.kind_mood),
                     onClick = onPickMood,
                 )
             }
         },
         confirmButton = {},
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancelar") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
         },
     )
 }
@@ -85,14 +87,14 @@ fun GymQuestionDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("¿Has ido al gimnasio hoy?") },
+        title = { Text(stringResource(R.string.gym_asked_today)) },
         shape = RoundedCornerShape(20.dp),
         containerColor = MaterialTheme.colorScheme.background,
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(9.dp)) {
                 BotonTipoPrincipal(
                     kind = EntryKind.GYM,
-                    texto = "Sí",
+                    texto = stringResource(R.string.action_yes),
                     onClick = { onAnswer(true) },
                 )
                 OutlinedButton(
@@ -102,7 +104,7 @@ fun GymQuestionDialog(
                     border = BorderStroke(1.4.dp, MaterialTheme.colorScheme.outline),
                 ) {
                     Text(
-                        text = "No",
+                        text = stringResource(R.string.action_no),
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.fillMaxWidth(),
@@ -112,7 +114,7 @@ fun GymQuestionDialog(
         },
         confirmButton = {},
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancelar") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
         },
     )
 }

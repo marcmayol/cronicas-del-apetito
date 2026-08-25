@@ -96,6 +96,7 @@ class RejillaAvisosTest {
         assertEquals("26 08:00", horaDe(despertar))
     }
 
+    /** El texto de la frecuencia ya sale de recursos y se comprueba en pantalla. */
     @Test
     fun `las horas se escriben siempre con dos cifras`() {
         assertEquals("08:00", horaTexto(8 * 60))
@@ -103,11 +104,4 @@ class RejillaAvisosTest {
         assertEquals("22:30", horaTexto(22 * 60 + 30))
     }
 
-    @Test
-    fun `la frecuencia se lee en horas y minutos`() {
-        assertEquals("cada 30 min", frecuenciaTexto(30))
-        assertEquals("cada 1 h", frecuenciaTexto(60))
-        assertEquals("cada 1 h 30 min", frecuenciaTexto(90))
-        assertEquals("cada 4 h", frecuenciaTexto(240))
-    }
 }

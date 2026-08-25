@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -39,6 +40,8 @@ import com.marcm.cronicasapetito.data.EntryKind
 import com.marcm.cronicasapetito.notifications.GymAlarmScheduler
 import com.marcm.cronicasapetito.notifications.MealAlarmScheduler
 import com.marcm.cronicasapetito.notifications.PrefsRecordatorios
+import com.marcm.cronicasapetito.R
+import com.marcm.cronicasapetito.notifications.frecuenciaCorta
 import com.marcm.cronicasapetito.notifications.frecuenciaTexto
 import com.marcm.cronicasapetito.notifications.horaTexto
 import java.util.Calendar
@@ -59,7 +62,7 @@ fun SeccionRecordatorios() {
     // -----------------------------------------------------------------------
     // Comida
     // -----------------------------------------------------------------------
-    TituloSeccion("Recordatorios de comida")
+    TituloSeccion(stringResource(R.string.reminders_meal_section))
     var comidaActiva by remember { mutableStateOf(PrefsRecordatorios.comidaActiva(context)) }
     var inicioMin by remember { mutableIntStateOf(PrefsRecordatorios.comidaInicioMin(context)) }
     var finMin by remember { mutableIntStateOf(PrefsRecordatorios.comidaFinMin(context)) }
@@ -70,9 +73,9 @@ fun SeccionRecordatorios() {
 
     Bloque {
         FilaInterruptor(
-            titulo = "Preguntarme si he comido",
-            subtitulo = if (comidaActiva) resumenVentana(inicioMin, finMin, cadaMin)
-            else "Desactivado: no llegará ningún aviso",
+            titulo = stringResource(R.string.reminders_meal_switch),
+            subtitulo = if (comidaActiva) resumenVentana(context, inicioMin, finMin, cadaMin)
+            else stringResource(R.string.reminders_meal_off),
             marcado = comidaActiva,
             tinte = visualDe(EntryKind.FOOD).color,
             onCambio = {
@@ -85,7 +88,7 @@ fun SeccionRecordatorios() {
         if (comidaActiva) {
             Separador()
             FilaHora(
-                titulo = "Empiezan a las",
+                titulo = stringResource(R.string.reminders_start_at),
                 minutosDelDia = inicioMin,
                 onElegir = { elegido ->
                     inicioMin = elegido
@@ -95,10 +98,10 @@ fun SeccionRecordatorios() {
             )
             Separador()
             FilaHora(
-                titulo = "Terminan a las",
+                titulo = stringResource(R.string.reminders_end_at),
                 subtitulo = when {
-                    finMin == inicioMin -> "Todo el día"
-                    finMin < inicioMin -> "Del día siguiente"
+                    finMin == inicioMin -> stringResource(R.string.reminders_all_day)
+                    finMin < inicioMin -> stringResource(R.string.reminders_next_day)
                     else -> null
                 },
                 minutosDelDia = finMin,
@@ -109,11 +112,11 @@ fun SeccionRecordatorios() {
                 },
             )
             Separador()
-            BloqueOpciones(titulo = "Cada cuánto") {
+            BloqueOpciones(titulo = stringResource(R.string.reminders_how_often)) {
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     PrefsRecordatorios.FRECUENCIAS.forEach { opcion ->
                         ChipOpcion(
-                            texto = frecuenciaTexto(opcion).removePrefix("cada "),
+                            texto = frecuenciaCorta(context, opcion),
                             activo = cadaMin == opcion,
                             tinte = visualDe(EntryKind.FOOD).color,
                             onClick = {
@@ -127,10 +130,11 @@ fun SeccionRecordatorios() {
             }
             Separador()
             FilaInterruptor(
-                titulo = "Ofrecer «Caminar» en el aviso",
-                subtitulo = if (caminataEnAviso)
-                    "El aviso de comida trae también el botón de caminata"
-                else "El aviso solo pregunta por la comida",
+                titulo = stringResource(R.string.reminders_walk_switch),
+                subtitulo = stringResource(
+                    if (caminataEnAviso) R.string.reminders_walk_on
+                    else R.string.reminders_walk_off
+                ),
                 marcado = caminataEnAviso,
                 tinte = visualDe(EntryKind.WALK).color,
                 onCambio = {
@@ -144,7 +148,7 @@ fun SeccionRecordatorios() {
     // -----------------------------------------------------------------------
     // Gimnasio
     // -----------------------------------------------------------------------
-    TituloSeccion("Recordatorio de gimnasio")
+    TituloSeccion(stringResource(R.string.reminders_gym_section))
     var gymActivo by remember { mutableStateOf(PrefsRecordatorios.gymActivo(context)) }
     var gymHora by remember { mutableIntStateOf(PrefsRecordatorios.gymHoraMin(context)) }
     var gymDias by remember { mutableStateOf(PrefsRecordatorios.gymDias(context)) }
@@ -154,9 +158,9 @@ fun SeccionRecordatorios() {
 
     Bloque {
         FilaInterruptor(
-            titulo = "Preguntarme por el gimnasio",
-            subtitulo = if (gymActivo) resumenGimnasio(gymHora, gymDias, gymObjetivo)
-            else "Desactivado: no se preguntará nunca",
+            titulo = stringResource(R.string.reminders_gym_switch),
+            subtitulo = if (gymActivo) resumenGimnasio(context, gymHora, gymDias, gymObjetivo)
+            else stringResource(R.string.reminders_gym_off),
             marcado = gymActivo,
             tinte = visualDe(EntryKind.GYM).color,
             onCambio = {
@@ -169,7 +173,7 @@ fun SeccionRecordatorios() {
         if (gymActivo) {
             Separador()
             FilaHora(
-                titulo = "A las",
+                titulo = stringResource(R.string.reminders_gym_at),
                 minutosDelDia = gymHora,
                 onElegir = { elegido ->
                     gymHora = elegido
@@ -179,8 +183,8 @@ fun SeccionRecordatorios() {
             )
             Separador()
             BloqueOpciones(
-                titulo = "Qué días",
-                nota = if (gymDias.isEmpty()) "Sin ningún día no se preguntará." else null,
+                titulo = stringResource(R.string.reminders_gym_days),
+                nota = if (gymDias.isEmpty()) stringResource(R.string.reminders_gym_no_days) else null,
             ) {
                 SelectorDias(
                     dias = gymDias,
@@ -194,8 +198,8 @@ fun SeccionRecordatorios() {
             }
             Separador()
             BloqueOpciones(
-                titulo = "Dejar de preguntar al llegar a",
-                nota = "Veces por semana. Cuando ya has ido esas veces, la semana se da por hecha.",
+                titulo = stringResource(R.string.reminders_gym_goal),
+                nota = stringResource(R.string.reminders_gym_goal_note),
             ) {
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     (1..7).forEach { veces ->
@@ -210,7 +214,7 @@ fun SeccionRecordatorios() {
                         )
                     }
                     ChipOpcion(
-                        texto = "Sin tope",
+                        texto = stringResource(R.string.reminders_no_cap),
                         activo = gymObjetivo == PrefsRecordatorios.GYM_SIN_OBJETIVO,
                         tinte = visualDe(EntryKind.GYM).color,
                         onClick = {
@@ -230,22 +234,34 @@ fun SeccionRecordatorios() {
 // Resúmenes: lo que se lee bajo cada interruptor sin abrir nada
 // ---------------------------------------------------------------------------
 
-private fun resumenVentana(inicioMin: Int, finMin: Int, cadaMin: Int): String {
+private fun resumenVentana(context: Context, inicioMin: Int, finMin: Int, cadaMin: Int): String {
     val duracion = PrefsRecordatorios.duracion(inicioMin, finMin)
     val avisos = duracion / cadaMin + 1
-    return "${horaTexto(inicioMin)} → ${horaTexto(finMin)} · ${frecuenciaTexto(cadaMin)} " +
-        "· $avisos ${if (avisos == 1) "aviso" else "avisos"} al día"
+    return context.getString(
+        R.string.reminders_summary_meal,
+        horaTexto(inicioMin),
+        horaTexto(finMin),
+        frecuenciaTexto(context, cadaMin),
+        context.resources.getQuantityString(R.plurals.reminders_per_day, avisos, avisos),
+    )
 }
 
-private fun resumenGimnasio(horaMin: Int, dias: Set<Int>, objetivo: Int): String {
+private fun resumenGimnasio(
+    context: Context,
+    horaMin: Int,
+    dias: Set<Int>,
+    objetivo: Int,
+): String {
     val diasTexto = when {
-        dias.isEmpty() -> "ningún día"
-        dias.size == 7 -> "todos los días"
-        else -> ORDEN_DIAS.filter { it in dias }.joinToString(" ") { INICIALES.getValue(it) }
+        dias.isEmpty() -> context.getString(R.string.reminders_no_days_short)
+        dias.size == 7 -> context.getString(R.string.reminders_every_day)
+        else -> ORDEN_DIAS.filter { it in dias }
+            .joinToString(" ") { inicialDeDia(context, it) }
     }
-    val tope = if (objetivo == PrefsRecordatorios.GYM_SIN_OBJETIVO) "sin tope"
-    else "hasta $objetivo/semana"
-    return "${horaTexto(horaMin)} · $diasTexto · $tope"
+    val tope = if (objetivo == PrefsRecordatorios.GYM_SIN_OBJETIVO)
+        context.getString(R.string.reminders_no_cap_short)
+    else context.getString(R.string.reminders_cap_short, objetivo)
+    return context.getString(R.string.reminders_summary_gym, horaTexto(horaMin), diasTexto, tope)
 }
 
 /** La semana empieza en lunes, como en el resto de la app. */
@@ -254,11 +270,11 @@ private val ORDEN_DIAS = listOf(
     Calendar.FRIDAY, Calendar.SATURDAY, Calendar.SUNDAY,
 )
 
-private val INICIALES = mapOf(
-    Calendar.MONDAY to "L", Calendar.TUESDAY to "M", Calendar.WEDNESDAY to "X",
-    Calendar.THURSDAY to "J", Calendar.FRIDAY to "V", Calendar.SATURDAY to "S",
-    Calendar.SUNDAY to "D",
-)
+/** Inicial del día, sacada del mismo sitio que las del calendario. */
+private fun inicialDeDia(context: Context, diaCalendar: Int): String {
+    val iniciales = context.getString(R.string.weekday_initials)
+    return iniciales.getOrNull(ORDEN_DIAS.indexOf(diaCalendar))?.toString() ?: "?"
+}
 
 // ---------------------------------------------------------------------------
 // Piezas de la sección
@@ -406,7 +422,7 @@ private fun SelectorDias(dias: Set<Int>, tinte: Color, onCambio: (Set<Int>) -> U
                 onClick = { onCambio(if (activo) dias - dia else dias + dia) },
             ) {
                 Text(
-                    text = INICIALES.getValue(dia),
+                    text = inicialDeDia(LocalContext.current, dia),
                     style = MaterialTheme.typography.labelLarge,
                     fontWeight = if (activo) FontWeight.SemiBold else FontWeight.Medium,
                     color = if (activo) tinte else MaterialTheme.colorScheme.onSecondaryContainer,

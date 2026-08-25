@@ -25,4 +25,182 @@
     <string name="sleep_banner">Modo a dormir activo · los avisos volverán a las %1$s</string>
     <string name="wake_button">Ya estoy despierto</string>
     <string name="wake_toast">¡Buenos días! Vuelvo a avisarte ☀️</string>
+
+    <!-- Los cuatro tipos de registro -->
+    <string name="kind_food">Comida</string>
+    <string name="kind_walk">Caminata</string>
+    <string name="kind_mood">Estado de ánimo</string>
+    <string name="kind_mood_short">Ánimo</string>
+    <string name="kind_gym">Gimnasio</string>
+
+    <!-- Cómo se lee un registro -->
+    <string name="content_walk_minutes">%1$d minutos</string>
+    <string name="content_gym_yes">Sí, he ido</string>
+    <string name="content_gym_no">No he ido</string>
+
+    <!-- Formatos de fecha. Son patrones de SimpleDateFormat/DateTimeFormatter:
+         al traducir hay que reordenarlos, no traducir las letras. -->
+    <string name="fmt_day_long">"EEEE d 'de' MMMM"</string>
+    <string name="fmt_day_long_year">"EEEE d 'de' MMMM 'de' yyyy"</string>
+    <string name="fmt_day_month">"d 'de' MMMM"</string>
+    <string name="fmt_day_month_short_year">d MMM yyyy</string>
+    <string name="fmt_month_year">MMMM yyyy</string>
+    <string name="fmt_day_time">"EEEE d 'de' MMMM, HH:mm"</string>
+    <string name="fmt_day_month_year_long">"d 'de' MMMM 'de' yyyy"</string>
+
+    <!-- Iniciales de los días, de lunes a domingo -->
+    <string name="weekday_initials">LMXJVSD</string>
+
+    <!-- Rangos de fechas. Cada idioma los arma a su manera, por eso son frases
+         completas con huecos y no trozos concatenados. -->
+    <string name="week_range_same_month">Semana del %1$d al %2$s</string>
+    <string name="week_range_cross_month">Semana del %1$s al %2$s</string>
+    <string name="date_range_same_month">Del %1$d al %2$s</string>
+    <string name="date_range_cross_month">Del %1$s al %2$s</string>
+    <string name="date_range_with_year">%1$s de %2$d</string>
+
+    <!-- Lo que se exporta (PDF e imagen). Acaba impreso en la consulta. -->
+    <string name="export_legend">● comida   ▲ caminata   ◆ ánimo   ■ gimnasio</string>
+    <string name="export_empty">Sin registros en este periodo.</string>
+    <string name="export_generated_on">generado el %1$s</string>
+    <string name="export_header">CRÓNICAS DEL APETITO</string>
+    <string name="fmt_export_day">"EEEE d 'de' MMMM yyyy"</string>
+    <string name="fmt_export_generated">dd/MM/yyyy</string>
+    <string name="export_page">pág. %1$d</string>
+
+    <!-- Resumen de un periodo. Los plurales los resuelve Android por idioma. -->
+    <string name="summary_none">Sin anotaciones</string>
+    <string name="summary_label_meals">comidas</string>
+    <string name="summary_label_minutes">min</string>
+    <string name="summary_label_notes">notas</string>
+    <string name="summary_label_gym">gym</string>
+    <string name="summary_gym_went">gimnasio</string>
+    <string name="summary_minutes">%1$d min</string>
+    <string name="filter_hint_lines">del %1$d al %2$d\n(filtro activo)</string>
+
+    <!-- Interfaz -->
+    <string name="action_share">Compartir</string>
+    <string name="action_more">Más opciones</string>
+    <string name="menu_settings">Ajustes</string>
+    <string name="menu_export_filtered">Exportar el rango filtrado (PDF)</string>
+    <string name="menu_export_all">Exportar todo el historial (PDF)</string>
+    <string name="menu_export_all_note">Ignora el filtro</string>
+    <string name="history_all">Historial completo</string>
+    <string name="action_add">Anotar</string>
+    <string name="filter_by_dates">Filtrar por fechas</string>
+    <string name="filter_clear">Quitar filtro</string>
+    <string name="day_end">Eso es todo por hoy.</string>
+    <string name="filter_note_week">Los días fuera del filtro se ven atenuados y no cuentan en el resumen ni en lo que se comparte.</string>
+    <string name="filter_note_month">Fuera del rango: los días atenuados conservan sus marcas, pero no cuentan en el resumen ni en lo que se comparte.</string>
+    <string name="open_full_day">Ver día completo ›</string>
+    <string name="view_day">Día</string>
+    <string name="view_week">Semana</string>
+    <string name="view_month">Mes</string>
+    <string name="photo_hide">Ocultar foto</string>
+    <string name="photo_show">Ver foto</string>
+    <string name="period_previous">Periodo anterior</string>
+    <string name="period_next">Periodo siguiente</string>
+    <string name="filter_last_7">Últimos 7 días</string>
+    <string name="filter_last_30">Últimos 30 días</string>
+    <string name="filter_this_month">Este mes</string>
+    <string name="filter_all">Todo</string>
+    <string name="filter_subtitle">Acota lo que ves en las tres vistas. No afecta a lo guardado.</string>
+    <string name="filter_from">Desde</string>
+    <string name="filter_to">Hasta</string>
+    <string name="filter_no_future">Las fechas futuras no se pueden elegir.</string>
+    <string name="action_cancel">Cancelar</string>
+    <string name="action_apply">Aplicar</string>
+    <string name="share_image">Imagen</string>
+    <string name="share_image_desc">Se ve directamente en el chat. Recomendada para Semana y Mes.</string>
+    <string name="share_pdf">PDF</string>
+    <string name="share_pdf_desc">Para imprimir o llevar a consulta. Incluye las fotos.</string>
+    <string name="update_up_to_date_short">estás al día</string>
+    <string name="update_action">Actualizar</string>
+    <string name="update_verifying_download">Verificando la descarga…</string>
+    <string name="update_installing">Instalando…</string>
+    <string name="update_checking">Comprobando…</string>
+    <string name="update_verifying">Verificando…</string>
+    <string name="update_error_network">Sin conexión.</string>
+    <string name="update_error_http">No se pudo contactar con el servidor.</string>
+    <string name="update_error_manifest">La información de actualización no es válida.</string>
+    <string name="update_error_download">Falló la descarga.</string>
+    <string name="update_error_hash">La descarga estaba corrupta (se descartó).</string>
+    <string name="update_error_install">No se pudo instalar</string>
+    <string name="photo_save_failed">No se pudo guardar la foto</string>
+    <string name="action_back">Volver</string>
+    <string name="entry_what_did_you_eat">¿Qué has comido?</string>
+    <string name="entry_photo_label">Foto del plato</string>
+    <string name="entry_photo_saving">Guardando foto…</string>
+    <string name="entry_camera">Cámara</string>
+    <string name="entry_gallery">Galería</string>
+    <string name="entry_photo_remove"> Quitar foto</string>
+    <string name="entry_how_did_you_feel">¿Cómo te has sentido?</string>
+    <string name="entry_mood_blank_ok">Puedes dejarlo en blanco si no quieres anotarlo</string>
+    <string name="entry_mood_saved_apart">Se guardará como nota de ánimo aparte, con la misma hora</string>
+    <string name="field_optional"> (opcional)</string>
+    <string name="action_save">Guardar</string>
+    <string name="field_datetime">FECHA Y HORA</string>
+    <string name="action_change">Cambiar</string>
+    <string name="add_what">¿Qué quieres anotar?</string>
+    <string name="gym_asked_today">¿Has ido al gimnasio hoy?</string>
+    <string name="walk_title">Caminata</string>
+    <string name="walk_did_you_walk">¿Has ido a caminar?</string>
+    <string name="walk_how_long">¿Cuánto tiempo has caminado?</string>
+    <string name="walk_minutes_unit">minutos</string>
+    <string name="walk_other_amount">Otra cantidad</string>
+    <string name="mood_how_do_you_feel">¿Cómo te sientes?</string>
+    <string name="mood_standalone_hint">Escribe cómo te sientes ahora mismo. No hace falta que hayas comido ni caminado.</string>
+    <string name="mood_optional_hint">Si quieres, anota cómo te has sentido. Es opcional.</string>
+    <string name="mood_placeholder">Describe cómo te sientes ahora mismo</string>
+    <string name="action_continue">Continuar</string>
+    <string name="action_previous">Atrás</string>
+    <string name="action_skip">Omitir</string>
+    <string name="settings_title">Ajustes</string>
+    <string name="settings_updates">Actualizaciones</string>
+    <string name="settings_auto_check">Buscar automáticamente</string>
+    <string name="settings_auto_check_desc">Comprueba si hay una versión nueva</string>
+    <string name="settings_check_now">Buscar ahora</string>
+    <string name="settings_check">Buscar</string>
+    <string name="settings_download_install">Descargar e instalar</string>
+    <string name="settings_about">Acerca de</string>
+    <string name="settings_local_only">· datos solo en este móvil</string>
+    <string name="reminders_meal_section">Recordatorios de comida</string>
+    <string name="reminders_meal_switch">Preguntarme si he comido</string>
+    <string name="reminders_meal_off">Desactivado: no llegará ningún aviso</string>
+    <string name="reminders_start_at">Empiezan a las</string>
+    <string name="reminders_end_at">Terminan a las</string>
+    <string name="reminders_all_day">Todo el día</string>
+    <string name="reminders_next_day">Del día siguiente</string>
+    <string name="reminders_how_often">Cada cuánto</string>
+    <string name="reminders_walk_switch">Ofrecer «Caminar» en el aviso</string>
+    <string name="reminders_walk_on">El aviso de comida trae también el botón de caminata</string>
+    <string name="reminders_walk_off">El aviso solo pregunta por la comida</string>
+    <string name="reminders_gym_section">Recordatorio de gimnasio</string>
+    <string name="reminders_gym_switch">Preguntarme por el gimnasio</string>
+    <string name="reminders_gym_off">Desactivado: no se preguntará nunca</string>
+    <string name="reminders_gym_at">A las</string>
+    <string name="reminders_gym_days">Qué días</string>
+    <string name="reminders_gym_no_days">Sin ningún día no se preguntará.</string>
+    <string name="reminders_gym_goal">Dejar de preguntar al llegar a</string>
+    <string name="reminders_gym_goal_note">Veces por semana. Cuando ya has ido esas veces, la semana se da por hecha.</string>
+    <string name="reminders_no_cap">Sin tope</string>
+    <string name="reminders_summary_meal">%1$s → %2$s · %3$s · %4$s</string>
+    <string name="reminders_summary_gym">%1$s · %2$s · %3$s</string>
+    <string name="reminders_no_days_short">ningún día</string>
+    <string name="reminders_every_day">todos los días</string>
+    <string name="reminders_no_cap_short">sin tope</string>
+    <string name="reminders_cap_short">hasta %1$d/semana</string>
+    <string name="freq_minutes">cada %1$d min</string>
+    <string name="freq_hours">cada %1$d h</string>
+    <string name="freq_hours_minutes">cada %1$d h %2$d min</string>
+    <string name="freq_minutes_short">%1$d min</string>
+    <string name="freq_hours_short">%1$d h</string>
+    <string name="freq_hours_minutes_short">%1$d h %2$d min</string>
+    <string name="update_up_to_date">Estás al día · %1$s (%2$d)</string>
+    <string name="update_available">Hay una versión nueva: %1$s</string>
+    <string name="update_downloading">Descargando… %1$d%%</string>
+    <string name="update_last_known">Última versión conocida: %1$s</string>
+    <string name="settings_version">Versión %1$s (%2$d) %3$s</string>
+    <string name="label_today">hoy</string>
+    <string name="photo_of_meal">Foto de la comida</string>
 </resources>

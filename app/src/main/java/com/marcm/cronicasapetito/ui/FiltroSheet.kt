@@ -2,6 +2,7 @@ package com.marcm.cronicasapetito.ui
 
 import android.app.DatePickerDialog
 import android.content.Context
+import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -34,17 +35,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.marcm.cronicasapetito.R
 import com.marcm.cronicasapetito.data.RangoFechas
 import java.time.LocalDate
 
 /** Atajos: cubren el 90% de los casos, el rango manual queda debajo. */
-private enum class Atajo(val etiqueta: String) {
-    SIETE("Últimos 7 días"),
-    TREINTA("Últimos 30 días"),
-    ESTE_MES("Este mes"),
-    TODO("Todo");
+private enum class Atajo(@StringRes val etiqueta: Int) {
+    SIETE(R.string.filter_last_7),
+    TREINTA(R.string.filter_last_30),
+    ESTE_MES(R.string.filter_this_month),
+    TODO(R.string.filter_all);
 
     fun rango(hoy: LocalDate): RangoFechas? = when (this) {
         SIETE -> RangoFechas.ultimosDias(7, hoy)
@@ -72,10 +75,10 @@ fun FiltroSheet(
         containerColor = MaterialTheme.colorScheme.background,
     ) {
         Column(modifier = Modifier.padding(horizontal = 20.dp).padding(bottom = 24.dp)) {
-            Text("Filtrar por fechas", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.filter_by_dates), style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(2.dp))
             Text(
-                text = "Acota lo que ves en las tres vistas. No afecta a lo guardado.",
+                text = stringResource(R.string.filter_subtitle),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -84,7 +87,7 @@ fun FiltroSheet(
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Atajo.entries.forEach { atajo ->
                     ChipAtajo(
-                        texto = atajo.etiqueta,
+                        texto = stringResource(atajo.etiqueta),
                         activo = atajoElegido == atajo,
                         onClick = {
                             atajoElegido = atajo
@@ -97,13 +100,13 @@ fun FiltroSheet(
             Spacer(Modifier.height(14.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 CampoFecha(
-                    etiqueta = "Desde",
+                    etiqueta = stringResource(R.string.filter_from),
                     fecha = desde,
                     modifier = Modifier.weight(1f),
                     onElegir = { desde = it; atajoElegido = null },
                 )
                 CampoFecha(
-                    etiqueta = "Hasta",
+                    etiqueta = stringResource(R.string.filter_to),
                     fecha = hasta,
                     modifier = Modifier.weight(1f),
                     onElegir = { hasta = it; atajoElegido = null },
@@ -111,7 +114,7 @@ fun FiltroSheet(
             }
             Spacer(Modifier.height(6.dp))
             Text(
-                text = "Las fechas futuras no se pueden elegir.",
+                text = stringResource(R.string.filter_no_future),
                 style = MaterialTheme.typography.bodySmall,
                 color = colorsCronicas.tenue,
             )
@@ -122,7 +125,7 @@ fun FiltroSheet(
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                TextButton(onClick = onCerrar) { Text("Cancelar") }
+                TextButton(onClick = onCerrar) { Text(stringResource(R.string.action_cancel)) }
                 Spacer(Modifier.width(8.dp))
                 Button(
                     onClick = {
@@ -133,7 +136,7 @@ fun FiltroSheet(
                         )
                     },
                     shape = RoundedCornerShape(999.dp),
-                ) { Text("Aplicar") }
+                ) { Text(stringResource(R.string.action_apply)) }
             }
         }
     }

@@ -7,11 +7,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import com.marcm.cronicasapetito.R
 import com.marcm.cronicasapetito.data.PhotoStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -45,7 +47,7 @@ fun PhotoThumb(
         if (bitmap != null) {
             Image(
                 bitmap = bitmap,
-                contentDescription = "Foto de la comida",
+                contentDescription = stringResource(R.string.photo_of_meal),
                 contentScale = contentScale,
                 modifier = Modifier.fillMaxSize()
             )

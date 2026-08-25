@@ -36,14 +36,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.marcm.cronicasapetito.R
 import com.marcm.cronicasapetito.data.EntryKind
 import com.marcm.cronicasapetito.data.Periodos
 import com.marcm.cronicasapetito.data.ResumenDia
@@ -78,7 +81,7 @@ fun VistaDia(
         if (porDia.isNotEmpty() && estado.entradasVisibles.size <= 3) {
             item(key = "cierre") {
                 Text(
-                    text = "Eso es todo por hoy.",
+                    text = stringResource(R.string.day_end),
                     style = MaterialTheme.typography.bodyMedium,
                     color = colorsCronicas.tenue,
                     textAlign = TextAlign.Center,
@@ -157,7 +160,7 @@ fun VistaSemana(
 
         if (estado.filtro != null) {
             NotaFueraDeRango(
-                "Los días fuera del filtro se ven atenuados y no cuentan en el resumen " +
+                stringResource(R.string.filter_note_week) +
                     "ni en lo que se comparte."
             )
         }
@@ -187,7 +190,7 @@ private fun FilaDia(
             // Sin ancho fijo y en una sola línea: con el zoom al 150% un ancho
             // en dp partía el número del día en dos («M 1 / 8»).
             Text(
-                text = "${inicialDia(dia)} ${dia.dayOfMonth}",
+                text = "${inicialDia(LocalContext.current, dia)} ${dia.dayOfMonth}",
                 style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = alfa),
@@ -283,7 +286,7 @@ fun VistaMes(
         if (estado.filtro != null) {
             Spacer(Modifier.height(8.dp))
             NotaFueraDeRango(
-                "Fuera del rango: los días atenuados conservan sus marcas, pero no cuentan " +
+                stringResource(R.string.filter_note_month) +
                     "en el resumen ni en lo que se comparte."
             )
         }
@@ -395,7 +398,7 @@ private fun TarjetaDiaSeleccionado(
                 if (!resumen.vacio) {
                     TextButton(onClick = onAbrir, contentPadding = PaddingValues(4.dp)) {
                         Text(
-                            text = "Ver día completo ›",
+                            text = stringResource(R.string.open_full_day),
                             style = MaterialTheme.typography.labelLarge,
                             fontWeight = FontWeight.SemiBold,
                         )
