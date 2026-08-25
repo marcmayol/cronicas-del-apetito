@@ -225,4 +225,19 @@
     <string name="reminders_mood_on">Sale al anotar y como cierre de la caminata</string>
     <string name="reminders_mood_off">No se ofrece en ningún sitio</string>
     <string name="reminders_mood_section">Estado de ánimo</string>
+
+    <!-- Copia de seguridad -->
+    <string name="backup_section">Tus datos</string>
+    <string name="backup_export">Guardar una copia</string>
+    <string name="backup_export_desc">Un archivo con todo tu historial y tus fotos, donde tú elijas</string>
+    <string name="backup_export_action">Guardar</string>
+    <string name="backup_export_done">Copia guardada: %1$d registros y %2$d fotos</string>
+    <string name="backup_export_failed">No se pudo escribir el archivo</string>
+    <string name="backup_import">Recuperar una copia</string>
+    <string name="backup_import_desc">Vuelve a meter lo que guardaste, sin borrar lo que ya tengas</string>
+    <string name="backup_import_action">Recuperar</string>
+    <string name="backup_import_title">¿Recuperar esta copia?</string>
+    <string name="backup_import_explain">Se añadirá lo que falte. Los registros que ya tengas se quedan como están: nada se borra ni se sobrescribe.</string>
+    <string name="backup_import_invalid">Ese archivo no es una copia de Crónicas del Apetito</string>
+    <string name="backup_import_done">Recuperado: %1$d registros y %2$d fotos</string>
 </resources>

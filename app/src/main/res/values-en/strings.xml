@@ -231,4 +231,19 @@
     <string name="reminders_mood_on">Shows up when adding an entry and after a walk</string>
     <string name="reminders_mood_off">Not offered anywhere</string>
     <string name="reminders_mood_section">Mood</string>
+
+    <!-- Backup -->
+    <string name="backup_section">Your data</string>
+    <string name="backup_export">Save a copy</string>
+    <string name="backup_export_desc">One file with your whole history and your photos, wherever you want it</string>
+    <string name="backup_export_action">Save</string>
+    <string name="backup_export_done">Copy saved: %1$d entries and %2$d photos</string>
+    <string name="backup_export_failed">Could not write the file</string>
+    <string name="backup_import">Restore a copy</string>
+    <string name="backup_import_desc">Put back what you saved, without deleting what you already have</string>
+    <string name="backup_import_action">Restore</string>
+    <string name="backup_import_title">Restore this copy?</string>
+    <string name="backup_import_explain">Whatever is missing will be added. Entries you already have stay as they are: nothing is deleted or overwritten.</string>
+    <string name="backup_import_invalid">That file is not an Appetite Chronicles copy</string>
+    <string name="backup_import_done">Restored: %1$d entries and %2$d photos</string>
 </resources>

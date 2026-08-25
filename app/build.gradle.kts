@@ -23,8 +23,8 @@ android {
         applicationId = "com.marcm.cronicasapetito"
         minSdk = 26
         targetSdk = 34
-        versionCode = 10
-        versionName = "2.1"
+        versionCode = 11
+        versionName = "2.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -65,6 +65,10 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.8"
     }
+    testOptions {
+        // android.util.Log en tests de JVM: devolver 0 en vez de reventar.
+        unitTests.isReturnDefaultValues = true
+    }
     packaging {
         resources.excludes += "/META-INF/{AL2.0,LGPL2.1}"
     }
@@ -92,6 +96,9 @@ dependencies {
 
     implementation(project(":actualizador"))
 
+    // El org.json del android.jar es un stub vacío en tests de JVM; esta es la
+    // implementación de verdad, para poder comprobar el formato del respaldo.
+    testImplementation("org.json:json:20240303")
     testImplementation("junit:junit:4.13.2")
 
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

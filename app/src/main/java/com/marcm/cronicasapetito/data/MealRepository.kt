@@ -44,6 +44,9 @@ class MealRepository(private val dao: MealEntryDao) {
             )
         )
 
+    /** Inserta una entrada ya formada. Solo la usa la restauración de un respaldo. */
+    suspend fun añadirDeRespaldo(entrada: MealEntry): Long = dao.insert(entrada)
+
     suspend fun getInRange(from: Long, to: Long): List<MealEntry> = dao.getInRange(from, to)
     suspend fun getAll(): List<MealEntry> = dao.getAll()
 

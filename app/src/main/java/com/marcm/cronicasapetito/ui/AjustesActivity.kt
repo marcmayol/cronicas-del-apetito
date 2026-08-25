@@ -53,6 +53,7 @@ import com.marcm.actualizador.Modo
 import com.marcm.actualizador.TipoError
 import com.marcm.cronicasapetito.BuildConfig
 import com.marcm.cronicasapetito.CronicasApp
+import com.marcm.cronicasapetito.data.MealRepository
 import com.marcm.cronicasapetito.R
 import kotlinx.coroutines.launch
 
@@ -61,10 +62,15 @@ class AjustesActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val actualizador = (application as CronicasApp).actualizador
+        val app = application as CronicasApp
+        val repositorio = MealRepository(app.database.mealDao())
         setContent {
             CronicasTheme {
-                AjustesScreen(actualizador = actualizador, onBack = { finish() })
+                AjustesScreen(
+                    actualizador = app.actualizador,
+                    repositorio = repositorio,
+                    onBack = { finish() },
+                )
             }
         }
     }
@@ -77,7 +83,11 @@ class AjustesActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun AjustesScreen(actualizador: Actualizador, onBack: () -> Unit) {
+private fun AjustesScreen(
+    actualizador: Actualizador,
+    repositorio: MealRepository,
+    onBack: () -> Unit,
+) {
     val scope = rememberCoroutineScope()
     val estado by actualizador.estado.collectAsState()
     var buscarAuto by remember { mutableStateOf(actualizador.buscarAutomaticamente) }
@@ -107,6 +117,10 @@ private fun AjustesScreen(actualizador: Actualizador, onBack: () -> Unit) {
         ) {
             // Lo primero, porque es lo que cada persona necesita ajustar a su vida.
             SeccionRecordatorios()
+
+            // Justo debajo de los recordatorios: es lo segundo que alguien
+            // busca cuando la app le importa lo suficiente.
+            SeccionDatos(repositorio)
 
             TituloSeccion(stringResource(R.string.settings_updates))
             Bloque {

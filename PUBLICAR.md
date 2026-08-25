@@ -66,13 +66,18 @@ ya sirve el `versionCode` nuevo (reintentando por la caché del CDN).
 
 La app venía instalándose como *debug* (`…cronicasapetito.debug`). El release limpio
 usa `…cronicasapetito` (otra app para el sistema), así que sus datos no migran solos.
-Para conservar el historial de un móvil, con él conectado por adb:
+Desde la v2.2 esto lo hace la propia app: **Ajustes → Tus datos → Guardar una
+copia** escribe un ZIP con todo el historial y las fotos donde tú elijas, y
+**Recuperar** lo vuelve a meter. No hace falta cable, ni adb, ni que la app sea
+debuggable — que es justo el problema de la app pública: `run-as` no funciona
+con ella.
+
+Además, al abrir una versión que migra la base, la app deja una copia del
+archivo tal cual estaba en `cronicas.db.antes-de-v<N>`, dentro de su propia
+carpeta.
+
+Para el paquete debug, que sí es debuggable, sigue valiendo la vía corta:
 
 ```bash
-# Backup de la BD del paquete debug (requiere app debuggable)
 adb exec-out run-as com.marcm.cronicasapetito.debug cat databases/cronicas.db > cronicas-backup.db
-# …instalar el release y, si se quiere, restaurar en el paquete release.
 ```
-
-> La app pública arranca con base de datos **limpia**; la copia local queda para
-> reinyectar el historial si se desea.

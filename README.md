@@ -15,6 +15,7 @@ App Android para registrar lo que comes a lo largo del día, pensada para acompa
 - El **estado de ánimo se anota suelto** desde el botón Anotar, sin tener que pasar antes por una comida ni por una caminata.
 - La **primera vez** hay tres pasos —qué quieres llevar, a qué horas, permiso de avisos— y se sale de ahí con la app montada. Quien actualiza desde una versión anterior no los ve.
 - **Español e inglés**, según el idioma del móvil. En inglés la app se llama *Appetite Chronicles*.
+- **Tus datos son tuyos**: desde Ajustes se guarda una copia con todo el historial y las fotos en un ZIP, y se recupera igual de fácil. Sin cuentas ni nube, pero con salida.
 
 Todo se guarda en local en el móvil. Sin nube ni cuentas.
 
@@ -23,6 +24,7 @@ Todo se guarda en local en el móvil. Sin nube ni cuentas.
 Están señaladas en el código, pero conviene tenerlas presentes al tocar textos:
 
 - **`fmt_*` en strings.xml son patrones de fecha**, no frases. Al traducir se reordenan las letras (`EEEE d 'de' MMMM` → `EEEE d MMMM`); traducirlas rompe el formateo.
+- **Antes de migrar la base, la app guarda una copia.** `cronicas.db.antes-de-v4` queda junto a la base en la carpeta de la app. Una migración probada no debería perder nada, pero el historial de meses de alguien no es sitio para confiar en «no debería».
 - **La respuesta del gimnasio es un valor, no un texto.** Se guarda como `yes`/`no` en la base de datos y solo se traduce al mostrarla. Hasta la v2.1 se guardaba «Sí», y traducir eso habría dejado el contador semanal a cero para siempre sin dar ningún error: la migración 3→4 reescribe los registros viejos.
 
 ## Las tres vistas
