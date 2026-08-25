@@ -61,19 +61,30 @@ class WalkMoodActivity : ComponentActivity() {
 
     companion object {
         const val EXTRA_START_AT_MINUTES = "start_at_minutes"
+        /** Anotar solo cómo te sientes, sin pasar por la caminata. */
+        const val EXTRA_SOLO_ANIMO = "solo_animo"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        MealNotifier.dismiss(this)
 
         val repo = MealRepository((application as CronicasApp).database.mealDao())
         val empezarEnMinutos = intent.getBooleanExtra(EXTRA_START_AT_MINUTES, false)
+        val soloAnimo = intent.getBooleanExtra(EXTRA_SOLO_ANIMO, false)
+
+        // El aviso de comida se descarta porque esta pantalla es su respuesta.
+        // Anotando solo el ánimo no lo es: la pregunta de la comida sigue viva.
+        if (!soloAnimo) MealNotifier.dismiss(this)
 
         setContent {
             CronicasTheme {
                 FlujoCaminata(
-                    pasoInicial = if (empezarEnMinutos) Paso.MINUTOS else Paso.PREGUNTA,
+                    pasoInicial = when {
+                        soloAnimo -> Paso.ANIMO
+                        empezarEnMinutos -> Paso.MINUTOS
+                        else -> Paso.PREGUNTA
+                    },
+                    soloAnimo = soloAnimo,
                     onSave = { minutos, animo, timestamp ->
                         lifecycleScope.launch {
                             if (minutos != null && minutos > 0) repo.addWalk(minutos, timestamp)
@@ -92,6 +103,7 @@ class WalkMoodActivity : ComponentActivity() {
 @Composable
 private fun FlujoCaminata(
     pasoInicial: Paso = Paso.PREGUNTA,
+    soloAnimo: Boolean = false,
     onSave: (minutos: Int?, animo: String, timestamp: Long) -> Unit,
     onCancel: () -> Unit
 ) {
@@ -99,13 +111,14 @@ private fun FlujoCaminata(
     var minutos by remember { mutableStateOf(0) }
     var animo by remember { mutableStateOf("") }
     var momento by remember { mutableLongStateOf(System.currentTimeMillis()) }
-    val visual = visualDe(EntryKind.WALK)
+    val tipo = if (soloAnimo) EntryKind.MOOD else EntryKind.WALK
+    val visual = visualDe(tipo)
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
-                title = { Text("Caminata") },
+                title = { Text(if (soloAnimo) "Estado de ánimo" else "Caminata") },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background,
                 ),
@@ -114,7 +127,7 @@ private fun FlujoCaminata(
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
                     }
                 },
-                actions = { SelloTipo(EntryKind.WALK) },
+                actions = { SelloTipo(tipo) },
             )
         },
         bottomBar = {
@@ -131,10 +144,12 @@ private fun FlujoCaminata(
                     alineadoAlInicio = true,
                 )
                 Paso.ANIMO -> BarraGuardar(
-                    habilitado = true,
+                    // Anotado suelto, un ánimo en blanco no guardaría nada;
+                    // como cola de la caminata sí puede omitirse.
+                    habilitado = !soloAnimo || animo.isNotBlank(),
                     onCancelar = onCancel,
-                    onGuardar = { onSave(minutos, animo, momento) },
-                    textoGuardar = if (animo.isBlank()) "Omitir" else "Guardar",
+                    onGuardar = { onSave(if (soloAnimo) null else minutos, animo, momento) },
+                    textoGuardar = if (!soloAnimo && animo.isBlank()) "Omitir" else "Guardar",
                 )
             }
         },
@@ -147,15 +162,18 @@ private fun FlujoCaminata(
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
             // Los tres tramos: el paso en el que estás, que antes no se veía.
-            IndicadorPasos(
-                total = 3,
-                completados = when (paso) {
-                    Paso.PREGUNTA -> 1
-                    Paso.MINUTOS -> 2
-                    Paso.ANIMO -> 3
-                },
-                color = visual.color,
-            )
+            // Anotando solo el ánimo no hay recorrido que enseñar.
+            if (!soloAnimo) {
+                IndicadorPasos(
+                    total = 3,
+                    completados = when (paso) {
+                        Paso.PREGUNTA -> 1
+                        Paso.MINUTOS -> 2
+                        Paso.ANIMO -> 3
+                    },
+                    color = visual.color,
+                )
+            }
 
             when (paso) {
                 Paso.PREGUNTA -> {
@@ -251,12 +269,24 @@ private fun FlujoCaminata(
                 }
 
                 Paso.ANIMO -> {
-                    Text("¿Cómo te has sentido?", style = MaterialTheme.typography.headlineSmall)
                     Text(
-                        text = "Si quieres, anota cómo te has sentido. Es opcional.",
+                        text = if (soloAnimo) "¿Cómo te sientes?" else "¿Cómo te has sentido?",
+                        style = MaterialTheme.typography.headlineSmall,
+                    )
+                    Text(
+                        text = if (soloAnimo)
+                            "Escribe cómo te sientes ahora mismo. No hace falta que hayas comido ni caminado."
+                        else "Si quieres, anota cómo te has sentido. Es opcional.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
+                    if (soloAnimo) {
+                        FilaFechaHora(
+                            selectedTime = momento,
+                            tinte = visual.color,
+                            onPicked = { momento = it },
+                        )
+                    }
                     OutlinedTextField(
                         value = animo,
                         onValueChange = { animo = it },

@@ -5,23 +5,22 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import java.util.Calendar
 
 object MealAlarmScheduler {
 
     private const val REQUEST_CODE = 1001
-    const val START_HOUR = 8
-    const val END_HOUR_INCLUSIVE = 24 // 00:00 del día siguiente
 
     fun scheduleNext(context: Context) {
-        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(context, MealAlarmReceiver::class.java)
-        val pi = PendingIntent.getBroadcast(
-            context, REQUEST_CODE, intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+        if (!PrefsRecordatorios.comidaActiva(context)) {
+            cancel(context)
+            return
+        }
+        programar(context, nextTrigger(context))
+    }
 
-        val triggerAt = nextHourlyTrigger(context)
+    private fun programar(context: Context, triggerAt: Long) {
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val pi = pendingIntent(context)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             if (alarmManager.canScheduleExactAlarms()) {
@@ -35,20 +34,20 @@ object MealAlarmScheduler {
     }
 
     /**
-     * Activa el "modo a dormir": silencia los recordatorios hasta las
-     * [START_HOUR]:00 de la próxima mañana, descarta cualquier aviso visible
-     * y reprograma la alarma para que despierte ya directamente a esa hora.
+     * Activa el "modo a dormir": silencia los recordatorios hasta el comienzo de
+     * la próxima ventana, descarta cualquier aviso visible y reprograma la
+     * alarma para que despierte ya directamente a esa hora.
      */
     fun goToSleep(context: Context) {
-        SleepPrefs.setSleepUntil(context, nextStartHourMillis())
+        SleepPrefs.setSleepUntil(context, proximoInicioVentana(context))
         MealNotifier.dismiss(context)
         scheduleNext(context)
     }
 
     /**
-     * Cancela el "modo a dormir" antes de tiempo (p. ej. si te levantas antes
-     * de las 8:00): borra el periodo de descanso y vuelve a programar la alarma
-     * a la siguiente hora en punto dentro de la franja.
+     * Cancela el "modo a dormir" antes de tiempo (p. ej. si te levantas antes de
+     * que abra la ventana): borra el periodo de descanso y vuelve a programar la
+     * alarma al siguiente aviso.
      */
     fun wakeUp(context: Context) {
         SleepPrefs.clear(context)
@@ -57,62 +56,39 @@ object MealAlarmScheduler {
 
     fun cancel(context: Context) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        alarmManager.cancel(pendingIntent(context))
+    }
+
+    private fun pendingIntent(context: Context): PendingIntent {
         val intent = Intent(context, MealAlarmReceiver::class.java)
-        val pi = PendingIntent.getBroadcast(
+        return PendingIntent.getBroadcast(
             context, REQUEST_CODE, intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        alarmManager.cancel(pi)
     }
 
     /**
-     * Devuelve el siguiente cambio de hora en punto dentro de la franja
-     * [START_HOUR, END_HOUR_INCLUSIVE]. Si estamos fuera de ventana, salta a las 8:00 del próximo día válido.
+     * Siguiente aviso según la ventana configurada. Si estamos en «modo a
+     * dormir», la próxima alarma es directamente el instante de despertar.
      */
-    private fun nextHourlyTrigger(context: Context): Long {
-        val now = Calendar.getInstance()
-
-        // Modo "me voy a dormir": si seguimos dentro del periodo de descanso,
-        // la próxima alarma es directamente el instante de despertar.
+    private fun nextTrigger(context: Context): Long {
+        val ahora = System.currentTimeMillis()
         val sleepUntil = SleepPrefs.getSleepUntil(context)
-        if (sleepUntil > now.timeInMillis) {
-            return sleepUntil
-        }
+        if (sleepUntil > ahora) return sleepUntil
 
-        val target = Calendar.getInstance().apply {
-            timeInMillis = now.timeInMillis
-            set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
-            add(Calendar.HOUR_OF_DAY, 1)
-        }
-        val hour = target.get(Calendar.HOUR_OF_DAY)
-        // Ventana: 8..23 + 0 (medianoche del día siguiente)
-        val inWindow = hour in START_HOUR..23 || hour == 0
-        if (!inWindow) {
-            // Saltar a las 8:00 del próximo día válido (si es antes de las 8, mismo día)
-            if (hour < START_HOUR) {
-                target.set(Calendar.HOUR_OF_DAY, START_HOUR)
-            } else {
-                target.add(Calendar.DAY_OF_YEAR, 1)
-                target.set(Calendar.HOUR_OF_DAY, START_HOUR)
-            }
-        }
-        return target.timeInMillis
+        return RejillaAvisos.proximoDisparo(
+            ahora = ahora,
+            inicioMin = PrefsRecordatorios.comidaInicioMin(context),
+            duracionMin = PrefsRecordatorios.comidaDuracionMin(context),
+            cadaMin = PrefsRecordatorios.comidaCadaMin(context),
+        )
     }
 
-    /** Próxima ocurrencia de las [START_HOUR]:00 (mañana, salvo que aún no hayan sido hoy). */
-    private fun nextStartHourMillis(): Long {
-        val now = Calendar.getInstance()
-        val target = Calendar.getInstance().apply {
-            set(Calendar.HOUR_OF_DAY, START_HOUR)
-            set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
-        }
-        if (target.timeInMillis <= now.timeInMillis) {
-            target.add(Calendar.DAY_OF_YEAR, 1)
-        }
-        return target.timeInMillis
-    }
+    /** Hora a la que vuelven los avisos tras dormir: el primero de la próxima ventana. */
+    fun proximoInicioVentana(context: Context): Long = RejillaAvisos.proximoDisparo(
+        ahora = System.currentTimeMillis(),
+        inicioMin = PrefsRecordatorios.comidaInicioMin(context),
+        duracionMin = 0,
+        cadaMin = PrefsRecordatorios.comidaCadaMin(context),
+    )
 }

@@ -103,6 +103,9 @@ private fun AjustesScreen(actualizador: Actualizador, onBack: () -> Unit) {
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState()),
         ) {
+            // Lo primero, porque es lo que cada persona necesita ajustar a su vida.
+            SeccionRecordatorios()
+
             TituloSeccion("Actualizaciones")
             Bloque {
                 Row(
@@ -203,7 +206,7 @@ private fun AjustesScreen(actualizador: Actualizador, onBack: () -> Unit) {
 }
 
 @Composable
-private fun TituloSeccion(texto: String) {
+internal fun TituloSeccion(texto: String) {
     Text(
         text = texto.uppercase(),
         style = MaterialTheme.typography.labelSmall,
@@ -213,7 +216,7 @@ private fun TituloSeccion(texto: String) {
 }
 
 @Composable
-private fun Bloque(contenido: @Composable () -> Unit) {
+internal fun Bloque(contenido: @Composable () -> Unit) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(14.dp),
@@ -225,7 +228,7 @@ private fun Bloque(contenido: @Composable () -> Unit) {
 }
 
 @Composable
-private fun Separador() {
+internal fun Separador() {
     Box(
         Modifier
             .fillMaxWidth()

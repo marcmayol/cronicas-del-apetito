@@ -18,16 +18,16 @@ object MealNotifier {
 
     fun ensureChannel(context: Context) {
         val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        if (nm.getNotificationChannel(CHANNEL_ID) == null) {
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                context.getString(R.string.notif_channel_name),
-                NotificationManager.IMPORTANCE_HIGH
-            ).apply {
-                description = context.getString(R.string.notif_channel_desc)
-            }
-            nm.createNotificationChannel(channel)
+        // Se vuelve a crear siempre: así el nombre y la descripción se refrescan
+        // si cambian, y Android respeta la importancia que haya elegido el usuario.
+        val channel = NotificationChannel(
+            CHANNEL_ID,
+            context.getString(R.string.notif_channel_name),
+            NotificationManager.IMPORTANCE_HIGH
+        ).apply {
+            description = context.getString(R.string.notif_channel_desc)
         }
+        nm.createNotificationChannel(channel)
     }
 
     fun show(context: Context) {
@@ -42,7 +42,10 @@ object MealNotifier {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        // Acción "Caminar" → abre el flujo de caminata + estado de ánimo
+        // Acción "Caminar" → abre el flujo de caminata + estado de ánimo.
+        // Solo sale si el carril de caminata está activo en Ajustes: quien solo
+        // quiere llevar la comida no tiene por qué ver el botón.
+        val conCaminata = PrefsRecordatorios.caminataEnAviso(context)
         val walkIntent = Intent(context, WalkMoodActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
@@ -61,12 +64,18 @@ object MealNotifier {
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentTitle(context.getString(R.string.notif_title))
-            .setContentText(context.getString(R.string.notif_text))
+            .setContentText(
+                context.getString(
+                    if (conCaminata) R.string.notif_text else R.string.notif_text_sin_caminata
+                )
+            )
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
             .setContentIntent(yesPi)
             .addAction(0, context.getString(R.string.action_yes), yesPi)
-            .addAction(0, context.getString(R.string.action_walk), walkPi)
+            .apply {
+                if (conCaminata) addAction(0, context.getString(R.string.action_walk), walkPi)
+            }
             .addAction(0, context.getString(R.string.action_no), noPi)
             .build()
 

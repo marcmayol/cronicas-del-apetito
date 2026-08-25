@@ -16,16 +16,16 @@ object GymNotifier {
 
     fun ensureChannel(context: Context) {
         val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        if (nm.getNotificationChannel(CHANNEL_ID) == null) {
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                context.getString(R.string.gym_notif_channel_name),
-                NotificationManager.IMPORTANCE_HIGH
-            ).apply {
-                description = context.getString(R.string.gym_notif_channel_desc)
-            }
-            nm.createNotificationChannel(channel)
+        // Se vuelve a crear siempre: así el nombre y la descripción se refrescan
+        // si cambian, y Android respeta la importancia que haya elegido el usuario.
+        val channel = NotificationChannel(
+            CHANNEL_ID,
+            context.getString(R.string.gym_notif_channel_name),
+            NotificationManager.IMPORTANCE_HIGH
+        ).apply {
+            description = context.getString(R.string.gym_notif_channel_desc)
         }
+        nm.createNotificationChannel(channel)
     }
 
     fun show(context: Context) {

@@ -16,13 +16,19 @@ class GymAlarmReceiver : BroadcastReceiver() {
         val repo = MealRepository(app.database.mealDao())
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                // No molestamos en fin de semana, si ya hay registro hoy,
-                // o si ya se ha ido 2 veces esta semana.
-                if (repo.shouldAskGym()) {
+                // No molestamos si el carril está apagado, si hoy no es uno de los
+                // días elegidos, si ya hay registro hoy, o si ya se ha alcanzado
+                // el objetivo semanal.
+                val activo = PrefsRecordatorios.gymActivo(context)
+                val toca = repo.shouldAskGym(
+                    dias = PrefsRecordatorios.gymDias(context),
+                    objetivoSemanal = PrefsRecordatorios.gymObjetivoSemanal(context),
+                )
+                if (activo && toca) {
                     GymNotifier.show(context)
                 }
             } finally {
-                // Reprogramar para las 22:00 del día siguiente.
+                // Reprogramar para el próximo día elegido.
                 GymAlarmScheduler.scheduleNext(context)
                 pending.finish()
             }

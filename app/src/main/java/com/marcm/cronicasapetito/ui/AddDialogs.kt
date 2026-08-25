@@ -37,6 +37,7 @@ fun AddEntryPickerDialog(
     onPickFood: () -> Unit,
     onPickWalk: () -> Unit,
     onPickGym: () -> Unit,
+    onPickMood: () -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -59,6 +60,13 @@ fun AddEntryPickerDialog(
                     kind = EntryKind.GYM,
                     texto = "Gimnasio",
                     onClick = onPickGym,
+                )
+                // El ánimo ya no cuelga de la caminata: hay días en que lo único
+                // que hay que anotar es cómo estás.
+                BotonTipoSecundario(
+                    kind = EntryKind.MOOD,
+                    texto = "Estado de ánimo",
+                    onClick = onPickMood,
                 )
             }
         },

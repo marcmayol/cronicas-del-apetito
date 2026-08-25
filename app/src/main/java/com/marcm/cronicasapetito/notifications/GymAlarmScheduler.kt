@@ -10,17 +10,17 @@ import java.util.Calendar
 object GymAlarmScheduler {
 
     private const val REQUEST_CODE = 1002
-    const val GYM_HOUR = 22 // 22:00
 
     fun scheduleNext(context: Context) {
-        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(context, GymAlarmReceiver::class.java)
-        val pi = PendingIntent.getBroadcast(
-            context, REQUEST_CODE, intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+        val dias = PrefsRecordatorios.gymDias(context)
+        if (!PrefsRecordatorios.gymActivo(context) || dias.isEmpty()) {
+            cancel(context)
+            return
+        }
 
-        val triggerAt = nextTrigger()
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val pi = pendingIntent(context)
+        val triggerAt = nextTrigger(PrefsRecordatorios.gymHoraMin(context), dias)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             if (alarmManager.canScheduleExactAlarms()) {
@@ -35,26 +35,37 @@ object GymAlarmScheduler {
 
     fun cancel(context: Context) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        alarmManager.cancel(pendingIntent(context))
+    }
+
+    private fun pendingIntent(context: Context): PendingIntent {
         val intent = Intent(context, GymAlarmReceiver::class.java)
-        val pi = PendingIntent.getBroadcast(
+        return PendingIntent.getBroadcast(
             context, REQUEST_CODE, intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        alarmManager.cancel(pi)
     }
 
-    /** Próximas 22:00; si ya pasaron hoy, las de mañana. */
-    private fun nextTrigger(): Long {
-        val now = Calendar.getInstance()
-        val target = Calendar.getInstance().apply {
-            set(Calendar.HOUR_OF_DAY, GYM_HOUR)
+    /**
+     * Próxima vez que sean las [horaMin] en uno de los [dias] elegidos. Saltar
+     * directamente al día bueno evita despertar la app los días que no toca.
+     */
+    private fun nextTrigger(horaMin: Int, dias: Set<Int>): Long {
+        val ahora = System.currentTimeMillis()
+        val base = Calendar.getInstance().apply {
+            timeInMillis = ahora
+            set(Calendar.HOUR_OF_DAY, 0)
             set(Calendar.MINUTE, 0)
             set(Calendar.SECOND, 0)
             set(Calendar.MILLISECOND, 0)
         }
-        if (target.timeInMillis <= now.timeInMillis) {
-            target.add(Calendar.DAY_OF_YEAR, 1)
+        for (salto in 0..7) {
+            val dia = (base.clone() as Calendar).apply { add(Calendar.DAY_OF_YEAR, salto) }
+            if (dia.get(Calendar.DAY_OF_WEEK) !in dias) continue
+            val instante = dia.apply { add(Calendar.MINUTE, horaMin) }.timeInMillis
+            if (instante > ahora) return instante
         }
-        return target.timeInMillis
+        // Con [dias] no vacío siempre hay uno en la semana que viene.
+        return ahora + 24L * 60 * 60 * 1000
     }
 }

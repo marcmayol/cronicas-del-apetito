@@ -60,11 +60,9 @@ class MealRepository(private val dao: MealEntryDao) {
         return dao.countByKindInRange(EntryKind.GYM, start, end) > 0
     }
 
-    /** True si [now] cae en sábado o domingo. */
-    fun isWeekend(now: Long = System.currentTimeMillis()): Boolean {
-        val dow = Calendar.getInstance().apply { timeInMillis = now }.get(Calendar.DAY_OF_WEEK)
-        return dow == Calendar.SATURDAY || dow == Calendar.SUNDAY
-    }
+    /** Día de la semana de [now] en las constantes de [Calendar.DAY_OF_WEEK]. */
+    fun diaDeLaSemana(now: Long = System.currentTimeMillis()): Int =
+        Calendar.getInstance().apply { timeInMillis = now }.get(Calendar.DAY_OF_WEEK)
 
     /** Nº de veces que se ha respondido "Sí" al gimnasio en la semana (lun-dom) de [now]. */
     suspend fun gymYesCountThisWeek(now: Long = System.currentTimeMillis()): Int {
@@ -84,14 +82,19 @@ class MealRepository(private val dao: MealEntryDao) {
 
     /**
      * Decide si toca preguntar por el gimnasio en [now]. No preguntamos si:
-     * - es fin de semana (sábado/domingo),
+     * - hoy no es uno de los [dias] elegidos en Ajustes,
      * - ya hay un registro de gimnasio hoy,
-     * - ya se ha ido al gimnasio (respondido "Sí") 2 veces esta semana.
+     * - ya se ha alcanzado el [objetivoSemanal] de veces esta semana
+     *   (con 0 no hay tope: pregunta siempre que toque).
      */
-    suspend fun shouldAskGym(now: Long = System.currentTimeMillis()): Boolean {
-        if (isWeekend(now)) return false
+    suspend fun shouldAskGym(
+        dias: Set<Int>,
+        objetivoSemanal: Int,
+        now: Long = System.currentTimeMillis(),
+    ): Boolean {
+        if (diaDeLaSemana(now) !in dias) return false
         if (hasGymEntryToday(now)) return false
-        if (gymYesCountThisWeek(now) >= 2) return false
+        if (objetivoSemanal > 0 && gymYesCountThisWeek(now) >= objetivoSemanal) return false
         return true
     }
 }

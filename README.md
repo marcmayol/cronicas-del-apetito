@@ -1,16 +1,18 @@
 # Crónicas del Apetito
 
-App Android personal para registrar lo que comes a lo largo del día, pensada para acompañar el trabajo con la psicóloga sobre ansiedad y comida.
+App Android para registrar lo que comes a lo largo del día, pensada para acompañar el trabajo con la psicóloga sobre ansiedad y comida. Nació de un caso concreto, pero **todos los recordatorios se configuran**: la horquilla, la frecuencia y qué carriles quieres.
 
 ## Qué hace
 
-- Te envía una notificación **cada hora en punto de 8:00 a 00:00** preguntando "¿Has comido algo?", con acciones **Sí** (anotar comida), **Caminar** y **No**.
-- A las **22:00 entre semana** pregunta si has ido al gimnasio, y se registra desde la propia notificación.
+- Te envía una notificación preguntando "¿Has comido algo?", con acciones **Sí** (anotar comida), **Caminar** y **No**. **A la hora que le digas**: eliges cuándo empiezan, cuándo terminan y cada cuánto llegan (por defecto, cada hora de 8:00 a 00:00).
+- Pregunta si has ido al gimnasio, y se registra desde la propia notificación. También configurable: **a qué hora, qué días y cuántas veces por semana** antes de dejar de insistir (por defecto, 22:00 de lunes a viernes hasta 2 veces).
+- Cada carril **se puede apagar entero**: quien solo quiera llevar la comida quita el gimnasio, y quita también el botón **Caminar** del aviso.
 - Guarda cuatro tipos de registro: **comida** (texto + foto opcional), **caminata** (minutos), **estado de ánimo** (texto) y **gimnasio** (sí/no).
 - La pantalla principal se puede mirar de **tres formas**: Día, Semana y Mes.
 - **Filtro por rango de fechas** que acota las tres vistas, con atajos (últimos 7 / 30 días, este mes, todo).
 - Botón **Compartir**: manda exactamente lo que estás viendo —vista + periodo + filtro— como **imagen** (Semana y Mes) o **PDF** (Día y rangos largos).
-- **Modo "me voy a dormir"**: silencia los avisos hasta las 8:00 del día siguiente.
+- **Modo "me voy a dormir"**: silencia los avisos hasta que vuelva a abrirse tu horquilla al día siguiente.
+- El **estado de ánimo se anota suelto** desde el botón Anotar, sin tener que pasar antes por una comida ni por una caminata.
 
 Todo se guarda en local en el móvil. Sin nube ni cuentas.
 

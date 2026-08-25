@@ -45,6 +45,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -54,6 +55,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.marcm.actualizador.Actualizador
 import com.marcm.cronicasapetito.R
@@ -63,7 +66,9 @@ import com.marcm.cronicasapetito.export.ImagenExporter
 import com.marcm.cronicasapetito.export.PdfExporter
 import com.marcm.cronicasapetito.export.shareFile
 import com.marcm.cronicasapetito.notifications.MealAlarmScheduler
+import com.marcm.cronicasapetito.notifications.PrefsRecordatorios
 import com.marcm.cronicasapetito.notifications.SleepPrefs
+import com.marcm.cronicasapetito.notifications.horaTexto
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -86,7 +91,16 @@ fun MainScreen(
     var mostrarAnotar by remember { mutableStateOf(false) }
     var mostrarGimnasio by remember { mutableStateOf(false) }
     var mostrarDormir by remember { mutableStateOf(false) }
-    var durmiendo by remember { mutableStateOf(SleepPrefs.isSleeping(context)) }
+
+    // Los ajustes se cambian en otra pantalla: al volver hay que releerlos, o el
+    // botón de dormir seguiría ahí con los recordatorios ya apagados.
+    var relectura by remember { mutableIntStateOf(0) }
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { relectura++ }
+    var durmiendo by remember(relectura) { mutableStateOf(SleepPrefs.isSleeping(context)) }
+    val comidaActiva = remember(relectura) { PrefsRecordatorios.comidaActiva(context) }
+    val horaDespertar = remember(relectura) {
+        horaTexto(PrefsRecordatorios.comidaInicioMin(context))
+    }
 
     LaunchedEffect(Unit) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -109,8 +123,10 @@ fun MainScreen(
                     containerColor = MaterialTheme.colorScheme.background,
                 ),
                 actions = {
-                    IconButton(onClick = { mostrarDormir = true }) {
-                        Icon(Icons.Filled.Bedtime, stringResource(R.string.sleep_button))
+                    if (comidaActiva) {
+                        IconButton(onClick = { mostrarDormir = true }) {
+                            Icon(Icons.Filled.Bedtime, stringResource(R.string.sleep_button))
+                        }
                     }
                     IconButton(onClick = { mostrarCompartir = true }) {
                         Icon(Icons.Filled.Share, "Compartir")
@@ -207,6 +223,7 @@ fun MainScreen(
 
             if (durmiendo) {
                 BannerDormir(
+                    hora = horaDespertar,
                     onDespertar = {
                         MealAlarmScheduler.wakeUp(context)
                         durmiendo = false
@@ -358,6 +375,14 @@ fun MainScreen(
                 mostrarAnotar = false
                 mostrarGimnasio = true
             },
+            onPickMood = {
+                mostrarAnotar = false
+                context.startActivity(
+                    Intent(context, WalkMoodActivity::class.java).apply {
+                        putExtra(WalkMoodActivity.EXTRA_SOLO_ANIMO, true)
+                    }
+                )
+            },
         )
     }
 
@@ -373,13 +398,16 @@ fun MainScreen(
 
     if (mostrarDormir) {
         DialogoDormir(
+            hora = horaDespertar,
             onCerrar = { mostrarDormir = false },
             onConfirmar = {
                 mostrarDormir = false
                 MealAlarmScheduler.goToSleep(context)
                 durmiendo = true
                 Toast.makeText(
-                    context, context.getString(R.string.sleep_toast), Toast.LENGTH_LONG
+                    context,
+                    context.getString(R.string.sleep_toast, horaDespertar),
+                    Toast.LENGTH_LONG,
                 ).show()
             },
         )
@@ -455,7 +483,7 @@ private fun VacioSegunFiltro(estado: EstadoPrincipal, onQuitarFiltro: () -> Unit
 }
 
 @Composable
-private fun BannerDormir(onDespertar: () -> Unit) {
+private fun BannerDormir(hora: String, onDespertar: () -> Unit) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         color = MaterialTheme.colorScheme.secondaryContainer,
@@ -474,7 +502,7 @@ private fun BannerDormir(onDespertar: () -> Unit) {
             )
             Spacer(Modifier.width(8.dp))
             Text(
-                text = stringResource(R.string.sleep_banner),
+                text = stringResource(R.string.sleep_banner, hora),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSecondaryContainer,
                 modifier = Modifier.weight(1f),
@@ -487,7 +515,7 @@ private fun BannerDormir(onDespertar: () -> Unit) {
 }
 
 @Composable
-private fun DialogoDormir(onCerrar: () -> Unit, onConfirmar: () -> Unit) {
+private fun DialogoDormir(hora: String, onCerrar: () -> Unit, onConfirmar: () -> Unit) {
     AlertDialog(
         onDismissRequest = onCerrar,
         icon = {
@@ -506,7 +534,7 @@ private fun DialogoDormir(onCerrar: () -> Unit, onConfirmar: () -> Unit) {
             }
         },
         title = { Text(stringResource(R.string.sleep_dialog_title)) },
-        text = { Text(stringResource(R.string.sleep_dialog_text)) },
+        text = { Text(stringResource(R.string.sleep_dialog_text, hora)) },
         shape = RoundedCornerShape(20.dp),
         containerColor = MaterialTheme.colorScheme.background,
         confirmButton = {

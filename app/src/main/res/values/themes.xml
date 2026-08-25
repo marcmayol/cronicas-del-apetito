@@ -3,5 +3,16 @@
     <style name="Theme.CronicasDelApetito" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:statusBarColor">#FFF8EE</item>
+
+        <!--
+          Los selectores de fecha y hora son diálogos del sistema, no Compose: sin
+          esto salen con el verde de Material y rompen el papel y la tinta. Los
+          valores son los mismos de la paleta de Theme.kt.
+        -->
+        <item name="android:colorAccent">#6B4326</item>
+        <item name="android:colorPrimary">#6B4326</item>
+        <item name="android:colorControlActivated">#6B4326</item>
+        <item name="android:textColorPrimary">#2A2018</item>
+        <item name="android:colorBackground">#FAF6EF</item>
     </style>
 </resources>
