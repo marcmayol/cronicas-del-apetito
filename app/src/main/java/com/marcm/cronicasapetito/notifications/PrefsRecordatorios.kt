@@ -24,6 +24,8 @@ object PrefsRecordatorios {
     private const val K_GYM_HORA = "gym_hora_min"
     private const val K_GYM_DIAS = "gym_dias"
     private const val K_GYM_OBJETIVO = "gym_objetivo_semanal"
+    private const val K_ANIMO_ACTIVO = "animo_activo"
+    private const val K_BIENVENIDA_VISTA = "bienvenida_vista"
 
     /** 8:00, en minutos desde medianoche. */
     const val COMIDA_INICIO_POR_DEFECTO = 8 * 60
@@ -102,6 +104,37 @@ object PrefsRecordatorios {
 
     fun setCaminataEnAviso(context: Context, activa: Boolean) {
         prefs(context).edit().putBoolean(K_CAMINATA_EN_AVISO, activa).apply()
+    }
+
+    // -----------------------------------------------------------------------
+    // Estado de ánimo
+    // -----------------------------------------------------------------------
+
+    /**
+     * Si el ánimo se ofrece: en el botón Anotar y como cierre de la caminata.
+     * No tiene recordatorio propio, solo aparece o no aparece.
+     */
+    fun animoActivo(context: Context): Boolean =
+        prefs(context).getBoolean(K_ANIMO_ACTIVO, true)
+
+    fun setAnimoActivo(context: Context, activo: Boolean) {
+        prefs(context).edit().putBoolean(K_ANIMO_ACTIVO, activo).apply()
+    }
+
+    // -----------------------------------------------------------------------
+    // Primera vez
+    // -----------------------------------------------------------------------
+
+    /**
+     * Si ya se pasó por la bienvenida. Quien venga actualizando desde una
+     * versión anterior no la ve: ya tiene la app montada a su manera y sería
+     * un trámite en medio, así que se marca como vista al detectar registros.
+     */
+    fun bienvenidaVista(context: Context): Boolean =
+        prefs(context).getBoolean(K_BIENVENIDA_VISTA, false)
+
+    fun setBienvenidaVista(context: Context, vista: Boolean) {
+        prefs(context).edit().putBoolean(K_BIENVENIDA_VISTA, vista).apply()
     }
 
     // -----------------------------------------------------------------------

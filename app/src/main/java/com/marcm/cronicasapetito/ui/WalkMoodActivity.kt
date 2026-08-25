@@ -54,7 +54,9 @@ import com.marcm.cronicasapetito.CronicasApp
 import com.marcm.cronicasapetito.R
 import com.marcm.cronicasapetito.data.EntryKind
 import com.marcm.cronicasapetito.data.MealRepository
+import androidx.compose.ui.platform.LocalContext
 import com.marcm.cronicasapetito.notifications.MealNotifier
+import com.marcm.cronicasapetito.notifications.PrefsRecordatorios
 import kotlinx.coroutines.launch
 
 private enum class Paso { PREGUNTA, MINUTOS, ANIMO }
@@ -113,6 +115,7 @@ private fun FlujoCaminata(
     var minutos by remember { mutableStateOf(0) }
     var animo by remember { mutableStateOf("") }
     var momento by remember { mutableLongStateOf(System.currentTimeMillis()) }
+    val conAnimo = PrefsRecordatorios.animoActivo(LocalContext.current)
     val tipo = if (soloAnimo) EntryKind.MOOD else EntryKind.WALK
     val visual = visualDe(tipo)
 
@@ -140,8 +143,13 @@ private fun FlujoCaminata(
                     onCancelar = {
                         if (pasoInicial == Paso.PREGUNTA) paso = Paso.PREGUNTA else onCancel()
                     },
-                    onGuardar = { paso = Paso.ANIMO },
-                    textoGuardar = stringResource(R.string.action_continue),
+                    onGuardar = {
+                        // Sin el carril de ánimo, la caminata acaba en sus minutos.
+                        if (conAnimo) paso = Paso.ANIMO else onSave(minutos, "", momento)
+                    },
+                    textoGuardar = stringResource(
+                        if (conAnimo) R.string.action_continue else R.string.action_save
+                    ),
                     textoCancelar = stringResource(
                         if (pasoInicial == Paso.PREGUNTA) R.string.action_previous
                         else R.string.action_cancel

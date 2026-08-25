@@ -146,6 +146,27 @@ fun SeccionRecordatorios() {
     }
 
     // -----------------------------------------------------------------------
+    // Estado de ánimo
+    // -----------------------------------------------------------------------
+    TituloSeccion(stringResource(R.string.reminders_mood_section))
+    var animoActivo by remember { mutableStateOf(PrefsRecordatorios.animoActivo(context)) }
+
+    Bloque {
+        FilaInterruptor(
+            titulo = stringResource(R.string.reminders_mood_switch),
+            subtitulo = stringResource(
+                if (animoActivo) R.string.reminders_mood_on else R.string.reminders_mood_off
+            ),
+            marcado = animoActivo,
+            tinte = visualDe(EntryKind.MOOD).color,
+            onCambio = {
+                animoActivo = it
+                PrefsRecordatorios.setAnimoActivo(context, it)
+            },
+        )
+    }
+
+    // -----------------------------------------------------------------------
     // Gimnasio
     // -----------------------------------------------------------------------
     TituloSeccion(stringResource(R.string.reminders_gym_section))
@@ -265,13 +286,13 @@ private fun resumenGimnasio(
 }
 
 /** La semana empieza en lunes, como en el resto de la app. */
-private val ORDEN_DIAS = listOf(
+internal val ORDEN_DIAS = listOf(
     Calendar.MONDAY, Calendar.TUESDAY, Calendar.WEDNESDAY, Calendar.THURSDAY,
     Calendar.FRIDAY, Calendar.SATURDAY, Calendar.SUNDAY,
 )
 
 /** Inicial del día, sacada del mismo sitio que las del calendario. */
-private fun inicialDeDia(context: Context, diaCalendar: Int): String {
+internal fun inicialDeDia(context: Context, diaCalendar: Int): String {
     val iniciales = context.getString(R.string.weekday_initials)
     return iniciales.getOrNull(ORDEN_DIAS.indexOf(diaCalendar))?.toString() ?: "?"
 }
@@ -281,7 +302,7 @@ private fun inicialDeDia(context: Context, diaCalendar: Int): String {
 // ---------------------------------------------------------------------------
 
 @Composable
-private fun FilaInterruptor(
+internal fun FilaInterruptor(
     titulo: String,
     subtitulo: String,
     marcado: Boolean,
@@ -311,7 +332,7 @@ private fun FilaInterruptor(
 
 /** Fila con una hora y su botón: el mismo gesto que «Fecha y hora» al anotar. */
 @Composable
-private fun FilaHora(
+internal fun FilaHora(
     titulo: String,
     minutosDelDia: Int,
     subtitulo: String? = null,
@@ -358,7 +379,7 @@ private fun pedirHora(context: Context, actual: Int, onElegir: (Int) -> Unit) {
 }
 
 @Composable
-private fun BloqueOpciones(
+internal fun BloqueOpciones(
     titulo: String,
     nota: String? = null,
     contenido: @Composable () -> Unit,
@@ -383,7 +404,7 @@ private fun BloqueOpciones(
 }
 
 @Composable
-private fun ChipOpcion(texto: String, activo: Boolean, tinte: Color, onClick: () -> Unit) {
+internal fun ChipOpcion(texto: String, activo: Boolean, tinte: Color, onClick: () -> Unit) {
     Surface(
         shape = RoundedCornerShape(999.dp),
         color = if (activo) tinte.copy(alpha = 0.14f) else MaterialTheme.colorScheme.surface,

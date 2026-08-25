@@ -203,4 +203,26 @@
     <string name="settings_version">Versión %1$s (%2$d) %3$s</string>
     <string name="label_today">hoy</string>
     <string name="photo_of_meal">Foto de la comida</string>
+
+    <!-- Bienvenida -->
+    <string name="welcome_kinds_title">¿Qué quieres llevar?</string>
+    <string name="welcome_kinds_body">Elige de qué se te va a preguntar. Puedes cambiarlo cuando quieras en Ajustes.</string>
+    <string name="welcome_food_always">Es de lo que trata la app</string>
+    <string name="welcome_walk_detail">Los minutos que andas</string>
+    <string name="welcome_gym_detail">Si has ido, y cuántas veces por semana</string>
+    <string name="welcome_mood_detail">Cómo te sientes, cuando te apetezca anotarlo</string>
+    <string name="welcome_when_title">¿Cuándo te pregunto?</string>
+    <string name="welcome_when_body">La app te avisa dentro de esa horquilla y calla fuera de ella. Si te pasas, siempre puedes espaciarlos más.</string>
+    <string name="welcome_ready_title">Ya está</string>
+    <string name="welcome_ready_body">Solo falta que Android te deje avisarte. Sin ese permiso la app funciona igual, pero tendrías que acordarte tú.</string>
+    <string name="welcome_summary_meals">Comida de %1$s a %2$s, cada %3$s</string>
+    <string name="welcome_summary_walk">Las caminatas, desde el propio aviso</string>
+    <string name="welcome_summary_gym">El gimnasio, por la noche entre semana</string>
+    <string name="welcome_summary_mood">El ánimo, cuando quieras anotarlo</string>
+    <string name="welcome_change_later">Todo esto vive en Ajustes: nada de lo que elijas aquí queda cerrado.</string>
+    <string name="welcome_start">Empezar</string>
+    <string name="reminders_mood_switch">Ofrecer el estado de ánimo</string>
+    <string name="reminders_mood_on">Sale al anotar y como cierre de la caminata</string>
+    <string name="reminders_mood_off">No se ofrece en ningún sitio</string>
+    <string name="reminders_mood_section">Estado de ánimo</string>
 </resources>

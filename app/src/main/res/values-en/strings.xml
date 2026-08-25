@@ -8,6 +8,8 @@
       · weekday_initials is one letter per day, Monday first.
     -->
 
+    <string name="app_name">Appetite Chronicles</string>
+    <string name="export_header">APPETITE CHRONICLES</string>
     <string name="entry_title">Log a meal</string>
     <string name="notif_channel_name">Meal reminders</string>
     <string name="notif_channel_desc">Asks every so often whether you have eaten</string>
@@ -207,4 +209,26 @@
     <string name="settings_version">Version %1$s (%2$d) %3$s</string>
     <string name="label_today">today</string>
     <string name="photo_of_meal">Photo of the meal</string>
+
+    <!-- Welcome -->
+    <string name="welcome_kinds_title">What do you want to keep track of?</string>
+    <string name="welcome_kinds_body">Pick what you will be asked about. You can change it any time in Settings.</string>
+    <string name="welcome_food_always">What the app is for</string>
+    <string name="welcome_walk_detail">The minutes you walk</string>
+    <string name="welcome_gym_detail">Whether you went, and how often a week</string>
+    <string name="welcome_mood_detail">How you feel, whenever you want to note it</string>
+    <string name="welcome_when_title">When should I ask?</string>
+    <string name="welcome_when_body">The app nudges you inside that window and stays quiet outside it. If it is too much, you can always space the reminders out.</string>
+    <string name="welcome_ready_title">All set</string>
+    <string name="welcome_ready_body">All that is left is for Android to let me nudge you. Without that permission the app still works, but you would have to remember on your own.</string>
+    <string name="welcome_summary_meals">Food from %1$s to %2$s, every %3$s</string>
+    <string name="welcome_summary_walk">Walks, straight from the reminder</string>
+    <string name="welcome_summary_gym">The gym, on weekday evenings</string>
+    <string name="welcome_summary_mood">Your mood, whenever you want to note it</string>
+    <string name="welcome_change_later">All of this lives in Settings: nothing you pick here is final.</string>
+    <string name="welcome_start">Start</string>
+    <string name="reminders_mood_switch">Offer mood notes</string>
+    <string name="reminders_mood_on">Shows up when adding an entry and after a walk</string>
+    <string name="reminders_mood_off">Not offered anywhere</string>
+    <string name="reminders_mood_section">Mood</string>
 </resources>

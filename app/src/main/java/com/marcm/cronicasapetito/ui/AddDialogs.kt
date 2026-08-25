@@ -26,7 +26,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.marcm.cronicasapetito.R
+import androidx.compose.ui.platform.LocalContext
 import com.marcm.cronicasapetito.data.EntryKind
+import com.marcm.cronicasapetito.notifications.PrefsRecordatorios
 
 /**
  * P2 — «¿Qué quieres anotar?». Misma estructura que siempre (comida primero y
@@ -41,6 +43,11 @@ fun AddEntryPickerDialog(
     onPickGym: () -> Unit,
     onPickMood: () -> Unit,
 ) {
+    val context = LocalContext.current
+    val conCaminata = PrefsRecordatorios.caminataEnAviso(context)
+    val conGimnasio = PrefsRecordatorios.gymActivo(context)
+    val conAnimo = PrefsRecordatorios.animoActivo(context)
+
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.add_what)) },
@@ -53,23 +60,29 @@ fun AddEntryPickerDialog(
                     texto = stringResource(R.string.kind_food),
                     onClick = onPickFood,
                 )
-                BotonTipoSecundario(
-                    kind = EntryKind.WALK,
-                    texto = stringResource(R.string.kind_walk),
-                    onClick = onPickWalk,
-                )
-                BotonTipoSecundario(
-                    kind = EntryKind.GYM,
-                    texto = stringResource(R.string.kind_gym),
-                    onClick = onPickGym,
-                )
+                if (conCaminata) {
+                    BotonTipoSecundario(
+                        kind = EntryKind.WALK,
+                        texto = stringResource(R.string.kind_walk),
+                        onClick = onPickWalk,
+                    )
+                }
+                if (conGimnasio) {
+                    BotonTipoSecundario(
+                        kind = EntryKind.GYM,
+                        texto = stringResource(R.string.kind_gym),
+                        onClick = onPickGym,
+                    )
+                }
                 // El ánimo ya no cuelga de la caminata: hay días en que lo único
                 // que hay que anotar es cómo estás.
-                BotonTipoSecundario(
-                    kind = EntryKind.MOOD,
-                    texto = stringResource(R.string.kind_mood),
-                    onClick = onPickMood,
-                )
+                if (conAnimo) {
+                    BotonTipoSecundario(
+                        kind = EntryKind.MOOD,
+                        texto = stringResource(R.string.kind_mood),
+                        onClick = onPickMood,
+                    )
+                }
             }
         },
         confirmButton = {},

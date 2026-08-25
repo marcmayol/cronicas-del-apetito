@@ -17,11 +17,15 @@ import androidx.lifecycle.lifecycleScope
 import com.marcm.actualizador.Modo
 import com.marcm.cronicasapetito.data.MealRepository
 import com.marcm.cronicasapetito.notifications.MealAlarmScheduler
+import com.marcm.cronicasapetito.notifications.PrefsRecordatorios
 import com.marcm.cronicasapetito.notifications.MealNotifier
+import com.marcm.cronicasapetito.ui.BienvenidaActivity
 import com.marcm.cronicasapetito.ui.CronicasTheme
 import com.marcm.cronicasapetito.ui.MainScreen
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainActivity : ComponentActivity() {
 
@@ -32,11 +36,16 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        ensureNotificationPermission()
+        val repo = MealRepository((application as CronicasApp).database.mealDao())
+
+        // La primera vez se pasa por la bienvenida, que ya pide el permiso y
+        // deja los recordatorios montados. Quien venga actualizando no la ve:
+        // se le marca como vista en cuanto se detecta que ya tiene registros.
+        lifecycleScope.launch { abrirBienvenidaSiToca(repo) }
+
         MealNotifier.ensureChannel(this)
         MealAlarmScheduler.scheduleNext(this)
 
-        val repo = MealRepository((application as CronicasApp).database.mealDao())
         val actualizador = (application as CronicasApp).actualizador
 
         // Comprobación al abrir: en segundo plano, con un pequeño retardo. Silenciosa.
@@ -60,6 +69,25 @@ class MainActivity : ComponentActivity() {
         super.onResume()
         // Si el usuario volvió de conceder el permiso de instalación, reanuda el flujo.
         (application as CronicasApp).actualizador.onPermisoQuizaConcedido()
+    }
+
+    /**
+     * Decide si toca la bienvenida. Tener registros es la señal de que se viene
+     * de una versión anterior: entonces se da por vista y no se interrumpe a
+     * quien ya lleva meses usando la app.
+     */
+    private suspend fun abrirBienvenidaSiToca(repo: MealRepository) {
+        if (PrefsRecordatorios.bienvenidaVista(this)) {
+            ensureNotificationPermission()
+            return
+        }
+        val yaTieneRegistros = withContext(Dispatchers.IO) { repo.getAll().isNotEmpty() }
+        if (yaTieneRegistros) {
+            PrefsRecordatorios.setBienvenidaVista(this, true)
+            ensureNotificationPermission()
+        } else {
+            startActivity(Intent(this, BienvenidaActivity::class.java))
+        }
     }
 
     private fun ensureNotificationPermission() {
