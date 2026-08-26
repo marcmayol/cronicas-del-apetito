@@ -143,4 +143,32 @@ class ResumenesTest {
         val resumen = Resumenes.porDia(listOf(sinMinutos, caminata(lunes, 19, 20)))[lunes]!!
         assertEquals(20, resumen.minutosCaminados)
     }
+    /**
+     * Un día en el que solo se respondió «no he ido al gimnasio» tiene un
+     * registro, así que no está vacío, pero ninguna de las piezas que se pintan
+     * exige un valor positivo. Sin algo que decir, la fila de ese día salía en
+     * blanco en la imagen que se comparte: ni resumen ni «Sin anotaciones».
+     */
+    @Test
+    fun `un dia con solo un no al gimnasio tiene algo que ensenar`() {
+        val soloUnNo = MealEntry(
+            timestampMillis = instante(lunes, 22),
+            content = GymAnswer.NO,
+            kind = EntryKind.GYM,
+        )
+        val resumen = Resumenes.porDia(listOf(soloUnNo))[lunes]!!
+
+        assertFalse("respondió, así que el día no está vacío", resumen.vacio)
+        assertTrue(
+            "y algo hay que enseñar de él, o la fila sale en blanco",
+            resumen.tieneAlgoQueEnsenar,
+        )
+    }
+
+    @Test
+    fun `un dia sin ningun registro sigue estando vacio`() {
+        val resumen = ResumenDia(lunes)
+        assertTrue(resumen.vacio)
+        assertFalse(resumen.tieneAlgoQueEnsenar)
+    }
 }

@@ -263,8 +263,13 @@ object ImagenExporter {
                 EntryKind.MOOD to
                     res.getQuantityString(R.plurals.summary_notes, resumen.notasAnimo, resumen.notasAnimo)
             )
-            if (resumen.gimnasio == true) add(
-                EntryKind.GYM to context.getString(R.string.summary_gym_went)
+            // Un «no» también se dice: el día en que contestaste que no fuiste
+            // no es lo mismo que el día en que no se te preguntó.
+            if (resumen.gimnasio != null) add(
+                EntryKind.GYM to context.getString(
+                    if (resumen.gimnasio) R.string.summary_gym_went
+                    else R.string.summary_gym_missed
+                )
             )
         }
         piezas.forEach { (kind, texto) ->

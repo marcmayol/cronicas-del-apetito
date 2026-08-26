@@ -22,12 +22,23 @@ data class ResumenDia(
     val vacio: Boolean
         get() = comidas == 0 && minutosCaminados == 0 && notasAnimo == 0 && gimnasio == null
 
+    /**
+     * Si hay algo concreto que enseñar de este día. No es lo contrario de
+     * [vacio]: responder «no he ido al gimnasio» deja un registro —el día no
+     * está vacío— pero no genera ninguna pieza, y la fila salía en blanco.
+     */
+    val tieneAlgoQueEnsenar: Boolean
+        get() = comidas > 0 || minutosCaminados > 0 || notasAnimo > 0 || gimnasio != null
+
     /** Tipos presentes ese día, en orden fijo: los glifos del calendario. */
     val tiposPresentes: List<String>
         get() = buildList {
             if (comidas > 0) add(EntryKind.FOOD)
             if (minutosCaminados > 0) add(EntryKind.WALK)
             if (notasAnimo > 0) add(EntryKind.MOOD)
+            // Aquí sí es solo el «sí», al revés que en el resumen en línea: en el
+            // calendario un glifo se lee como «ese día hubo esto», y marcar el día
+            // que contestaste que no fuiste diría lo contrario de lo que pasó.
             if (gimnasio == true) add(EntryKind.GYM)
         }
 }

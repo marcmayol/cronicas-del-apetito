@@ -240,4 +240,6 @@
     <string name="backup_import_explain">Se añadirá lo que falte. Los registros que ya tengas se quedan como están: nada se borra ni se sobrescribe.</string>
     <string name="backup_import_invalid">Ese archivo no es una copia de Crónicas del Apetito</string>
     <string name="backup_import_done">Recuperado: %1$d registros y %2$d fotos</string>
+    <string name="summary_gym_missed">sin gimnasio</string>
+    <string name="summary_minutes_short">%1$d′</string>
 </resources>

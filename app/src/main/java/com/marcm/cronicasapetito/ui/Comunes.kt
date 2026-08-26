@@ -23,13 +23,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.DirectionsWalk
+import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.Image
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material.icons.outlined.ChatBubbleOutline
 import androidx.compose.material3.Icon
@@ -146,7 +146,7 @@ fun inicialDia(context: Context, d: LocalDate): String {
 
 fun iconoDe(kind: String): ImageVector = when (kind) {
     EntryKind.FOOD -> Icons.Filled.Restaurant
-    EntryKind.WALK -> Icons.Filled.DirectionsWalk
+    EntryKind.WALK -> Icons.AutoMirrored.Filled.DirectionsWalk
     EntryKind.MOOD -> Icons.Outlined.ChatBubbleOutline
     else -> Icons.Filled.FitnessCenter
 }
@@ -420,15 +420,33 @@ fun ResumenEnLinea(
 ) {
     val piezas = buildList {
         if (resumen.comidas > 0) add(
-            EntryKind.FOOD to "${resumen.comidas} ${if (resumen.comidas == 1) "comida" else "comidas"}"
+            EntryKind.FOOD to pluralStringResource(
+                R.plurals.summary_meals, resumen.comidas, resumen.comidas
+            )
         )
         if (resumen.minutosCaminados > 0) add(
-            EntryKind.WALK to if (detallado) "${resumen.minutosCaminados} min" else "${resumen.minutosCaminados}′"
+            EntryKind.WALK to stringResource(
+                if (detallado) R.string.summary_minutes else R.string.summary_minutes_short,
+                resumen.minutosCaminados,
+            )
         )
         if (resumen.notasAnimo > 0) add(
-            EntryKind.MOOD to "${resumen.notasAnimo} ${if (resumen.notasAnimo == 1) "nota" else "notas"}"
+            EntryKind.MOOD to pluralStringResource(
+                R.plurals.summary_notes, resumen.notasAnimo, resumen.notasAnimo
+            )
         )
-        if (resumen.gimnasio == true) add(EntryKind.GYM to if (detallado) "gimnasio" else "gym")
+        // Un «no he ido» también se enseña: es una respuesta, no un hueco.
+        resumen.gimnasio?.let { fue ->
+            add(
+                EntryKind.GYM to stringResource(
+                    when {
+                        !fue -> R.string.summary_gym_missed
+                        detallado -> R.string.summary_gym_went
+                        else -> R.string.summary_label_gym
+                    }
+                )
+            )
+        }
     }
 
     if (piezas.isEmpty()) {
@@ -502,7 +520,7 @@ fun NavegadorPeriodo(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         BotonNavegacion(
-            icono = Icons.Filled.KeyboardArrowLeft,
+            icono = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
             descripcion = stringResource(R.string.period_previous),
             onClick = onAnterior,
         )
@@ -514,7 +532,7 @@ fun NavegadorPeriodo(
             modifier = Modifier.weight(1f),
         )
         BotonNavegacion(
-            icono = Icons.Filled.KeyboardArrowRight,
+            icono = Icons.AutoMirrored.Filled.KeyboardArrowRight,
             descripcion = stringResource(R.string.period_next),
             onClick = onSiguiente,
         )

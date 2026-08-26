@@ -24,9 +24,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.MenuBook
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -204,7 +204,7 @@ private fun FilaDia(
             )
             if (!resumen.vacio && !atenuada) {
                 Icon(
-                    Icons.Filled.KeyboardArrowRight,
+                    Icons.AutoMirrored.Filled.KeyboardArrowRight,
                     contentDescription = null,
                     modifier = Modifier.size(12.dp),
                     tint = MaterialTheme.colorScheme.outline,
@@ -428,5 +428,5 @@ private fun NotaFueraDeRango(texto: String) {
 }
 
 /** Iconos de los dos estados vacíos: cuaderno en blanco y calendario filtrado. */
-val IconoCuaderno = Icons.Filled.MenuBook
+val IconoCuaderno = Icons.AutoMirrored.Filled.MenuBook
 val IconoCalendario = Icons.Filled.CalendarMonth

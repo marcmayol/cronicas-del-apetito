@@ -246,4 +246,6 @@
     <string name="backup_import_explain">Whatever is missing will be added. Entries you already have stay as they are: nothing is deleted or overwritten.</string>
     <string name="backup_import_invalid">That file is not an Appetite Chronicles copy</string>
     <string name="backup_import_done">Restored: %1$d entries and %2$d photos</string>
+    <string name="summary_gym_missed">no gym</string>
+    <string name="summary_minutes_short">%1$d′</string>
 </resources>
