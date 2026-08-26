@@ -1,8 +1,8 @@
 {
-  "versionCode": 12,
-  "versionName": "2.2.1",
-  "url": "https://github.com/marcmayol/cronicas-del-apetito/releases/download/v2.2.1/cronicas-del-apetito-v2.2.1.apk",
-  "sha256": "b953a9e8f06bd82032c2e2d2aa87813d1a20f5ea92f1c0e02597fb861253f54d",
-  "notas": "Los minutos de la caminata se escriben en un solo sitio, y el campo de comida explica mejor qué anotar.",
+  "versionCode": 13,
+  "versionName": "2.2.2",
+  "url": "https://github.com/marcmayol/cronicas-del-apetito/releases/download/v2.2.2/cronicas-del-apetito-v2.2.2.apk",
+  "sha256": "c1e1cef0471a1fc0911c58a93e619f21ab9cc6fea1c5efaad3bc83c614057f86",
+  "notas": "El día en que respondes que no has ido al gimnasio ya no sale en blanco en lo que compartes.",
   "check_horas": 24
 }
