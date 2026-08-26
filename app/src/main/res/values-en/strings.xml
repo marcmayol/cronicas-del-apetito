@@ -19,7 +19,8 @@
     <string name="action_yes">Yes</string>
     <string name="action_no">No</string>
     <string name="action_walk">Walk</string>
-    <string name="input_hint">What did you eat? Remember to note how much (e.g. 1 or 2 plates of pasta)</string>
+    <string name="input_hint">A plate of pasta, two slices of toast, half an apple…</string>
+    <string name="input_support">Note how much, too: that is the part you forget later.</string>
     <string name="save">Save</string>
     <string name="empty_history">Nothing logged yet. Tap Add, or wait for the next reminder.</string>
     <string name="gym_notif_channel_name">Gym reminder</string>

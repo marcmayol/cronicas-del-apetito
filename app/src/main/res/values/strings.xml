@@ -9,7 +9,8 @@
     <string name="action_yes">Sí</string>
     <string name="action_no">No</string>
     <string name="action_walk">Caminar</string>
-    <string name="input_hint">¿Qué has comido? Recuerda anotar la cantidad (ej.: 1 o 2 platos de macarrones)</string>
+    <string name="input_hint">Un plato de pasta, dos tostadas, media manzana…</string>
+    <string name="input_support">Anota también cuánto: es lo que cuesta recordar después.</string>
     <string name="save">Guardar</string>
     <string name="empty_history">Aún no has anotado nada. Pulsa Anotar, o espera a la próxima notificación.</string>
     <string name="gym_notif_channel_name">Recordatorio de gimnasio</string>

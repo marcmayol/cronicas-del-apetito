@@ -226,7 +226,11 @@ private fun EntryScreen(
                     value = foodText,
                     onValueChange = { foodText = it },
                     modifier = Modifier.fillMaxWidth(),
+                    // El placeholder enseña el formato —cantidad incluida— en vez de
+                    // repetir la pregunta que ya está justo encima. Que la cantidad
+                    // importa se dice debajo, una vez, sin sermón.
                     placeholder = { Text(stringResource(R.string.input_hint)) },
+                    supportingText = { Text(stringResource(R.string.input_support)) },
                     minLines = 4,
                     shape = RoundedCornerShape(14.dp),
                     colors = OutlinedTextFieldDefaults.colors(
