@@ -37,6 +37,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -53,6 +54,7 @@ import androidx.lifecycle.lifecycleScope
 import com.marcm.cronicasapetito.CronicasApp
 import com.marcm.cronicasapetito.R
 import com.marcm.cronicasapetito.data.EntryKind
+import com.marcm.cronicasapetito.data.MealEntry
 import com.marcm.cronicasapetito.data.MealRepository
 import androidx.compose.ui.platform.LocalContext
 import com.marcm.cronicasapetito.notifications.MealNotifier
@@ -75,6 +77,7 @@ class WalkMoodActivity : ComponentActivity() {
         val repo = MealRepository((application as CronicasApp).database.mealDao())
         val empezarEnMinutos = intent.getBooleanExtra(EXTRA_START_AT_MINUTES, false)
         val soloAnimo = intent.getBooleanExtra(EXTRA_SOLO_ANIMO, false)
+        val idAEditar = intent.getLongExtra(EXTRA_EDITAR_ID, 0L)
 
         // El aviso de comida se descarta porque esta pantalla es su respuesta.
         // Anotando solo el ánimo no lo es: la pregunta de la comida sigue viva.
@@ -82,22 +85,64 @@ class WalkMoodActivity : ComponentActivity() {
 
         setContent {
             CronicasTheme {
-                FlujoCaminata(
-                    pasoInicial = when {
-                        soloAnimo -> Paso.ANIMO
-                        empezarEnMinutos -> Paso.MINUTOS
-                        else -> Paso.PREGUNTA
-                    },
-                    soloAnimo = soloAnimo,
-                    onSave = { minutos, animo, timestamp ->
-                        lifecycleScope.launch {
-                            if (minutos != null && minutos > 0) repo.addWalk(minutos, timestamp)
-                            if (animo.isNotBlank()) repo.addMood(animo.trim(), timestamp)
-                            finish()
-                        }
-                    },
-                    onCancel = { finish() }
-                )
+                // Corrigiendo se espera al registro: pintar la pantalla vacía y
+                // rellenarla después deja un hueco en el que se puede guardar.
+                var original by remember { mutableStateOf<MealEntry?>(null) }
+                var cargando by remember { mutableStateOf(idAEditar != 0L) }
+
+                LaunchedEffect(idAEditar) {
+                    if (idAEditar != 0L) {
+                        original = repo.obtener(idAEditar)
+                        cargando = false
+                    }
+                }
+
+                if (!cargando) {
+                    FlujoCaminata(
+                        pasoInicial = when {
+                            soloAnimo -> Paso.ANIMO
+                            empezarEnMinutos -> Paso.MINUTOS
+                            else -> Paso.PREGUNTA
+                        },
+                        soloAnimo = soloAnimo,
+                        original = original,
+                        onSave = { minutos, animo, timestamp ->
+                            lifecycleScope.launch {
+                                val previo = original
+                                when {
+                                    // Corrigiendo se cambia el registro, no se
+                                    // añade otro encima.
+                                    previo != null && previo.kind == EntryKind.MOOD ->
+                                        repo.actualizar(
+                                            previo.copy(
+                                                content = animo.trim(),
+                                                timestampMillis = timestamp,
+                                            )
+                                        )
+
+                                    previo != null -> repo.actualizar(
+                                        previo.copy(
+                                            content = "$minutos min",
+                                            minutes = minutos,
+                                            timestampMillis = timestamp,
+                                        )
+                                    )
+
+                                    else -> {
+                                        if (minutos != null && minutos > 0) {
+                                            repo.addWalk(minutos, timestamp)
+                                        }
+                                        if (animo.isNotBlank()) {
+                                            repo.addMood(animo.trim(), timestamp)
+                                        }
+                                    }
+                                }
+                                finish()
+                            }
+                        },
+                        onCancel = { finish() },
+                    )
+                }
             }
         }
     }
@@ -108,13 +153,18 @@ class WalkMoodActivity : ComponentActivity() {
 private fun FlujoCaminata(
     pasoInicial: Paso = Paso.PREGUNTA,
     soloAnimo: Boolean = false,
+    original: MealEntry? = null,
     onSave: (minutos: Int?, animo: String, timestamp: Long) -> Unit,
     onCancel: () -> Unit
 ) {
     var paso by remember { mutableStateOf(pasoInicial) }
-    var minutos by remember { mutableStateOf(0) }
-    var animo by remember { mutableStateOf("") }
-    var momento by remember { mutableLongStateOf(System.currentTimeMillis()) }
+    var minutos by remember { mutableStateOf(original?.minutes ?: 0) }
+    var animo by remember {
+        mutableStateOf(if (original?.kind == EntryKind.MOOD) original.content else "")
+    }
+    var momento by remember {
+        mutableLongStateOf(original?.timestampMillis ?: System.currentTimeMillis())
+    }
     val conAnimo = PrefsRecordatorios.animoActivo(LocalContext.current)
     val tipo = if (soloAnimo) EntryKind.MOOD else EntryKind.WALK
     val visual = visualDe(tipo)
@@ -144,11 +194,15 @@ private fun FlujoCaminata(
                         if (pasoInicial == Paso.PREGUNTA) paso = Paso.PREGUNTA else onCancel()
                     },
                     onGuardar = {
-                        // Sin el carril de ánimo, la caminata acaba en sus minutos.
-                        if (conAnimo) paso = Paso.ANIMO else onSave(minutos, "", momento)
+                        // Sin el carril de ánimo —o corrigiendo una caminata ya
+                        // anotada— esto acaba aquí: encadenar el ánimo al corregir
+                        // crearía una nota nueva que nadie ha pedido.
+                        if (conAnimo && original == null) paso = Paso.ANIMO
+                        else onSave(minutos, "", momento)
                     },
                     textoGuardar = stringResource(
-                        if (conAnimo) R.string.action_continue else R.string.action_save
+                        if (conAnimo && original == null) R.string.action_continue
+                        else R.string.action_save
                     ),
                     textoCancelar = stringResource(
                         if (pasoInicial == Paso.PREGUNTA) R.string.action_previous

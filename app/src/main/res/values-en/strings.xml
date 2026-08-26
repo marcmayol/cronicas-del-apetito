@@ -248,4 +248,8 @@
     <string name="backup_import_done">Restored: %1$d entries and %2$d photos</string>
     <string name="summary_gym_missed">no gym</string>
     <string name="summary_minutes_short">%1$d′</string>
+    <string name="entry_edit">Edit</string>
+    <string name="entry_delete">Delete</string>
+    <string name="entry_deleted">Entry deleted</string>
+    <string name="action_undo">Undo</string>
 </resources>

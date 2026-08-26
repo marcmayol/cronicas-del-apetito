@@ -317,12 +317,23 @@ fun CabeceraDia(dia: LocalDate, modifier: Modifier = Modifier) {
  * en blanco y negro sigue distinguiendo los cuatro tipos.
  */
 @Composable
-fun TarjetaRegistro(entry: MealEntry, modifier: Modifier = Modifier) {
+fun TarjetaRegistro(
+    entry: MealEntry,
+    modifier: Modifier = Modifier,
+    onAcciones: (() -> Unit)? = null,
+) {
     val visual = visualDe(entry.kind)
     var fotoAbierta by remember(entry.id) { mutableStateOf(false) }
 
     Surface(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .then(
+                // Un toque abre corregir/borrar. Sin onAcciones la tarjeta es
+                // solo lectura, como en lo que se comparte.
+                if (onAcciones != null) Modifier.clickable(onClick = onAcciones)
+                else Modifier
+            ),
         shape = RoundedCornerShape(14.dp),
         color = MaterialTheme.colorScheme.surface,
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),

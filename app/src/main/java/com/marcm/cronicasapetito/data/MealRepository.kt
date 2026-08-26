@@ -44,8 +44,34 @@ class MealRepository(private val dao: MealEntryDao) {
             )
         )
 
-    /** Inserta una entrada ya formada. Solo la usa la restauración de un respaldo. */
+    /** Inserta una entrada ya formada. La usan la restauración y el deshacer. */
     suspend fun añadirDeRespaldo(entrada: MealEntry): Long = dao.insert(entrada)
+
+    suspend fun obtener(id: Long): MealEntry? = dao.getById(id)
+
+    suspend fun actualizar(entrada: MealEntry) = dao.update(entrada)
+
+    /**
+     * Borra un registro. La foto NO se borra aquí: mientras se pueda deshacer,
+     * el archivo tiene que seguir estando. De las que queden sin dueño se
+     * encarga [limpiarFotosHuerfanas] en el siguiente arranque.
+     */
+    suspend fun borrar(entrada: MealEntry) = dao.delete(entrada)
+
+    /**
+     * Borra del disco las fotos que ya no apunta ningún registro. Recoge tanto
+     * las de los registros borrados como las que pudieran haber quedado sueltas
+     * por un cierre a destiempo.
+     */
+    suspend fun limpiarFotosHuerfanas(carpetaFotos: java.io.File): Int {
+        if (!carpetaFotos.isDirectory) return 0
+        val enUso = dao.rutasDeFotoEnUso().map { java.io.File(it).name }.toHashSet()
+        var borradas = 0
+        carpetaFotos.listFiles()?.forEach { archivo ->
+            if (archivo.name !in enUso && archivo.delete()) borradas++
+        }
+        return borradas
+    }
 
     suspend fun getInRange(from: Long, to: Long): List<MealEntry> = dao.getInRange(from, to)
     suspend fun getAll(): List<MealEntry> = dao.getAll()

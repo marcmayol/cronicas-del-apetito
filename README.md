@@ -13,6 +13,7 @@ App Android para registrar lo que comes a lo largo del día, pensada para acompa
 - Botón **Compartir**: manda exactamente lo que estás viendo —vista + periodo + filtro— como **imagen** (Semana y Mes) o **PDF** (Día y rangos largos).
 - **Modo "me voy a dormir"**: silencia los avisos hasta que vuelva a abrirse tu horquilla al día siguiente.
 - El **estado de ánimo se anota suelto** desde el botón Anotar, sin tener que pasar antes por una comida ni por una caminata.
+- **Todo se puede corregir y borrar**: un toque en cualquier registro abre corregirlo o quitarlo, y borrar siempre ofrece deshacer. Con un aviso cada hora uno anota deprisa, y lo que se anota mal acaba impreso en la consulta.
 - La **primera vez** hay tres pasos —qué quieres llevar, a qué horas, permiso de avisos— y se sale de ahí con la app montada. Quien actualiza desde una versión anterior no los ve.
 - **Español e inglés**, según el idioma del móvil. En inglés la app se llama *Appetite Chronicles*.
 - **Tus datos son tuyos**: desde Ajustes se guarda una copia con todo el historial y las fotos en un ZIP, y se recupera igual de fácil. Sin cuentas ni nube, pero con salida.

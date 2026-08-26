@@ -51,6 +51,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -87,21 +88,54 @@ class EntryActivity : ComponentActivity() {
         MealNotifier.dismiss(this)
 
         val repo = MealRepository((application as CronicasApp).database.mealDao())
+        val idAEditar = intent.getLongExtra(EXTRA_EDITAR_ID, 0L)
 
         setContent {
             CronicasTheme {
-                EntryScreen(
-                    onSave = { foodText, moodText, timestamp, photoPath ->
-                        lifecycleScope.launch {
-                            repo.addFood(foodText, timestamp, photoPath)
-                            if (moodText.isNotBlank()) {
-                                repo.addMood(moodText.trim(), timestamp)
+                // Corrigiendo, la pantalla espera a tener el registro cargado: si
+                // se pintara vacía y se rellenara después, un dedo rápido podría
+                // guardar el original en blanco.
+                var original by remember { mutableStateOf<com.marcm.cronicasapetito.data.MealEntry?>(null) }
+                var cargando by remember { mutableStateOf(idAEditar != 0L) }
+
+                LaunchedEffect(idAEditar) {
+                    if (idAEditar != 0L) {
+                        original = repo.obtener(idAEditar)
+                        cargando = false
+                    }
+                }
+
+                if (!cargando) {
+                    EntryScreen(
+                        original = original,
+                        onSave = { foodText, moodText, timestamp, photoPath ->
+                            lifecycleScope.launch {
+                                val previo = original
+                                if (previo != null) {
+                                    repo.actualizar(
+                                        previo.copy(
+                                            content = foodText,
+                                            timestampMillis = timestamp,
+                                            photoPath = photoPath,
+                                        )
+                                    )
+                                    // El ánimo escrito al corregir se guarda aparte,
+                                    // igual que al anotar: es otro registro.
+                                    if (moodText.isNotBlank()) {
+                                        repo.addMood(moodText.trim(), timestamp)
+                                    }
+                                } else {
+                                    repo.addFood(foodText, timestamp, photoPath)
+                                    if (moodText.isNotBlank()) {
+                                        repo.addMood(moodText.trim(), timestamp)
+                                    }
+                                }
+                                finish()
                             }
-                            finish()
-                        }
-                    },
-                    onCancel = { finish() }
-                )
+                        },
+                        onCancel = { finish() },
+                    )
+                }
             }
         }
     }
@@ -111,15 +145,18 @@ class EntryActivity : ComponentActivity() {
 @Composable
 private fun EntryScreen(
     onSave: (foodText: String, moodText: String, timestamp: Long, photoPath: String?) -> Unit,
-    onCancel: () -> Unit
+    onCancel: () -> Unit,
+    original: com.marcm.cronicasapetito.data.MealEntry? = null,
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    var foodText by rememberSaveable { mutableStateOf("") }
+    var foodText by rememberSaveable { mutableStateOf(original?.content ?: "") }
     var moodText by rememberSaveable { mutableStateOf("") }
-    var selectedTime by rememberSaveable { mutableLongStateOf(System.currentTimeMillis()) }
+    var selectedTime by rememberSaveable {
+        mutableLongStateOf(original?.timestampMillis ?: System.currentTimeMillis())
+    }
     // rememberSaveable: sobreviven si Android recrea la Activity al volver de la cámara.
-    var photoPath by rememberSaveable { mutableStateOf<String?>(null) }
+    var photoPath by rememberSaveable { mutableStateOf(original?.photoPath) }
     var cameraTempPath by rememberSaveable { mutableStateOf<String?>(null) }
     var processingPhoto by rememberSaveable { mutableStateOf(false) }
     val scrollState = rememberScrollState()

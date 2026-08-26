@@ -1,14 +1,29 @@
 package com.marcm.cronicasapetito.data
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface MealEntryDao {
     @Insert
     suspend fun insert(entry: MealEntry): Long
+
+    @Update
+    suspend fun update(entry: MealEntry)
+
+    @Delete
+    suspend fun delete(entry: MealEntry)
+
+    @Query("SELECT * FROM meal_entries WHERE id = :id")
+    suspend fun getById(id: Long): MealEntry?
+
+    /** Las rutas de foto que siguen en uso: lo que NO esté aquí se puede borrar. */
+    @Query("SELECT photoPath FROM meal_entries WHERE photoPath IS NOT NULL")
+    suspend fun rutasDeFotoEnUso(): List<String>
 
     @Query("SELECT * FROM meal_entries ORDER BY timestampMillis DESC")
     fun observeAll(): Flow<List<MealEntry>>

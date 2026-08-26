@@ -6,6 +6,7 @@ import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.marcm.cronicasapetito.data.GymAnswer
 import com.marcm.cronicasapetito.data.MealEntry
 import com.marcm.cronicasapetito.data.MealRepository
 import com.marcm.cronicasapetito.data.Periodos
@@ -21,6 +22,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -141,6 +143,35 @@ class MainViewModel(
 
     fun seleccionarDia(dia: LocalDate?) {
         diaSeleccionado.value = dia
+    }
+
+    /**
+     * Borra un registro y devuelve lo borrado, para poder ofrecer deshacer.
+     * La foto no se toca: mientras el deshacer siga en pantalla el archivo
+     * tiene que existir, y de las que queden sin dueño se encarga la limpieza
+     * del siguiente arranque.
+     */
+    fun borrar(entrada: MealEntry, onBorrado: (MealEntry) -> Unit) {
+        viewModelScope.launch {
+            repository.borrar(entrada)
+            onBorrado(entrada)
+        }
+    }
+
+    /** Cambia el sí/no de un registro de gimnasio ya anotado, sin tocar su hora. */
+    fun corregirGimnasio(entrada: MealEntry, fue: Boolean) {
+        viewModelScope.launch {
+            repository.actualizar(
+                entrada.copy(
+                    content = if (fue) GymAnswer.YES else GymAnswer.NO
+                )
+            )
+        }
+    }
+
+    /** Vuelve a meter lo borrado, con su id y su hora originales. */
+    fun deshacerBorrado(entrada: MealEntry) {
+        viewModelScope.launch { repository.añadirDeRespaldo(entrada) }
     }
 
     /** Abrir un día concreto desde Semana o Mes: cambia de vista y de ancla. */

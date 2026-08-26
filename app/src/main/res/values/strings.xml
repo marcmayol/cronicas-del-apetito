@@ -242,4 +242,8 @@
     <string name="backup_import_done">Recuperado: %1$d registros y %2$d fotos</string>
     <string name="summary_gym_missed">sin gimnasio</string>
     <string name="summary_minutes_short">%1$d′</string>
+    <string name="entry_edit">Corregir</string>
+    <string name="entry_delete">Borrar</string>
+    <string name="entry_deleted">Registro borrado</string>
+    <string name="action_undo">Deshacer</string>
 </resources>

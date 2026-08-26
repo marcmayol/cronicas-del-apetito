@@ -60,6 +60,7 @@ import java.time.LocalDate
 fun VistaDia(
     estado: EstadoPrincipal,
     modifier: Modifier = Modifier,
+    onAccionesRegistro: ((com.marcm.cronicasapetito.data.MealEntry) -> Unit)? = null,
 ) {
     val porDia = remember(estado.entradasVisibles) {
         estado.entradasVisibles.groupBy { it.dia() }.toList().sortedByDescending { it.first }
@@ -75,7 +76,10 @@ fun VistaDia(
                 CabeceraDia(dia, modifier = Modifier.padding(top = 10.dp, bottom = 2.dp))
             }
             items(registros, key = { it.id }) { entry ->
-                TarjetaRegistro(entry)
+                TarjetaRegistro(
+                    entry,
+                    onAcciones = onAccionesRegistro?.let { abrir -> { abrir(entry) } },
+                )
             }
         }
         if (porDia.isNotEmpty() && estado.entradasVisibles.size <= 3) {

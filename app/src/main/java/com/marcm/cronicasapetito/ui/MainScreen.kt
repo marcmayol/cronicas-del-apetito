@@ -36,6 +36,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -61,6 +65,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.marcm.actualizador.Actualizador
 import com.marcm.cronicasapetito.R
 import com.marcm.cronicasapetito.data.MealRepository
+import com.marcm.cronicasapetito.data.MealEntry
 import com.marcm.cronicasapetito.data.Periodos
 import com.marcm.cronicasapetito.export.ImagenExporter
 import com.marcm.cronicasapetito.export.PdfExporter
@@ -90,6 +95,9 @@ fun MainScreen(
     var mostrarMenu by remember { mutableStateOf(false) }
     var mostrarAnotar by remember { mutableStateOf(false) }
     var mostrarGimnasio by remember { mutableStateOf(false) }
+    var gimnasioAEditar by remember { mutableStateOf<MealEntry?>(null) }
+    var registroConAcciones by remember { mutableStateOf<MealEntry?>(null) }
+    val avisos = remember { SnackbarHostState() }
     var mostrarDormir by remember { mutableStateOf(false) }
 
     // Los ajustes se cambian en otra pantalla: al volver hay que releerlos, o el
@@ -111,6 +119,7 @@ fun MainScreen(
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
+        snackbarHost = { SnackbarHost(avisos) },
         topBar = {
             TopAppBar(
                 title = {
@@ -280,7 +289,10 @@ fun MainScreen(
                     estado.entradasVisibles.isEmpty() && estado.vista == Vista.DIA ->
                         VacioSegunFiltro(estado, viewModel::quitarFiltro)
 
-                    estado.vista == Vista.DIA -> VistaDia(estado)
+                    estado.vista == Vista.DIA -> VistaDia(
+                        estado = estado,
+                        onAccionesRegistro = { registroConAcciones = it },
+                    )
 
                     estado.vista == Vista.SEMANA -> VistaSemana(
                         estado = estado,
@@ -386,12 +398,54 @@ fun MainScreen(
         )
     }
 
+    registroConAcciones?.let { entrada ->
+        val textoBorrado = stringResource(R.string.entry_deleted)
+        val textoDeshacer = stringResource(R.string.action_undo)
+        AccionesRegistroSheet(
+            entry = entrada,
+            onCerrar = { registroConAcciones = null },
+            onEditar = {
+                registroConAcciones = null
+                val destino = intentDeEdicion(context, entrada)
+                if (destino != null) context.startActivity(destino)
+                else gimnasioAEditar = entrada   // el sí/no se cambia aquí mismo
+            },
+            onBorrar = {
+                registroConAcciones = null
+                viewModel.borrar(entrada) { borrada ->
+                    scope.launch {
+                        // Borrar algo que anotaste hace semanas no debería
+                        // depender de que aciertes a la primera.
+                        val r = avisos.showSnackbar(
+                            message = textoBorrado,
+                            actionLabel = textoDeshacer,
+                            duration = SnackbarDuration.Long,
+                        )
+                        if (r == SnackbarResult.ActionPerformed) {
+                            viewModel.deshacerBorrado(borrada)
+                        }
+                    }
+                }
+            },
+        )
+    }
+
     if (mostrarGimnasio) {
         GymQuestionDialog(
             onDismiss = { mostrarGimnasio = false },
             onAnswer = { fue ->
                 mostrarGimnasio = false
                 scope.launch { repository.addGym(fue) }
+            },
+        )
+    }
+
+    gimnasioAEditar?.let { entrada ->
+        GymQuestionDialog(
+            onDismiss = { gimnasioAEditar = null },
+            onAnswer = { fue ->
+                gimnasioAEditar = null
+                viewModel.corregirGimnasio(entrada, fue)
             },
         )
     }
