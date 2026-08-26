@@ -1,8 +1,8 @@
 {
-  "versionCode": 11,
-  "versionName": "2.2",
-  "url": "https://github.com/marcmayol/cronicas-del-apetito/releases/download/v2.2/cronicas-del-apetito-v2.2.apk",
-  "sha256": "5c596e46809b83e0e3745ee3f08377ce146bf82fa40cd768a92f6012d4fabbdb",
-  "notas": "Recordatorios configurables (horario, frecuencia y qué carriles), español e inglés, bienvenida al instalar, y copia de seguridad de tus datos desde Ajustes.",
+  "versionCode": 12,
+  "versionName": "2.2.1",
+  "url": "https://github.com/marcmayol/cronicas-del-apetito/releases/download/v2.2.1/cronicas-del-apetito-v2.2.1.apk",
+  "sha256": "b953a9e8f06bd82032c2e2d2aa87813d1a20f5ea92f1c0e02597fb861253f54d",
+  "notas": "Los minutos de la caminata se escriben en un solo sitio, y el campo de comida explica mejor qué anotar.",
   "check_horas": 24
 }
