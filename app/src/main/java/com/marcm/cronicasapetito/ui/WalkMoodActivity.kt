@@ -222,36 +222,43 @@ private fun FlujoCaminata(
                         tinte = visual.color,
                         onPicked = { momento = it },
                     )
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Surface(
-                            modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(14.dp),
-                            color = MaterialTheme.colorScheme.surface,
-                            border = BorderStroke(1.4.dp, visual.color),
-                        ) {
-                            Row(
-                                modifier = Modifier.padding(14.dp),
-                                verticalAlignment = Alignment.Bottom,
-                            ) {
-                                Text(
-                                    text = minutos.toString(),
-                                    style = estiloCifra,
-                                    color = MaterialTheme.colorScheme.onSurface,
-                                )
-                                Spacer(Modifier.width(8.dp))
-                                Text(
-                                    text = stringResource(R.string.walk_minutes_unit),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            }
-                        }
-                        Spacer(Modifier.width(12.dp))
-                        BotonPaso("−5") { minutos = (minutos - 5).coerceAtLeast(0) }
-                        Spacer(Modifier.width(8.dp))
-                        BotonPaso("+5") { minutos = (minutos + 5).coerceAtMost(600) }
-                    }
-                    // Teclear números de pie es lo más lento que hay.
+                    // Una sola caja con el número, y editable. Antes había dos que
+                    // enseñaban lo mismo: la de arriba con borde de color parecía un
+                    // campo pero no dejaba escribir, y debajo había otra que sí.
+                    OutlinedTextField(
+                        value = if (minutos == 0) "" else minutos.toString(),
+                        onValueChange = { texto ->
+                            minutos = texto.filter { it.isDigit() }.take(3).toIntOrNull() ?: 0
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        textStyle = estiloCifra,
+                        placeholder = {
+                            Text("0", style = estiloCifra, color = colorsCronicas.tenue)
+                        },
+                        suffix = {
+                            Text(
+                                text = stringResource(R.string.walk_minutes_unit),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        },
+                        shape = RoundedCornerShape(14.dp),
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = visual.color,
+                            unfocusedBorderColor = visual.color,
+                            cursorColor = visual.color,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                            focusedContainerColor = MaterialTheme.colorScheme.surface,
+                        ),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number,
+                            imeAction = ImeAction.Done,
+                        ),
+                    )
+                    // Los atajos se quedan: teclear números de pie es lo más lento que
+                    // hay. Los ±5 no aportaban nada que no hicieran mejor el teclado o
+                    // estos chips, y sumaban una fila de ruido.
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         listOf(15, 30, 45, 60, 90).forEach { atajo ->
                             ChipMinutos(
@@ -263,25 +270,6 @@ private fun FlujoCaminata(
                             )
                         }
                     }
-                    OutlinedTextField(
-                        value = if (minutos == 0) "" else minutos.toString(),
-                        onValueChange = { texto ->
-                            minutos = texto.filter { it.isDigit() }.take(3).toIntOrNull() ?: 0
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        label = { Text(stringResource(R.string.walk_other_amount)) },
-                        shape = RoundedCornerShape(14.dp),
-                        singleLine = true,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = visual.color,
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                            focusedContainerColor = MaterialTheme.colorScheme.surface,
-                        ),
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Number,
-                            imeAction = ImeAction.Done,
-                        ),
-                    )
                 }
 
                 Paso.ANIMO -> {
@@ -343,24 +331,6 @@ private fun IndicadorPasos(total: Int, completados: Int, color: androidx.compose
                     )
             )
         }
-    }
-}
-
-@Composable
-private fun BotonPaso(texto: String, onClick: () -> Unit) {
-    OutlinedButton(
-        onClick = onClick,
-        modifier = Modifier.size(48.dp),
-        shape = RoundedCornerShape(12.dp),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
-        contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp),
-    ) {
-        Text(
-            text = texto,
-            style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.onSecondaryContainer,
-        )
     }
 }
 

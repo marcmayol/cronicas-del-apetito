@@ -153,7 +153,6 @@
     <string name="walk_did_you_walk">Did you go for a walk?</string>
     <string name="walk_how_long">How long did you walk for?</string>
     <string name="walk_minutes_unit">minutes</string>
-    <string name="walk_other_amount">Another amount</string>
     <string name="mood_how_do_you_feel">How do you feel?</string>
     <string name="mood_standalone_hint">Write how you feel right now. You do not need to have eaten or walked.</string>
     <string name="mood_optional_hint">Note how you felt, if you like. It is optional.</string>
