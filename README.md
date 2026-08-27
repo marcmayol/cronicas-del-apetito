@@ -16,6 +16,7 @@ App Android para registrar lo que comes a lo largo del día, pensada para acompa
 - **Todo se puede corregir y borrar**: un toque en cualquier registro abre corregirlo o quitarlo, y borrar siempre ofrece deshacer. Con un aviso cada hora uno anota deprisa, y lo que se anota mal acaba impreso en la consulta.
 - La **primera vez** hay tres pasos —qué quieres llevar, a qué horas, permiso de avisos— y se sale de ahí con la app montada. Quien actualiza desde una versión anterior no los ve.
 - **Español e inglés**, según el idioma del móvil. En inglés la app se llama *Appetite Chronicles*.
+- **Tema claro y oscuro**, según el móvil. Lo que se exporta se queda siempre en papel claro: se imprime.
 - **Tus datos son tuyos**: desde Ajustes se guarda una copia con todo el historial y las fotos en un ZIP, y se recupera igual de fácil. Sin cuentas ni nube, pero con salida.
 
 Todo se guarda en local en el móvil. Sin nube ni cuentas.
@@ -124,3 +125,7 @@ Cubren la lógica que se rompe en los bordes: semanas a caballo entre meses, hue
 - La hora exacta no la garantiza Android al 100% en modo Doze. Por eso usamos `setExactAndAllowWhileIdle` cuando hay permiso, y reprogramamos la siguiente alarma cada vez que llega la actual.
 - Si el móvil mata la app en segundo plano (Xiaomi/Huawei son agresivas), añádela a la "lista blanca" de batería.
 - La tipografía **Lora** va empaquetada en `res/font/lora.ttf` (SIL OFL, fuente variable) y solo se usa en títulos y cifras; el cuerpo va en Roboto, que es lo que crece con el zoom del sistema.
+
+## Licencia
+
+[MIT](LICENSE). Se ofrece tal cual, sin garantía: es una herramienta para apuntar lo que comes, no un dispositivo médico ni un sustituto de un profesional.

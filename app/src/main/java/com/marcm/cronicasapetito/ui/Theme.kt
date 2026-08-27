@@ -1,6 +1,9 @@
 package com.marcm.cronicasapetito.ui
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.material3.lightColorScheme
@@ -34,6 +37,22 @@ private val Borde = Color(0xFFC9B394)           // outline, bordes interactivos
 private val BordeTarjeta = Color(0xFFEDE2D2)    // outlineVariant
 private val RojoTierra = Color(0xFFA4442E)      // error, nunca alarma
 
+// --- De noche -----------------------------------------------------------------
+// No es la paleta clara invertida sin más: se conserva el marrón cálido para que
+// siga siendo la misma app, pero el papel pasa a ser tinta. El último aviso es a
+// medianoche y hay un botón de irse a dormir, así que esta es la pantalla que más
+// veces se mira a oscuras.
+private val MarronClaro = Color(0xFFD9A574)     // primary de noche
+private val TostadoOscuro = Color(0xFF4A3A2C)   // contenedores tonales
+private val NocheFondo = Color(0xFF1A1512)      // background
+private val NocheSuperficie = Color(0xFF241E1A) // surface: por encima del fondo
+private val NocheVariante = Color(0xFF2E2620)   // surfaceVariant
+private val TintaClara = Color(0xFFF0E7DC)      // onSurface
+private val TintaClaraSuave = Color(0xFFB9AA99) // onSurfaceVariant
+private val BordeNoche = Color(0xFF6B5A47)      // outline
+private val BordeTarjetaNoche = Color(0xFF3A302A)
+private val RojoTierraClaro = Color(0xFFE08268) // error de noche
+
 private val LightColors = lightColorScheme(
     primary = Marron,
     onPrimary = Color.White,
@@ -55,6 +74,27 @@ private val LightColors = lightColorScheme(
     onError = Color.White,
 )
 
+private val DarkColors = darkColorScheme(
+    primary = MarronClaro,
+    onPrimary = Color(0xFF3A2415),
+    primaryContainer = TostadoOscuro,
+    onPrimaryContainer = Color(0xFFF1E3D1),
+    secondary = Color(0xFFD79A6A),
+    onSecondary = Color(0xFF3A2415),
+    secondaryContainer = TostadoOscuro,
+    onSecondaryContainer = Color(0xFFF1E3D1),
+    background = NocheFondo,
+    onBackground = TintaClara,
+    surface = NocheSuperficie,
+    onSurface = TintaClara,
+    surfaceVariant = NocheVariante,
+    onSurfaceVariant = TintaClaraSuave,
+    outline = BordeNoche,
+    outlineVariant = BordeTarjetaNoche,
+    error = RojoTierraClaro,
+    onError = Color(0xFF3A1610),
+)
+
 /**
  * Colores del sistema que no tienen un rol Material 3 propio. Se leen con
  * [colorsCronicas] desde cualquier composable dentro de [CronicasTheme].
@@ -64,6 +104,11 @@ data class ColoresCronicas(
     val tenue: Color = Color(0xFFA19281),
     /** Fondo de la pantalla principal, más cálido que las tarjetas. */
     val fondo: Color = Crema,
+)
+
+private val ColoresNoche = ColoresCronicas(
+    tenue = Color(0xFF9A8B7A),
+    fondo = NocheFondo,
 )
 
 private val LocalColoresCronicas = staticCompositionLocalOf { ColoresCronicas() }
@@ -98,12 +143,38 @@ private val VisualAnimo =
 private val VisualGimnasio =
     VisualTipo(R.string.kind_gym, Color(0xFF47698C), Color(0xFFE3EBF2), "■")
 
-fun visualDe(kind: String): VisualTipo = when (kind) {
-    EntryKind.FOOD -> VisualComida
-    EntryKind.WALK -> VisualCaminata
-    EntryKind.MOOD -> VisualAnimo
-    EntryKind.GYM -> VisualGimnasio
-    else -> VisualComida
+// De noche los cuatro tonos se aclaran: los de día están calculados para
+// contrastar sobre blanco y sobre tinta desaparecerían. Los contenedores, al
+// revés, se oscurecen hasta ser solo un tinte.
+private val VisualComidaNoche =
+    VisualTipo(R.string.kind_food, Color(0xFFD9995F), Color(0xFF3A2A1C), "●")
+private val VisualCaminataNoche =
+    VisualTipo(R.string.kind_walk, Color(0xFF9DBE85), Color(0xFF25301E), "▲")
+private val VisualAnimoNoche =
+    VisualTipo(R.string.kind_mood, Color(0xFFC3A3D6), Color(0xFF2E2436), "◆")
+private val VisualGimnasioNoche =
+    VisualTipo(R.string.kind_gym, Color(0xFF8FB4D9), Color(0xFF1F2B36), "■")
+
+/**
+ * El visual de un tipo, según sea de día o de noche. El glifo no cambia nunca:
+ * es lo que hace legible el registro sin color, y de eso depende que se entienda
+ * fotocopiado en la consulta.
+ */
+@Composable
+fun visualDe(kind: String): VisualTipo = if (isSystemInDarkTheme()) {
+    when (kind) {
+        EntryKind.WALK -> VisualCaminataNoche
+        EntryKind.MOOD -> VisualAnimoNoche
+        EntryKind.GYM -> VisualGimnasioNoche
+        else -> VisualComidaNoche
+    }
+} else {
+    when (kind) {
+        EntryKind.WALK -> VisualCaminata
+        EntryKind.MOOD -> VisualAnimo
+        EntryKind.GYM -> VisualGimnasio
+        else -> VisualComida
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -150,9 +221,14 @@ val estiloCifra: TextStyle
 
 @Composable
 fun CronicasTheme(content: @Composable () -> Unit) {
-    MaterialTheme(
-        colorScheme = LightColors,
-        typography = CronicasTypography,
-        content = content,
-    )
+    val noche = isSystemInDarkTheme()
+    CompositionLocalProvider(
+        LocalColoresCronicas provides if (noche) ColoresNoche else ColoresCronicas()
+    ) {
+        MaterialTheme(
+            colorScheme = if (noche) DarkColors else LightColors,
+            typography = CronicasTypography,
+            content = content,
+        )
+    }
 }

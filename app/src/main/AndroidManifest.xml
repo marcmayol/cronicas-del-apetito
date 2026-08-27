@@ -2,8 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!--
+      SCHEDULE_EXACT_ALARM y no USE_EXACT_ALARM: el segundo es un permiso
+      restringido, pensado para alarmas y temporizadores, que se concede solo
+      y no se puede quitar. Aquí los avisos son recordatorios: si el sistema
+      no da la alarma exacta, MealAlarmScheduler cae a setAndAllowWhileIdle y
+      llegan con unos minutos de margen, que para esto sobra.
+    -->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
-    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application

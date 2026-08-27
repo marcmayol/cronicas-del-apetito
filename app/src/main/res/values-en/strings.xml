@@ -235,7 +235,7 @@
     <!-- Backup -->
     <string name="backup_section">Your data</string>
     <string name="backup_export">Save a copy</string>
-    <string name="backup_export_desc">One file with your whole history and your photos, wherever you want it</string>
+    <string name="backup_export_desc">One file with your whole history and your photos, wherever you want it. It is not encrypted: keep it where you would keep a medical report.</string>
     <string name="backup_export_action">Save</string>
     <string name="backup_export_done">Copy saved: %1$d entries and %2$d photos</string>
     <string name="backup_export_failed">Could not write the file</string>
@@ -252,4 +252,8 @@
     <string name="entry_delete">Delete</string>
     <string name="entry_deleted">Entry deleted</string>
     <string name="action_undo">Undo</string>
+    <string name="entry_actions_hint">edit or delete</string>
+    <string name="exact_alarms_title">Reminders on the dot</string>
+    <string name="exact_alarms_body">Android will not let the app fire at the exact minute. Reminders still arrive, but they may be a few minutes late.</string>
+    <string name="exact_alarms_action">Allow</string>
 </resources>

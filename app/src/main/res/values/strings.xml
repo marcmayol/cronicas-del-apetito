@@ -229,7 +229,7 @@
     <!-- Copia de seguridad -->
     <string name="backup_section">Tus datos</string>
     <string name="backup_export">Guardar una copia</string>
-    <string name="backup_export_desc">Un archivo con todo tu historial y tus fotos, donde tú elijas</string>
+    <string name="backup_export_desc">Un archivo con todo tu historial y tus fotos, donde tú elijas. No va cifrado: guárdalo donde guardarías un informe médico.</string>
     <string name="backup_export_action">Guardar</string>
     <string name="backup_export_done">Copia guardada: %1$d registros y %2$d fotos</string>
     <string name="backup_export_failed">No se pudo escribir el archivo</string>
@@ -246,4 +246,8 @@
     <string name="entry_delete">Borrar</string>
     <string name="entry_deleted">Registro borrado</string>
     <string name="action_undo">Deshacer</string>
+    <string name="entry_actions_hint">corregir o borrar</string>
+    <string name="exact_alarms_title">Avisos puntuales</string>
+    <string name="exact_alarms_body">Android no deja que la app avise al minuto exacto. Los recordatorios llegan igual, pero pueden retrasarse unos minutos.</string>
+    <string name="exact_alarms_action">Permitir</string>
 </resources>

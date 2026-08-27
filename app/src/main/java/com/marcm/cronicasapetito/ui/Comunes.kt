@@ -331,7 +331,12 @@ fun TarjetaRegistro(
             .then(
                 // Un toque abre corregir/borrar. Sin onAcciones la tarjeta es
                 // solo lectura, como en lo que se comparte.
-                if (onAcciones != null) Modifier.clickable(onClick = onAcciones)
+                if (onAcciones != null) Modifier.clickable(
+                    // Con TalkBack, «pulsar» a secas no dice a qué lleva. Esto
+                    // hace que se lea «toca dos veces para corregir o borrar».
+                    onClickLabel = stringResource(R.string.entry_actions_hint),
+                    onClick = onAcciones,
+                )
                 else Modifier
             ),
         shape = RoundedCornerShape(14.dp),

@@ -81,7 +81,6 @@ import kotlinx.coroutines.launch
 fun MainScreen(
     repository: MealRepository,
     actualizador: Actualizador,
-    onRequestExactAlarmPermission: () -> Unit,
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -110,12 +109,6 @@ fun MainScreen(
         horaTexto(PrefsRecordatorios.comidaInicioMin(context))
     }
 
-    LaunchedEffect(Unit) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            val am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-            if (!am.canScheduleExactAlarms()) onRequestExactAlarmPermission()
-        }
-    }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,

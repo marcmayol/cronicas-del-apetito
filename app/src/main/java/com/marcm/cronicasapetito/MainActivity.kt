@@ -56,11 +56,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             CronicasTheme {
-                MainScreen(
-                    repository = repo,
-                    actualizador = actualizador,
-                    onRequestExactAlarmPermission = { openExactAlarmSettings() }
-                )
+                MainScreen(repository = repo, actualizador = actualizador)
             }
         }
     }
@@ -102,15 +98,4 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun openExactAlarmSettings() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            val am = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-            if (!am.canScheduleExactAlarms()) {
-                val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
-                    data = Uri.parse("package:$packageName")
-                }
-                startActivity(intent)
-            }
-        }
-    }
 }

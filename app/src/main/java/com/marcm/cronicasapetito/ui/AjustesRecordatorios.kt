@@ -145,6 +145,43 @@ fun SeccionRecordatorios() {
         }
     }
 
+    // Solo asoma si Android no deja poner alarmas exactas. Sin ese permiso la
+    // app sigue avisando —con unos minutos de margen—, así que esto es una
+    // mejora que se ofrece, no una pantalla del sistema en la cara al abrir.
+    if (!puedeAlarmasExactas(context)) {
+        Spacer(Modifier.height(12.dp))
+        Bloque {
+            Row(
+                modifier = Modifier.padding(14.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(R.string.exact_alarms_title),
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Medium,
+                    )
+                    Text(
+                        text = stringResource(R.string.exact_alarms_body),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                Spacer(Modifier.width(10.dp))
+                OutlinedButton(
+                    onClick = { abrirAjustesDeAlarmas(context) },
+                    shape = RoundedCornerShape(999.dp),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+                ) {
+                    Text(
+                        stringResource(R.string.exact_alarms_action),
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                }
+            }
+        }
+    }
+
     // -----------------------------------------------------------------------
     // Estado de ánimo
     // -----------------------------------------------------------------------
@@ -454,5 +491,26 @@ private fun SelectorDias(dias: Set<Int>, tinte: Color, onCambio: (Set<Int>) -> U
                 )
             }
         }
+    }
+}
+
+/** Si Android permite a la app poner alarmas al minuto exacto. */
+private fun puedeAlarmasExactas(context: Context): Boolean =
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+        (context.getSystemService(Context.ALARM_SERVICE) as android.app.AlarmManager)
+            .canScheduleExactAlarms()
+    } else {
+        true
+    }
+
+private fun abrirAjustesDeAlarmas(context: Context) {
+    if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.S) return
+    runCatching {
+        context.startActivity(
+            android.content.Intent(
+                android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
+                android.net.Uri.parse("package:" + context.packageName),
+            )
+        )
     }
 }
