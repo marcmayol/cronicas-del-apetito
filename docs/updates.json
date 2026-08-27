@@ -1,8 +1,8 @@
 {
-  "versionCode": 13,
-  "versionName": "2.2.2",
-  "url": "https://github.com/marcmayol/cronicas-del-apetito/releases/download/v2.2.2/cronicas-del-apetito-v2.2.2.apk",
-  "sha256": "c1e1cef0471a1fc0911c58a93e619f21ab9cc6fea1c5efaad3bc83c614057f86",
-  "notas": "El día en que respondes que no has ido al gimnasio ya no sale en blanco en lo que compartes.",
+  "versionCode": 14,
+  "versionName": "2.3",
+  "url": "https://github.com/marcmayol/cronicas-del-apetito/releases/download/v2.3/cronicas-del-apetito-v2.3.apk",
+  "sha256": "7a17989108bb3f87158ace5ca5ab9eef7bb1afe0d87effda4f884843d1f69466",
+  "notas": "Ahora puedes corregir y borrar lo que anotaste (con deshacer), y la app tiene tema oscuro.",
   "check_horas": 24
 }
