@@ -1,6 +1,11 @@
 package com.marcm.cronicasapetito.ui
 
 import androidx.annotation.StringRes
+import android.app.Activity
+import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.CompositionLocalProvider
@@ -113,6 +118,13 @@ private val ColoresNoche = ColoresCronicas(
 
 private val LocalColoresCronicas = staticCompositionLocalOf { ColoresCronicas() }
 
+/**
+ * Si la app se está pintando de noche. No es lo mismo que [isSystemInDarkTheme]:
+ * desde Ajustes se puede forzar claro u oscuro contra lo que diga el móvil, y
+ * todo lo que dependa del tema tiene que mirar aquí y no al sistema.
+ */
+val LocalEsNoche = staticCompositionLocalOf { false }
+
 val colorsCronicas: ColoresCronicas
     @Composable get() = LocalColoresCronicas.current
 
@@ -161,7 +173,7 @@ private val VisualGimnasioNoche =
  * fotocopiado en la consulta.
  */
 @Composable
-fun visualDe(kind: String): VisualTipo = if (isSystemInDarkTheme()) {
+fun visualDe(kind: String): VisualTipo = if (LocalEsNoche.current) {
     when (kind) {
         EntryKind.WALK -> VisualCaminataNoche
         EntryKind.MOOD -> VisualAnimoNoche
@@ -221,9 +233,29 @@ val estiloCifra: TextStyle
 
 @Composable
 fun CronicasTheme(content: @Composable () -> Unit) {
-    val noche = isSystemInDarkTheme()
+    val noche = when (TemaApp.modo) {
+        TemaApp.Modo.CLARO -> false
+        TemaApp.Modo.OSCURO -> true
+        TemaApp.Modo.SISTEMA -> isSystemInDarkTheme()
+    }
+
+    // La barra de estado se pinta desde aquí y no desde themes.xml: el XML solo
+    // sabe lo que dice el móvil, y con el tema forzado a mano quedaría una
+    // franja clara sobre una app oscura, o al revés.
+    val vista = LocalView.current
+    if (!vista.isInEditMode) {
+        val fondoBarra = (if (noche) NocheFondo else Color(0xFFFFF8EE)).toArgb()
+        SideEffect {
+            val ventana = (vista.context as Activity).window
+            ventana.statusBarColor = fondoBarra
+            WindowCompat.getInsetsController(ventana, vista)
+                .isAppearanceLightStatusBars = !noche
+        }
+    }
+
     CompositionLocalProvider(
-        LocalColoresCronicas provides if (noche) ColoresNoche else ColoresCronicas()
+        LocalColoresCronicas provides if (noche) ColoresNoche else ColoresCronicas(),
+        LocalEsNoche provides noche,
     ) {
         MaterialTheme(
             colorScheme = if (noche) DarkColors else LightColors,

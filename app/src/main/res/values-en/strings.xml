@@ -256,4 +256,9 @@
     <string name="exact_alarms_title">Reminders on the dot</string>
     <string name="exact_alarms_body">Android will not let the app fire at the exact minute. Reminders still arrive, but they may be a few minutes late.</string>
     <string name="exact_alarms_action">Allow</string>
+    <string name="appearance_section">Appearance</string>
+    <string name="appearance_theme">Theme</string>
+    <string name="appearance_system">Match the phone</string>
+    <string name="appearance_light">Light</string>
+    <string name="appearance_dark">Dark</string>
 </resources>

@@ -250,4 +250,9 @@
     <string name="exact_alarms_title">Avisos puntuales</string>
     <string name="exact_alarms_body">Android no deja que la app avise al minuto exacto. Los recordatorios llegan igual, pero pueden retrasarse unos minutos.</string>
     <string name="exact_alarms_action">Permitir</string>
+    <string name="appearance_section">Apariencia</string>
+    <string name="appearance_theme">Tema</string>
+    <string name="appearance_system">El del móvil</string>
+    <string name="appearance_light">Claro</string>
+    <string name="appearance_dark">Oscuro</string>
 </resources>

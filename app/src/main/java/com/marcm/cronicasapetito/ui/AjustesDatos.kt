@@ -4,6 +4,9 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -170,3 +173,37 @@ private fun avisar(context: android.content.Context, texto: String) {
 
 private fun selloDeHoy(): String =
     SimpleDateFormat("yyyyMMdd", Locale.US).format(Date())
+
+/**
+ * Elegir el tema. Va con los tres de siempre —seguir al móvil, claro u
+ * oscuro— porque «seguir al móvil» es lo que casi todo el mundo quiere, pero
+ * quien tiene el sistema en oscuro y prefiere leer esto en claro (o al revés)
+ * no debería tener que cambiar el móvil entero para conseguirlo.
+ */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun SeccionApariencia() {
+    val context = LocalContext.current
+
+    TituloSeccion(stringResource(R.string.appearance_section))
+    Bloque {
+        BloqueOpciones(titulo = stringResource(R.string.appearance_theme)) {
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                TemaApp.Modo.entries.forEach { opcion ->
+                    ChipOpcion(
+                        texto = stringResource(
+                            when (opcion) {
+                                TemaApp.Modo.SISTEMA -> R.string.appearance_system
+                                TemaApp.Modo.CLARO -> R.string.appearance_light
+                                TemaApp.Modo.OSCURO -> R.string.appearance_dark
+                            }
+                        ),
+                        activo = TemaApp.modo == opcion,
+                        tinte = MaterialTheme.colorScheme.primary,
+                        onClick = { TemaApp.cambiar(context, opcion) },
+                    )
+                }
+            }
+        }
+    }
+}

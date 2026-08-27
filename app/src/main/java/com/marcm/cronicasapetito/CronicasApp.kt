@@ -10,6 +10,7 @@ import com.marcm.cronicasapetito.notifications.GymNotifier
 import com.marcm.cronicasapetito.notifications.MealAlarmScheduler
 import com.marcm.cronicasapetito.notifications.MealNotifier
 import com.marcm.cronicasapetito.ui.Fechas
+import com.marcm.cronicasapetito.ui.TemaApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -34,6 +35,8 @@ class CronicasApp : Application() {
         // Los formatos de fecha salen de recursos: hay que darles el contexto
         // antes de que cualquier pantalla los pida.
         Fechas.init(this)
+        // Antes de que se pinte nada: el tema elegido decide los colores.
+        TemaApp.init(this)
         MealNotifier.ensureChannel(this)
         GymNotifier.ensureChannel(this)
         MealAlarmScheduler.scheduleNext(this)

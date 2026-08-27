@@ -122,6 +122,8 @@ private fun AjustesScreen(
             // busca cuando la app le importa lo suficiente.
             SeccionDatos(repositorio)
 
+            SeccionApariencia()
+
             TituloSeccion(stringResource(R.string.settings_updates))
             Bloque {
                 Row(
