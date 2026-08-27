@@ -1,8 +1,8 @@
 {
-  "versionCode": 14,
-  "versionName": "2.3",
-  "url": "https://github.com/marcmayol/cronicas-del-apetito/releases/download/v2.3/cronicas-del-apetito-v2.3.apk",
-  "sha256": "7a17989108bb3f87158ace5ca5ab9eef7bb1afe0d87effda4f884843d1f69466",
-  "notas": "Ahora puedes corregir y borrar lo que anotaste (con deshacer), y la app tiene tema oscuro.",
+  "versionCode": 15,
+  "versionName": "2.3.1",
+  "url": "https://github.com/marcmayol/cronicas-del-apetito/releases/download/v2.3.1/cronicas-del-apetito-v2.3.1.apk",
+  "sha256": "20181e36f191f2fac026a66bcb61fdae40b08180a87b3f752044c7924a2de611",
+  "notas": "El tema ya se elige desde Ajustes: el del móvil, claro u oscuro.",
   "check_horas": 24
 }
