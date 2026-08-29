@@ -14,7 +14,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
-import com.marcm.actualizador.Modo
 import com.marcm.cronicasapetito.data.MealRepository
 import com.marcm.cronicasapetito.notifications.MealAlarmScheduler
 import com.marcm.cronicasapetito.notifications.PrefsRecordatorios
@@ -46,17 +45,17 @@ class MainActivity : ComponentActivity() {
         MealNotifier.ensureChannel(this)
         MealAlarmScheduler.scheduleNext(this)
 
-        val actualizador = (application as CronicasApp).actualizador
+        val actualizaciones = (application as CronicasApp).actualizaciones
 
         // Comprobación al abrir: en segundo plano, con un pequeño retardo. Silenciosa.
         lifecycleScope.launch {
             delay(3000)
-            actualizador.comprobar(Modo.AUTOMATICO)
+            actualizaciones.comprobarAlAbrir()
         }
 
         setContent {
             CronicasTheme {
-                MainScreen(repository = repo, actualizador = actualizador)
+                MainScreen(repository = repo, actualizaciones = actualizaciones)
             }
         }
     }
@@ -64,7 +63,7 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         // Si el usuario volvió de conceder el permiso de instalación, reanuda el flujo.
-        (application as CronicasApp).actualizador.onPermisoQuizaConcedido()
+        (application as CronicasApp).actualizaciones.alVolverAlFrente()
     }
 
     /**

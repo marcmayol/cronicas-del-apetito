@@ -62,7 +62,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.marcm.actualizador.Actualizador
 import com.marcm.cronicasapetito.R
 import com.marcm.cronicasapetito.data.MealRepository
 import com.marcm.cronicasapetito.data.MealEntry
@@ -80,14 +79,13 @@ import kotlinx.coroutines.launch
 @Composable
 fun MainScreen(
     repository: MealRepository,
-    actualizador: Actualizador,
+    actualizaciones: PuenteActualizador,
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val viewModel: MainViewModel = viewModel(factory = MainViewModel.factory(repository))
     val estado by viewModel.estado.collectAsState()
     val registros by viewModel.registrosFiltrados.collectAsState()
-    val estadoActualizacion by actualizador.estado.collectAsState()
 
     var mostrarFiltro by remember { mutableStateOf(false) }
     var mostrarCompartir by remember { mutableStateOf(false) }
@@ -218,10 +216,7 @@ fun MainScreen(
                 .padding(padding)
                 .fillMaxSize(),
         ) {
-            BannerActualizacion(
-                estado = estadoActualizacion,
-                onActualizar = { actualizador.actualizarAhora() },
-            )
+            actualizaciones.Banner()
 
             if (durmiendo) {
                 BannerDormir(

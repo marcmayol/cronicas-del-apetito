@@ -40,6 +40,7 @@ import com.marcm.cronicasapetito.data.EntryKind
 import com.marcm.cronicasapetito.notifications.GymAlarmScheduler
 import com.marcm.cronicasapetito.notifications.MealAlarmScheduler
 import com.marcm.cronicasapetito.notifications.PrefsRecordatorios
+import com.marcm.cronicasapetito.BuildConfig
 import com.marcm.cronicasapetito.R
 import com.marcm.cronicasapetito.notifications.frecuenciaCorta
 import com.marcm.cronicasapetito.notifications.frecuenciaTexto
@@ -148,7 +149,7 @@ fun SeccionRecordatorios() {
     // Solo asoma si Android no deja poner alarmas exactas. Sin ese permiso la
     // app sigue avisando —con unos minutos de margen—, así que esto es una
     // mejora que se ofrece, no una pantalla del sistema en la cara al abrir.
-    if (!puedeAlarmasExactas(context)) {
+    if (BuildConfig.PIDE_ALARMAS_EXACTAS && !puedeAlarmasExactas(context)) {
         Spacer(Modifier.height(12.dp))
         Bloque {
             Row(

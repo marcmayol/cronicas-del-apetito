@@ -1,8 +1,6 @@
 package com.marcm.cronicasapetito
 
 import android.app.Application
-import com.marcm.actualizador.Actualizador
-import com.marcm.actualizador.ActualizadorConfig
 import com.marcm.cronicasapetito.data.AppDatabase
 import com.marcm.cronicasapetito.data.MealRepository
 import com.marcm.cronicasapetito.notifications.GymAlarmScheduler
@@ -10,7 +8,9 @@ import com.marcm.cronicasapetito.notifications.GymNotifier
 import com.marcm.cronicasapetito.notifications.MealAlarmScheduler
 import com.marcm.cronicasapetito.notifications.MealNotifier
 import com.marcm.cronicasapetito.ui.Fechas
+import com.marcm.cronicasapetito.ui.PuenteActualizador
 import com.marcm.cronicasapetito.ui.TemaApp
+import com.marcm.cronicasapetito.variante.crearPuenteActualizador
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -19,16 +19,8 @@ class CronicasApp : Application() {
 
     val database: AppDatabase by lazy { AppDatabase.get(this) }
 
-    val actualizador: Actualizador by lazy {
-        Actualizador(
-            app = this,
-            config = ActualizadorConfig(
-                manifiestoUrl = "https://marcmayol.com/cronicas-del-apetito/updates.json",
-                versionCodeActual = BuildConfig.VERSION_CODE,
-                checkHorasPorDefecto = 24,
-            ),
-        )
-    }
+    /** Cómo se actualiza esta variante. En Play, no se actualiza sola. */
+    val actualizaciones: PuenteActualizador by lazy { crearPuenteActualizador(this) }
 
     override fun onCreate() {
         super.onCreate()
@@ -41,8 +33,6 @@ class CronicasApp : Application() {
         GymNotifier.ensureChannel(this)
         MealAlarmScheduler.scheduleNext(this)
         GymAlarmScheduler.scheduleNext(this)
-        // Programa la comprobación periódica de actualizaciones (WorkManager).
-        actualizador.programarPeriodica()
 
         // Las fotos de los registros borrados se quedan en el disco a propósito
         // —mientras se pueda deshacer, el archivo tiene que existir—, así que

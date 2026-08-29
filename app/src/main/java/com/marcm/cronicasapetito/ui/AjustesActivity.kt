@@ -47,10 +47,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.marcm.actualizador.Actualizador
-import com.marcm.actualizador.EstadoActualizacion
-import com.marcm.actualizador.Modo
-import com.marcm.actualizador.TipoError
 import com.marcm.cronicasapetito.BuildConfig
 import com.marcm.cronicasapetito.CronicasApp
 import com.marcm.cronicasapetito.data.MealRepository
@@ -67,7 +63,7 @@ class AjustesActivity : ComponentActivity() {
         setContent {
             CronicasTheme {
                 AjustesScreen(
-                    actualizador = app.actualizador,
+                    actualizaciones = app.actualizaciones,
                     repositorio = repositorio,
                     onBack = { finish() },
                 )
@@ -77,20 +73,17 @@ class AjustesActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        (application as CronicasApp).actualizador.onPermisoQuizaConcedido()
+        (application as CronicasApp).actualizaciones.alVolverAlFrente()
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AjustesScreen(
-    actualizador: Actualizador,
+    actualizaciones: PuenteActualizador,
     repositorio: MealRepository,
     onBack: () -> Unit,
 ) {
-    val scope = rememberCoroutineScope()
-    val estado by actualizador.estado.collectAsState()
-    var buscarAuto by remember { mutableStateOf(actualizador.buscarAutomaticamente) }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -124,62 +117,7 @@ private fun AjustesScreen(
 
             SeccionApariencia()
 
-            TituloSeccion(stringResource(R.string.settings_updates))
-            Bloque {
-                Row(
-                    modifier = Modifier.padding(14.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = stringResource(R.string.settings_auto_check),
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Medium,
-                        )
-                        Text(
-                            text = stringResource(R.string.settings_auto_check_desc),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                    Switch(
-                        checked = buscarAuto,
-                        onCheckedChange = {
-                            buscarAuto = it
-                            actualizador.buscarAutomaticamente = it
-                        },
-                    )
-                }
-                Separador()
-                Row(
-                    modifier = Modifier.padding(14.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = stringResource(R.string.settings_check_now),
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Medium,
-                        )
-                        Spacer(Modifier.height(2.dp))
-                        LineaEstado(estado)
-                    }
-                    OutlinedButton(
-                        onClick = { scope.launch { actualizador.comprobar(Modo.MANUAL) } },
-                        shape = RoundedCornerShape(999.dp),
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
-                    ) { Text(stringResource(R.string.settings_check), fontWeight = FontWeight.SemiBold) }
-                }
-            }
-
-            if (estado is EstadoActualizacion.Disponible) {
-                Spacer(Modifier.height(12.dp))
-                Button(
-                    onClick = { actualizador.actualizarAhora() },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(14.dp),
-                ) { Text(stringResource(R.string.settings_download_install)) }
-            }
+            actualizaciones.SeccionAjustes()
 
             TituloSeccion(stringResource(R.string.settings_about))
             Bloque {
@@ -260,69 +198,4 @@ internal fun Separador() {
 }
 
 /** El estado vive bajo «Buscar ahora»; el error en rojo tierra, nunca alarma. */
-@Composable
-private fun LineaEstado(estado: EstadoActualizacion) {
-    when (estado) {
-        EstadoActualizacion.Comprobando -> Row(verticalAlignment = Alignment.CenterVertically) {
-            CircularProgressIndicator(modifier = Modifier.size(14.dp), strokeWidth = 2.dp)
-            Spacer(Modifier.width(8.dp))
-            Texto(stringResource(R.string.update_checking))
-        }
 
-        EstadoActualizacion.AlDia -> Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                Icons.Filled.Check,
-                contentDescription = null,
-                modifier = Modifier.size(13.dp),
-                tint = visualDe(com.marcm.cronicasapetito.data.EntryKind.WALK).color,
-            )
-            Spacer(Modifier.width(6.dp))
-            Texto(
-                stringResource(
-                    R.string.update_up_to_date,
-                    BuildConfig.VERSION_NAME,
-                    BuildConfig.VERSION_CODE,
-                ),
-                color = visualDe(com.marcm.cronicasapetito.data.EntryKind.WALK).color,
-            )
-        }
-
-        is EstadoActualizacion.Disponible ->
-            Texto(stringResource(R.string.update_available, estado.info.versionName))
-
-        is EstadoActualizacion.Descargando ->
-            Texto(stringResource(R.string.update_downloading, estado.porcentaje))
-        EstadoActualizacion.Verificando -> Texto(stringResource(R.string.update_verifying))
-        EstadoActualizacion.Instalando -> Texto(stringResource(R.string.update_installing))
-        is EstadoActualizacion.Error -> Texto(
-            mensajeError(estado),
-            color = MaterialTheme.colorScheme.error,
-        )
-
-        else -> Texto(
-            stringResource(R.string.update_last_known, BuildConfig.VERSION_NAME),
-            color = colorsCronicas.tenue,
-        )
-    }
-}
-
-@Composable
-private fun Texto(texto: String, color: androidx.compose.ui.graphics.Color = androidx.compose.ui.graphics.Color.Unspecified) {
-    Text(
-        text = texto,
-        style = MaterialTheme.typography.bodySmall,
-        color = if (color == androidx.compose.ui.graphics.Color.Unspecified)
-            MaterialTheme.colorScheme.onSurfaceVariant else color,
-    )
-}
-
-@Composable
-private fun mensajeError(e: EstadoActualizacion.Error): String = when (e.tipo) {
-    TipoError.SIN_RED -> stringResource(R.string.update_error_network)
-    TipoError.HTTP -> stringResource(R.string.update_error_http)
-    TipoError.MANIFIESTO -> stringResource(R.string.update_error_manifest)
-    TipoError.DESCARGA -> stringResource(R.string.update_error_download)
-    TipoError.HASH -> stringResource(R.string.update_error_hash)
-    TipoError.INSTALACION ->
-        stringResource(R.string.update_error_install) + (e.mensaje?.let { ": $it" } ?: ".")
-}

@@ -17,15 +17,34 @@ val keystoreProps = Properties().apply {
 
 android {
     namespace = "com.marcm.cronicasapetito"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.marcm.cronicasapetito"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 36
         versionCode = 15
         versionName = "2.3.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    // Dos caminos de distribución con reglas opuestas:
+    //  · fuera → DracApps y marcmayol.com, con auto-actualización propia.
+    //  · play  → Google Play, que PROHÍBE que una app se actualice por su
+    //            cuenta. La variante de Play ni siquiera enlaza :actualizador,
+    //            así que su permiso REQUEST_INSTALL_PACKAGES no llega al
+    //            manifiesto final.
+    flavorDimensions += "distribucion"
+    productFlavors {
+        create("fuera") {
+            dimension = "distribucion"
+            isDefault = true
+            buildConfigField("boolean", "PIDE_ALARMAS_EXACTAS", "true")
+        }
+        create("play") {
+            dimension = "distribucion"
+            buildConfigField("boolean", "PIDE_ALARMAS_EXACTAS", "false")
+        }
     }
 
     signingConfigs {
@@ -94,7 +113,8 @@ dependencies {
     implementation("androidx.room:room-ktx:2.6.1")
     ksp("androidx.room:room-compiler:2.6.1")
 
-    implementation(project(":actualizador"))
+    // Solo fuera de Play: ver el comentario de productFlavors.
+    "fueraImplementation"(project(":actualizador"))
 
     // El org.json del android.jar es un stub vacío en tests de JVM; esta es la
     // implementación de verdad, para poder comprobar el formato del respaldo.

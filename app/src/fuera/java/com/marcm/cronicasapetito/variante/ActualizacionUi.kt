@@ -1,4 +1,4 @@
-package com.marcm.cronicasapetito.ui
+package com.marcm.cronicasapetito.variante
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -19,6 +19,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.marcm.cronicasapetito.R
+import com.marcm.cronicasapetito.data.EntryKind
+import com.marcm.cronicasapetito.ui.visualDe
+import com.marcm.cronicasapetito.ui.colorsCronicas
 import com.marcm.actualizador.EstadoActualizacion
 
 /**

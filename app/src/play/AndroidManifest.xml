@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!--
+      En Play no se pide la alarma exacta. Google exige justificarla y la
+      reserva para alarmas y temporizadores; unos recordatorios de comida no
+      entran ahí, y pedirla es arriesgar el rechazo por algo que la app no
+      necesita: MealAlarmScheduler ya cae a setAndAllowWhileIdle cuando no la
+      tiene, y los avisos llegan con unos minutos de margen.
+    -->
+    <uses-permission
+        android:name="android.permission.SCHEDULE_EXACT_ALARM"
+        tools:node="remove" />
+
+</manifest>

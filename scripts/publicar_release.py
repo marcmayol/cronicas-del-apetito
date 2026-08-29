@@ -37,7 +37,9 @@ from pathlib import Path
 RAIZ = Path(__file__).resolve().parents[1]
 BUILD_GRADLE = RAIZ / "app" / "build.gradle.kts"
 MANIFIESTO = RAIZ / "docs" / "updates.json"
-APK_RELEASE = RAIZ / "app" / "build" / "outputs" / "apk" / "release" / "app-release.apk"
+# La variante «fuera» es la que se publica aquí: la de Play no lleva
+# auto-actualizador y se sube a la tienda, no a una Release de GitHub.
+APK_RELEASE = RAIZ / "app" / "build" / "outputs" / "apk" / "fuera" / "release" / "app-fuera-release.apk"
 
 _REPO = "marcmayol/cronicas-del-apetito"
 _PAGES_URL = "https://marcmayol.com/cronicas-del-apetito/updates.json"
@@ -178,7 +180,7 @@ def verificar_coherencia(vc_declarado: int, apk: Path, manifiesto: dict) -> None
 
 def construir() -> Path:
     asegurar_firma()
-    _ejecutar([_gradlew(), ":app:assembleRelease"])
+    _ejecutar([_gradlew(), ":app:assembleFueraRelease"])
     if not APK_RELEASE.is_file():
         raise SystemExit(f"No se generó el APK de release: {APK_RELEASE}")
     return APK_RELEASE
