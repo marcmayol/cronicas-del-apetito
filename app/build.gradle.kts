@@ -43,6 +43,14 @@ android {
         }
         create("play") {
             dimension = "distribucion"
+            // Paquete propio: son dos apps distintas a ojos de Android, y eso
+            // es lo que se quiere. Con el mismo id, la firma de Play App
+            // Signing chocaría con la de DracApps —quien tuviera una no podría
+            // actualizar a la otra— y además no podrían convivir en un móvil.
+            // Separadas, cada una lleva su firma y se pueden tener las dos.
+            // Los datos NO se comparten: para pasar de una a otra está la copia
+            // de seguridad de Ajustes.
+            applicationIdSuffix = ".play"
             buildConfigField("boolean", "PIDE_ALARMAS_EXACTAS", "false")
         }
     }

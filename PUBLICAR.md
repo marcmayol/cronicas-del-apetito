@@ -81,3 +81,36 @@ Para el paquete debug, que sí es debuggable, sigue valiendo la vía corta:
 ```bash
 adb exec-out run-as com.marcm.cronicasapetito.debug cat databases/cronicas.db > cronicas-backup.db
 ```
+
+## Dos variantes, dos caminos
+
+La app se distribuye por dos sitios con reglas opuestas, así que el mismo
+código sale en dos sabores:
+
+| | `fuera` | `play` |
+|---|---|---|
+| Dónde | DracApps y marcmayol.com | Google Play |
+| Paquete | `com.marcm.cronicasapetito` | `com.marcm.cronicasapetito.play` |
+| Se actualiza | sola, con `:actualizador` | desde la tienda |
+| Permisos | 8 | 2 (notificaciones y arranque) |
+| Se construye con | `assembleFueraRelease` | `bundlePlayRelease` |
+
+**Son dos apps distintas a ojos de Android, y a propósito.** Con el mismo
+`applicationId`, la clave que genera Play App Signing chocaría con la keystore
+de DracApps: quien tuviera una no podría actualizar a la otra. Separadas, cada
+una lleva su firma y **se pueden tener las dos instaladas a la vez** —útil para
+comparar—, con la pega de que no comparten datos: para pasar de una a otra se
+usa la copia de seguridad de Ajustes.
+
+Lo que la variante de Play **no** lleva, y por qué:
+
+- **El auto-actualizador.** La política de Device and Network Abuse prohíbe que
+  una app se actualice por una vía que no sea Play, y `REQUEST_INSTALL_PACKAGES`
+  no se puede usar para eso. Es motivo de retirada, no un aviso.
+- **`SCHEDULE_EXACT_ALARM`.** Google la reserva para alarmas y temporizadores.
+  La app ya cae a `setAndAllowWhileIdle` sin ella, así que pedirla sería
+  arriesgar el rechazo por algo que no necesita.
+
+Para probar la variante de Play sin publicarla, el canal de **pruebas internas**
+de Play instala y actualiza igual que el actualizador propio, y además el tiempo
+en pruebas cerradas cuenta para el requisito de los 12 testers.
