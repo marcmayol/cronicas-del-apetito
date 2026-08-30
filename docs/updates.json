@@ -1,8 +1,8 @@
 {
-  "versionCode": 15,
-  "versionName": "2.3.1",
-  "url": "https://github.com/marcmayol/cronicas-del-apetito/releases/download/v2.3.1/cronicas-del-apetito-v2.3.1.apk",
-  "sha256": "eb037d29996d13da6bd217217ba8624e12f26c9d37200f4b66d5c78f406bfa07",
-  "notas": "Crónicas del Apetito 2.3.1.",
+  "versionCode": 16,
+  "versionName": "2.4",
+  "url": "https://github.com/marcmayol/cronicas-del-apetito/releases/download/v2.4/cronicas-del-apetito-v2.4.apk",
+  "sha256": "035832cc9fd2f5ce4839b7c71b1ee13c96ed0b3ad99a3fe73874430200779f64",
+  "notas": "Preparada para Android 16. Por dentro, la app se separa en dos versiones: esta, que sigue actualizándose sola, y otra para Google Play.",
   "check_horas": 24
 }
