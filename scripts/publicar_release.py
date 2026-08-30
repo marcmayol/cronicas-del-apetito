@@ -210,18 +210,41 @@ def verificar_gh() -> None:
     if subprocess.call(["gh", "auth", "status"]) != 0:
         raise SystemExit("gh no está autenticado. Ejecuta: gh auth login")
 
+def asegurar_arbol_publicable() -> None:
+    """Nada del código puede quedarse sin subir cuando se cree el tag.
+
+    `gh release create` etiqueta lo que haya en el remoto en ese momento. Si el
+    código de esta versión sigue en local, el tag apunta a un commit que no la
+    contiene: la Release lleva el APK bueno pero el código enlazado es el
+    anterior, y eso no se nota hasta que alguien va a mirar qué cambió. Pasó con
+    la v2.4.1 y hubo que mover el tag a mano.
+    """
+    sucio = [
+        linea for linea in _salida(["git", "status", "--porcelain"]).splitlines()
+        if linea.strip() and not linea.endswith("docs/updates.json")
+    ]
+    if sucio:
+        raise SystemExit(
+            "Hay cambios sin commitear:\n  "
+            + "\n  ".join(sucio)
+            + "\n\nCommitéalos antes de publicar: si no, el tag de la Release "
+            "apuntará a un commit sin el código de esta versión."
+        )
+
 def publicar(apk: Path, manifiesto: dict, notas: str) -> None:
     vn = manifiesto["versionName"]
     asset = _asset_con_nombre(apk, vn)
+    # El push va ANTES de crear la Release, para que el tag caiga sobre el
+    # commit que sí lleva el código de esta versión.
+    _ejecutar(["git", "add", str(MANIFIESTO)])
+    _ejecutar(["git", "commit", "-m", f"Publica el manifiesto de la v{vn}"])
+    _ejecutar(["git", "push", "origin", "main"])
     _ejecutar([
         "gh", "release", "create", f"v{vn}", str(asset),
         "--repo", _REPO,
         "--title", f"Crónicas del Apetito {vn}",
         "--notes", notas or f"Crónicas del Apetito {vn}.",
     ])
-    _ejecutar(["git", "add", str(MANIFIESTO)])
-    _ejecutar(["git", "commit", "-m", f"Publica el manifiesto de la v{vn}"])
-    _ejecutar(["git", "push", "origin", "main"])
 
 def verificar_url_publica(vc_esperado: int, intentos: int = 30, espera_s: int = 10) -> None:
     """La URL de Pages puede tardar por la caché del CDN: reintenta unos minutos."""
@@ -250,6 +273,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if not args.dry_run:
         verificar_gh()
+        asegurar_arbol_publicable()
 
     manifiesto, apk = preparar(args.notas)
     print(f"Manifiesto v{manifiesto['versionName']} "
