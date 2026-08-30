@@ -41,14 +41,38 @@ estado **Borrador**. Todo lo que se podía dejar hecho, está hecho:
 | Clasificación de contenido | Todo «No» → PEGI 3, ESRB Para todos, Classind Todas las edades |
 | Prueba cerrada (Alpha) | Canal creado, **177 países**, correo de comentarios puesto |
 
-## Lo que sigue necesitando manos
+## Enviado a revisión (30-ago-2026)
 
-1. **Subir el AAB.** El archivo pesa 10,5 MB y el puente del navegador de
-   Claude corta en 10 MB, así que hay que soltarlo a mano en
-   Prueba cerrada → Alpha → la versión en borrador:
-   `app/build/outputs/bundle/playRelease/app-play-release.aab`
-2. **Los 12 testers.** Play exige 12 con opt-in continuo durante 14 días antes
-   de dar acceso a producción. Solo hay una lista («family», 1 usuario), así
-   que hay que decidir a quién se invita. Es lo único que puede retrasar esto
-   semanas.
-3. Revisar y enviar la versión a revisión.
+Los 15 cambios están **en revisión de Google**: ficha, contenido, y la versión
+**2.4.1 (17)** en el canal Prueba cerrada – Alpha, activo en 177 países.
+
+Los testers los gestiona el **grupo de Google `testers-community@googlegroups.com`**
+(bajo *Grupos de Google*, no *Listas de correo*, como pide Testers Community).
+
+El enlace de opt-in aparece en Play Console cuando Google aprueba la revisión.
+Su forma es siempre la misma:
+
+```
+https://play.google.com/apps/testing/com.marcm.cronicasapetito.play
+```
+
+## Lo que queda
+
+1. **Esperar la aprobación** (hasta 7 días, normalmente menos). Hasta entonces
+   el enlace no funciona.
+2. Terminar el envío en testerscommunity.com (pasos *App Details* y
+   *Review & Submit*).
+3. Los 14 días de prueba con 12 testers antes de pedir acceso a producción.
+
+## Si algún día lleva anuncios
+
+Es la vía de financiación que se ha planteado. No es marcar una casilla: hay
+que tocar cuatro sitios a la vez o Play bloquea la versión.
+
+- Permiso `com.google.android.gms.permission.AD_ID` en el manifiesto
+- Contenido de la aplicación → **ID de publicidad**: cambiar a «Sí»
+- Contenido de la aplicación → **Anuncios**: «Contiene anuncios»
+- **Seguridad de los datos**: dejaría de ser «no se recopila nada», porque la
+  red publicitaria sí recopila
+- Y la política de privacidad de `docs/privacidad.html`, que hoy promete
+  justamente lo contrario
