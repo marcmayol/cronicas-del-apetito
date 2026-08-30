@@ -64,6 +64,29 @@ https://play.google.com/apps/testing/com.marcm.cronicasapetito.play
    *Review & Submit*).
 3. Los 14 días de prueba con 12 testers antes de pedir acceso a producción.
 
+## Testers Community (preparado, sin enviar)
+
+El envío en testerscommunity.com está relleno hasta el último paso. **No se ha
+enviado a propósito**: gastaría el crédito Pro mientras el enlace de testing
+todavía devuelve 404, porque Play sigue revisando. En cuanto Play apruebe, se
+entra y se pulsa *Submit App*.
+
+| Campo | Valor |
+|---|---|
+| App name | Crónicas del Apetito |
+| Plan | **Pro** · 25 testers · informe ASO — hay **1 crédito ya comprado** |
+| Testing URL | `https://play.google.com/apps/testing/com.marcm.cronicasapetito.play` |
+| App icon | `graficos/icono-512.png` |
+| ¿Hecha con PWABuilder/Bubblewrap? | **No** (es Kotlin nativo; lo preguntan antes de gastar el crédito) |
+
+Notas para los testers (en inglés y español, porque la app es bilingüe):
+
+> No login needed: the app opens straight away, no account and no password. On
+> first launch there is a three-step welcome where you pick what you want to be
+> asked about (food, walks, gym, mood) and between which hours. Everything stays
+> on the phone. The app is in English and Spanish, and follows the phone's
+> language.
+
 ## Si algún día lleva anuncios
 
 Es la vía de financiación que se ha planteado. No es marcar una casilla: hay
