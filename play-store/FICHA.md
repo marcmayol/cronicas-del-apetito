@@ -71,12 +71,12 @@ llegan: de cada media hora a cada seis. Si un día te sobran, los espacias o los
 apagas. Y hay un botón de «me voy a dormir» que los calla hasta mañana.
 
 
-PARA LLEVARLO A CONSULTA
+PARA ENSEÑARLO, NO SOLO PARA GUARDARLO
 
 Míralo por día, por semana o por mes, y filtra por fechas. Lo que estés viendo
-se comparte tal cual, como imagen o como PDF, pensado para enseñárselo a quien
-te esté acompañando. Cada tipo de registro lleva su símbolo además de su color,
-así que se entiende también impreso en blanco y negro.
+se comparte tal cual, como imagen o como PDF, listo para mandarlo por mensaje o
+imprimirlo. Cada tipo de registro lleva su símbolo además de su color, así que
+se entiende también en blanco y negro.
 
 
 TUS DATOS SON TUYOS, Y SE NOTA
@@ -96,9 +96,9 @@ ADEMÁS
 • Cualquier registro se corrige o se borra, y borrar siempre se puede deshacer
 • Sin anuncios, sin compras dentro de la app, sin nada que desbloquear
 
-Crónicas del Apetito es una herramienta para apuntar lo que comes, pensada para
-acompañar el trabajo con un profesional. No es un dispositivo médico, no da
-consejo sanitario y no sustituye a nadie.
+Un cuaderno con recordatorios, nada más. Crónicas del Apetito no cuenta
+calorías, no te dice qué comer y no opina sobre lo que anotas: solo se acuerda
+de preguntarte, para que tú no tengas que hacerlo.
 ```
 
 *Unos 1900 caracteres de 4000.*

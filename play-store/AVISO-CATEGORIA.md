@@ -32,18 +32,17 @@ exige cuenta de organización para:
 La ficha que había preparado ponía **categoría «Salud y bienestar»**, que es
 pedir el mismo rechazo.
 
-Y aquí hay que ser honesto en las dos direcciones, porque de eso depende que
-esto salga bien o acabe en una infracción:
-
-**Lo que Crónicas del Apetito NO es.** No mide nada, no diagnostica, no da
-consejo sanitario, no gestiona medicación ni constantes, y no hace
+**Crónicas del Apetito no es una app de salud.** No mide nada, no diagnostica,
+no da consejo sanitario, no gestiona medicación ni constantes, y no hace
 investigación con personas. Es un cuaderno con recordatorios: escribes lo que
 comes y la app te pregunta a la hora que le digas. Funcionalmente está más
 cerca de una app de notas que de una app médica.
 
-**Lo que sí es.** Nació para acompañar un tratamiento y la descripción lo dice.
-Presentarla como si no tuviera nada que ver con la salud sería falsear la ficha,
-y eso también es motivo de retirada.
+Nació ligada a un tratamiento, pero eso quedó atrás y la app ha evolucionado.
+La ficha describe lo que la app hace hoy, así que no hay nada que esconder al
+categorizarla fuera de salud —que era la duda que había aquí antes—. Las
+referencias a acompañar a un profesional se han quitado de la ficha, la web y
+el README porque ya no describen el producto.
 
 ## La salida
 
@@ -53,9 +52,9 @@ Categorizarla por lo que hace, no por para qué se usa:
   encaja ahí sin forzar nada.
 - **No declarar funciones de salud** en el apartado de contenido: la app no
   ofrece ninguna de las que Play define como tales.
-- **Mantener el aviso de la descripción** tal cual está: «no es un dispositivo
-  médico, no da consejo sanitario y no sustituye a nadie». Eso juega a favor,
-  no en contra.
+- **Cerrar la descripción diciendo qué es**: «un cuaderno con recordatorios; no
+  cuenta calorías, no te dice qué comer y no opina sobre lo que anotas». Deja
+  claro que no hay funciones de salud sin ponerse a la defensiva.
 
 Si aun así Play la clasifica como app de salud, la única alternativa es una
 cuenta de organización, que exige empresa registrada y número D-U-N-S. Para una

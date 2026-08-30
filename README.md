@@ -1,6 +1,6 @@
 # Crónicas del Apetito
 
-App Android para registrar lo que comes a lo largo del día, pensada para acompañar el trabajo con la psicóloga sobre ansiedad y comida. Nació de un caso concreto, pero **todos los recordatorios se configuran** —la horquilla, la frecuencia y qué carriles quieres— y está **en español y en inglés**.
+App Android para registrar lo que comes a lo largo del día: en vez de esperar a que te acuerdes, te pregunta. **Todos los recordatorios se configuran** —la horquilla, la frecuencia y qué carriles quieres— y está **en español y en inglés**.
 
 ## Qué hace
 
@@ -128,4 +128,4 @@ Cubren la lógica que se rompe en los bordes: semanas a caballo entre meses, hue
 
 ## Licencia
 
-[MIT](LICENSE). Se ofrece tal cual, sin garantía: es una herramienta para apuntar lo que comes, no un dispositivo médico ni un sustituto de un profesional.
+[MIT](LICENSE). Se ofrece tal cual y sin garantía: es un cuaderno con recordatorios, no una herramienta clínica.
