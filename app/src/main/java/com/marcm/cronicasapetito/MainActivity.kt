@@ -10,6 +10,7 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import androidx.activity.ComponentActivity
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
@@ -33,6 +34,11 @@ class MainActivity : ComponentActivity() {
     ) { /* sin acción adicional, ya reprogramamos al abrir */ }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Android 15 en adelante dibuja bajo las barras del sistema quiera o no.
+        // Declararlo aquí hace que se comporte igual en todas las versiones, y
+        // que los insets que aplica la UI sean los mismos en el móvil de 2019
+        // que en el de este año.
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         val repo = MealRepository((application as CronicasApp).database.mealDao())

@@ -98,7 +98,7 @@ fun CompartirSheet(
 
             Spacer(Modifier.height(12.dp))
             Text(
-                text = "Se comparte exactamente lo que estás viendo: $contexto.",
+                text = stringResource(R.string.share_exactly, contexto),
                 style = MaterialTheme.typography.bodySmall,
                 color = colorsCronicas.tenue,
             )

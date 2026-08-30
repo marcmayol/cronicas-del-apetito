@@ -23,8 +23,8 @@ android {
         applicationId = "com.marcm.cronicasapetito"
         minSdk = 26
         targetSdk = 36
-        versionCode = 16
-        versionName = "2.4"
+        versionCode = 17
+        versionName = "2.4.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -68,7 +68,15 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            // R8 deja el dex en la mitad. Va en las dos variantes a propósito:
+            // así lo que se prueba por DracApps es exactamente lo que sube a
+            // Play, y un fallo de ofuscación aparece aquí antes que allí.
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
             if (keystorePropsFile.exists()) {
                 signingConfig = signingConfigs.getByName("release")
             }

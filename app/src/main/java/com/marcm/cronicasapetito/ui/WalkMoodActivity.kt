@@ -2,6 +2,7 @@ package com.marcm.cronicasapetito.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -72,6 +73,11 @@ class WalkMoodActivity : ComponentActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Android 15 en adelante dibuja bajo las barras del sistema quiera o no.
+        // Declararlo aquí hace que se comporte igual en todas las versiones, y
+        // que los insets que aplica la UI sean los mismos en el móvil de 2019
+        // que en el de este año.
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         val repo = MealRepository((application as CronicasApp).database.mealDao())

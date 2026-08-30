@@ -261,4 +261,7 @@
     <string name="appearance_system">Match the phone</string>
     <string name="appearance_light">Light</string>
     <string name="appearance_dark">Dark</string>
+    <string name="share_exactly">You share exactly what you are looking at: %1$s.</string>
+    <string name="share_filtered"> · filtered %1$s</string>
+    <string name="empty_filtered">Nothing logged %1$s.</string>
 </resources>

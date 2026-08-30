@@ -255,4 +255,7 @@
     <string name="appearance_system">El del móvil</string>
     <string name="appearance_light">Claro</string>
     <string name="appearance_dark">Oscuro</string>
+    <string name="share_exactly">Se comparte exactamente lo que estás viendo: %1$s.</string>
+    <string name="share_filtered"> · filtrado %1$s</string>
+    <string name="empty_filtered">No hay nada anotado %1$s.</string>
 </resources>

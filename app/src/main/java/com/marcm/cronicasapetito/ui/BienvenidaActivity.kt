@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
@@ -14,6 +15,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -72,6 +78,11 @@ class BienvenidaActivity : ComponentActivity() {
     ) { /* concedido o no, se sigue: la app funciona igual sin avisos */ }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Android 15 en adelante dibuja bajo las barras del sistema quiera o no.
+        // Declararlo aquí hace que se comporte igual en todas las versiones, y
+        // que los insets que aplica la UI sean los mismos en el móvil de 2019
+        // que en el de este año.
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContent {
             CronicasTheme {
@@ -376,7 +387,13 @@ private fun Tramos(total: Int, hechos: Int) {
 @Composable
 private fun BarraPasos(paso: PasoBienvenida, onAtras: () -> Unit, onAvanzar: () -> Unit) {
     Surface(color = MaterialTheme.colorScheme.background) {
-        Column {
+        // Mismo motivo que en BarraGuardar: el fondo llega al borde, los
+        // botones se quedan por encima de la barra de navegación.
+        Column(
+            modifier = Modifier.windowInsetsPadding(
+                WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom),
+            ),
+        ) {
             Box(
                 Modifier
                     .fillMaxWidth()

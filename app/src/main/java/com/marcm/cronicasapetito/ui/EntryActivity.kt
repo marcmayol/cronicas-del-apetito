@@ -6,6 +6,7 @@ import android.content.Context
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.PickVisualMediaRequest
@@ -15,6 +16,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -84,6 +90,11 @@ import java.util.Locale
 class EntryActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Android 15 en adelante dibuja bajo las barras del sistema quiera o no.
+        // Declararlo aquí hace que se comporte igual en todas las versiones, y
+        // que los insets que aplica la UI sean los mismos en el móvil de 2019
+        // que en el de este año.
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         MealNotifier.dismiss(this)
 
@@ -445,7 +456,15 @@ internal fun BarraGuardar(
     alineadoAlInicio: Boolean = false,
 ) {
     Surface(color = MaterialTheme.colorScheme.background) {
-        Column {
+        // El color llega hasta el borde de la pantalla, pero los botones se
+        // apartan de lo que haya abajo: la barra de navegación, o el teclado
+        // cuando está abierto. safeDrawing coge el mayor de los dos, así que
+        // no se suman y la barra sube sola al escribir.
+        Column(
+            modifier = Modifier.windowInsetsPadding(
+                WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom),
+            ),
+        ) {
             Box(
                 Modifier
                     .fillMaxWidth()

@@ -11,6 +11,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -208,6 +209,8 @@ fun MainScreen(
                 shape = RoundedCornerShape(16.dp),
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
+                // Sin esto el botón queda debajo de la barra de navegación.
+                modifier = Modifier.navigationBarsPadding(),
             )
         },
     ) { padding ->
@@ -313,8 +316,12 @@ fun MainScreen(
     }
 
     if (mostrarCompartir) {
+        // Se resuelve una vez aquí, en composición: dentro de la corrutina que
+        // exporta ya no se puede leer un recurso, y es el mismo texto que el
+        // documento lleva por título.
+        val contextoCompartir = contextoDeCompartir(estado)
         CompartirSheet(
-            contexto = contextoDeCompartir(estado),
+            contexto = contextoCompartir,
             formatoSugerido = if (estado.vista == Vista.DIA) FormatoCompartir.PDF
             else FormatoCompartir.IMAGEN,
             onCerrar = { mostrarCompartir = false },
@@ -325,7 +332,7 @@ fun MainScreen(
                         FormatoCompartir.PDF -> PdfExporter.export(
                             context = context,
                             entries = estado.entradasVisibles.sortedByDescending { it.timestampMillis },
-                            titulo = contextoDeCompartir(estado),
+                            titulo = contextoCompartir,
                         )
                         FormatoCompartir.IMAGEN -> when (estado.vista) {
                             Vista.SEMANA -> ImagenExporter.semana(
@@ -346,7 +353,7 @@ fun MainScreen(
                             Vista.DIA -> PdfExporter.export(
                                 context = context,
                                 entries = estado.entradasVisibles.sortedByDescending { it.timestampMillis },
-                                titulo = contextoDeCompartir(estado),
+                                titulo = contextoCompartir,
                             )
                         }
                     }
@@ -457,12 +464,19 @@ fun MainScreen(
 }
 
 /** Lo que dice la cabecera de lo compartido: vista + periodo + filtro. */
-private fun contextoDeCompartir(estado: EstadoPrincipal): String = when (estado.vista) {
-    Vista.SEMANA -> Fechas.semana(Periodos.lunesDe(estado.ancla)) +
-        (estado.filtro?.let { " · filtrado ${Fechas.rango(it).lowercase()}" } ?: "")
-    Vista.MES -> Fechas.mes(estado.mes) +
-        (estado.filtro?.let { " · filtrado ${Fechas.rango(it).lowercase()}" } ?: "")
-    Vista.DIA -> estado.filtro?.let { Fechas.rangoConAnio(it) } ?: "Historial completo"
+// Es @Composable porque el texto que compone se enseña, y lo que se enseña se
+// lee de los recursos: con el móvil en inglés esta línea salía en castellano.
+@Composable
+private fun contextoDeCompartir(estado: EstadoPrincipal): String {
+    val filtrado = estado.filtro?.let {
+        stringResource(R.string.share_filtered, Fechas.rango(it).lowercase())
+    } ?: ""
+    return when (estado.vista) {
+        Vista.SEMANA -> Fechas.semana(Periodos.lunesDe(estado.ancla)) + filtrado
+        Vista.MES -> Fechas.mes(estado.mes) + filtrado
+        Vista.DIA -> estado.filtro?.let { Fechas.rangoConAnio(it) }
+            ?: stringResource(R.string.history_all)
+    }
 }
 
 @Composable
@@ -516,7 +530,7 @@ private fun VacioSegunFiltro(estado: EstadoPrincipal, onQuitarFiltro: () -> Unit
     } else {
         EstadoVacio(
             icono = IconoCalendario,
-            mensaje = "No hay nada anotado ${Fechas.rango(filtro).lowercase()}.",
+            mensaje = stringResource(R.string.empty_filtered, Fechas.rango(filtro).lowercase()),
             accion = {
                 TextButton(onClick = onQuitarFiltro) { Text(stringResource(R.string.filter_clear)) }
             },
