@@ -41,51 +41,29 @@ estado **Borrador**. Todo lo que se podía dejar hecho, está hecho:
 | Clasificación de contenido | Todo «No» → PEGI 3, ESRB Para todos, Classind Todas las edades |
 | Prueba cerrada (Alpha) | Canal creado, **177 países**, correo de comentarios puesto |
 
-## Enviado a revisión (30-ago-2026)
+## En pruebas (30-ago-2026)
 
-Los 15 cambios están **en revisión de Google**: ficha, contenido, y la versión
-**2.4.1 (17)** en el canal Prueba cerrada – Alpha, activo en 177 países.
+**Google la aprobó el mismo día.** El canal Prueba cerrada – Alpha está activo
+con la **2.4.1 (17)** en 177 países, y los dos enlaces ya funcionan:
 
-Los testers los gestiona el **grupo de Google `testers-community@googlegroups.com`**
-(bajo *Grupos de Google*, no *Listas de correo*, como pide Testers Community).
+| Para | Enlace |
+|---|---|
+| Apuntarse como tester (web) | `https://play.google.com/apps/testing/com.marcm.cronicasapetito.play` |
+| La ficha en Play (Android) | `https://play.google.com/store/apps/details?id=com.marcm.cronicasapetito.play` |
 
-El enlace de opt-in aparece en Play Console cuando Google aprueba la revisión.
-Su forma es siempre la misma:
+Los testers los gestiona el grupo `testers-community@googlegroups.com`, puesto
+en *Grupos de Google* (no en *Listas de correo*, que es donde no vale).
 
-```
-https://play.google.com/apps/testing/com.marcm.cronicasapetito.play
-```
+**Testers Community**: enviado con el crédito Pro — 25 testers e informe ASO.
+En su panel: *Private Testing Pro · Day 0 / 16 · reports pending*. Su garantía
+dice que si se completan los 14 días y Google no da acceso a producción,
+devuelven el importe.
 
 ## Lo que queda
 
-1. **Esperar la aprobación** (hasta 7 días, normalmente menos). Hasta entonces
-   el enlace no funciona.
-2. Terminar el envío en testerscommunity.com (pasos *App Details* y
-   *Review & Submit*).
-3. Los 14 días de prueba con 12 testers antes de pedir acceso a producción.
-
-## Testers Community (preparado, sin enviar)
-
-El envío en testerscommunity.com está relleno hasta el último paso. **No se ha
-enviado a propósito**: gastaría el crédito Pro mientras el enlace de testing
-todavía devuelve 404, porque Play sigue revisando. En cuanto Play apruebe, se
-entra y se pulsa *Submit App*.
-
-| Campo | Valor |
-|---|---|
-| App name | Crónicas del Apetito |
-| Plan | **Pro** · 25 testers · informe ASO — hay **1 crédito ya comprado** |
-| Testing URL | `https://play.google.com/apps/testing/com.marcm.cronicasapetito.play` |
-| App icon | `graficos/icono-512.png` |
-| ¿Hecha con PWABuilder/Bubblewrap? | **No** (es Kotlin nativo; lo preguntan antes de gastar el crédito) |
-
-Notas para los testers (en inglés y español, porque la app es bilingüe):
-
-> No login needed: the app opens straight away, no account and no password. On
-> first launch there is a three-step welcome where you pick what you want to be
-> asked about (food, walks, gym, mood) and between which hours. Everything stays
-> on the phone. The app is in English and Spanish, and follows the phone's
-> language.
+1. Que corran los **14 días** con los testers instalados.
+2. Entonces, **Solicitar acceso a producción** desde el panel de Play Console.
+3. Mirar los informes de los testers y arreglar lo que salga (para eso están).
 
 ## Si algún día lleva anuncios
 
