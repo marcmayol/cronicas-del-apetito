@@ -4,6 +4,7 @@ Lo necesario para subir **Crónicas del Apetito** a Play, ya preparado.
 
 | Archivo | Qué es |
 |---|---|
+| `AVISO-CATEGORIA.md` | **Léelo primero.** Por qué la categoría no puede ser Salud |
 | `FICHA.md` | Nombre, descripciones corta y larga, categoría y enlaces, listos para pegar |
 | `data-safety.md` | El formulario de seguridad de los datos, respondido |
 | `graficos/` | Icono 512×512, gráfico destacado 1024×500 y cuatro capturas |

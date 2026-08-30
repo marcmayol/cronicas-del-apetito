@@ -17,8 +17,13 @@ Crónicas del Apetito
 ficha no se traduce automáticamente: si más adelante quieres ficha en inglés,
 se añade como traducción de la ficha en Play Console.*
 
-**Categoría**: Salud y bienestar
-**Etiquetas sugeridas**: diario de comidas, recordatorios, bienestar
+**Categoría**: Estilo de vida ⚠️ **no Salud y bienestar**
+
+> Esa categoría, con una cuenta personal, es rechazo seguro: las apps de salud
+> solo las pueden publicar cuentas de organización. Le pasó a Grimorio de Salud
+> el 2-jun-2026. Ver `AVISO-CATEGORIA.md`.
+
+**Etiquetas sugeridas**: diario, recordatorios, hábitos
 **Web**: https://marcmayol.com/cronicas-del-apetito/
 **Privacidad**: https://marcmayol.com/cronicas-del-apetito/privacidad.html
 **Contacto**: incidencias en GitHub, y el correo que uses en Play Console
@@ -123,5 +128,6 @@ a propósito: nada de lo que se ve es de nadie.
       paquete de Play (`com.marcm.cronicasapetito.play`) es distinto al de
       DracApps, así que no hay conflicto de firmas entre los dos canales.
 - [ ] Rellenar Data safety con `data-safety.md`.
-- [ ] Cuestionario de clasificación de contenido.
+- [ ] Cuestionario de clasificación de contenido. **No declarar funciones de
+      salud**: la app no ofrece ninguna de las que Play define como tales.
 - [ ] Marcar que **no** contiene anuncios.
