@@ -262,14 +262,25 @@ to.
 | Qué | Archivo | Tamaño |
 |---|---|---|
 | Icono | `icono-512.png` | 512×512 |
-| Destacado | `destacado-1024x500.png` | 1024×500 |
-| Capturas | `captura-1-dia.png` … `captura-4-ajustes.png` | 1080×2400 |
+| Destacado | `es/destacado-1024x500.png`, `en/destacado-1024x500.png` | 1024×500 |
+| Capturas | `es/01-aviso.png` … `es/06-recordatorios.png`, y lo mismo en `en/` | 1080×1920 |
 
-Play pide **mínimo 2 capturas** de teléfono; van cuatro. Llevan datos inventados
-a propósito: nada de lo que se ve es de nadie.
+Play pide **mínimo 2 capturas** de teléfono; van seis por idioma, con titular:
+ver `CAPTURAS.md`. Llevan datos inventados a propósito: nada de lo que se ve es
+de nadie.
 
-⚠️ Las capturas actuales son pantallazos crudos. El informe de testers pide que
-digan qué hace cada pantalla; ver `CAPTURAS.md`.
+**El destacado va por idioma.** Es el mismo dibujo con el nombre de cada ficha:
+en la inglesa la app se llama *Appetite Chronicles*, así que el destacado en
+castellano allí desmentía al título. Se rehace con:
+
+```bash
+python scripts/generar_destacado_play.py --idioma en
+```
+
+El panel del tenedor lo copia del destacado original (`destacado-1024x500.png`,
+que se queda como fuente del dibujo), y solo decide el texto.
+
+Los cuatro pantallazos crudos de agosto (`captura-*.png`) quedan sustituidos.
 
 ---
 
