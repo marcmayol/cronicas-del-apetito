@@ -123,18 +123,37 @@ las claves de firma de **todas** las apps que se distribuyan en Android, no solo
 las de Play. Lo que no se registre deja de poder instalarse en dispositivos
 Android certificados de determinados países.
 
-El 9-sep la cuenta tenía registrados **tres** paquetes, los tres de Play:
-`com.marcm.cronicasapetito.play` (3 claves verificadas),
-`com.marcm.grimoriodepociones` y `com.marcmayol.buildingmyfuturo`.
+El 9-sep la cuenta tenía registrados **tres** paquetes, los tres de Play. El de
+DracApps, `com.marcm.cronicasapetito`, no estaba: es otro nombre de paquete y
+otra firma, así que la verificación de la variante `play` no le servía de nada.
+Lo mismo pasaba con el resto del catálogo.
 
-**`com.marcm.cronicasapetito` —el de DracApps— no está.** Es otro nombre de
-paquete y otra firma, así que la verificación de la variante `play` no le sirve
-de nada. Lo mismo vale para el resto del catálogo de DracApps.
+**Hecho el 9-sep-2026: los 8 paquetes de fuera de Play, registrados.** La cuenta
+tiene ahora 11 nombres de paquete, todos «Registrada». En este repo toca
+`com.marcm.cronicasapetito`, con la huella de `claves/cronicas-release.jks`.
 
 Se registra en Play Console → *Verificación de desarrolladores de Android* →
-*Registrar nombre de paquete*, y la huella SHA-256 de la keystore de release se
-saca con:
+*Registrar nombre de paquete*. Google pide tres cosas: el nombre del paquete, la
+**huella SHA-256** de la clave, y **un APK firmado con esa misma clave** que
+lleve el identificador de la cuenta dentro.
+
+**La huella se saca del APK publicado, no de la keystore.** Es la firma que la
+gente tiene instalada, y así se comprueba de paso que la keystore es la correcta:
 
 ```bash
-keytool -list -v -keystore C:/ruta/segura/cronicas-release.jks -alias cronicas
+apksigner verify --print-certs cronicas-del-apetito-v2.5.1.apk
 ```
+
+**El APK de prueba no tiene que ser la app.** Google acepta un proyecto vacío con
+el mismo nombre de paquete, y conviene: el APK real pesa demasiado para subirlo
+por según qué vía. Uno mínimo (unos 12 KB) se hace sin Gradle:
+
+```bash
+# adi-registration.properties, con el identificador que enseña el diálogo, en assets/
+aapt2 link --manifest AndroidManifest.xml -I <sdk>/platforms/android-36/android.jar     -A assets --rename-manifest-package com.marcm.cronicasapetito -o min.apk
+apksigner sign --ks claves/cronicas-release.jks --ks-key-alias cronicas min.apk
+```
+
+El archivo `assets/adi-registration.properties` es **un identificador de la
+cuenta**, el mismo para todos los paquetes, y no hace falta que viaje en la app
+de verdad: se pone solo para el APK de prueba.
