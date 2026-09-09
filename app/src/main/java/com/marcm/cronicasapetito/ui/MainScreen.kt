@@ -1,10 +1,13 @@
 package com.marcm.cronicasapetito.ui
 
+import android.app.Activity
 import android.app.AlarmManager
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.os.SystemClock
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -51,6 +54,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -75,6 +79,9 @@ import com.marcm.cronicasapetito.notifications.PrefsRecordatorios
 import com.marcm.cronicasapetito.notifications.SleepPrefs
 import com.marcm.cronicasapetito.notifications.horaTexto
 import kotlinx.coroutines.launch
+
+/** Lo que dura el «pulsa otra vez»: menos no da tiempo, más se olvida. */
+private const val MARGEN_SALIDA_MS = 2500L
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -108,6 +115,28 @@ fun MainScreen(
         horaTexto(PrefsRecordatorios.comidaInicioMin(context))
     }
 
+    // Atrás desde aquí cerraba la app en seco, y en un móvil con gestos ese
+    // atrás se hace sin querer varias veces al día. Un diálogo de «¿seguro?»
+    // sería peor —Android no pregunta al salir de ninguna app—, así que se pide
+    // dos veces seguidas.
+    //
+    // La salida se decide aquí, con reloj propio, en vez de apartar el
+    // BackHandler mientras el aviso está en pantalla: haciéndolo así, el
+    // segundo atrás se lo comía el propio aviso y la app no se cerraba nunca.
+    val avisoDeSalida = stringResource(R.string.exit_confirm)
+    val actividad = context as? Activity
+    var atrasAnterior by remember { mutableLongStateOf(0L) }
+    BackHandler {
+        val ahora = SystemClock.elapsedRealtime()
+        if (ahora - atrasAnterior < MARGEN_SALIDA_MS) {
+            actividad?.finish()
+        } else {
+            atrasAnterior = ahora
+            scope.launch {
+                avisos.showSnackbar(avisoDeSalida, duration = SnackbarDuration.Short)
+            }
+        }
+    }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,

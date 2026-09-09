@@ -23,8 +23,8 @@ android {
         applicationId = "com.marcm.cronicasapetito"
         minSdk = 26
         targetSdk = 36
-        versionCode = 17
-        versionName = "2.4.1"
+        versionCode = 18
+        versionName = "2.5"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -40,6 +40,9 @@ android {
             dimension = "distribucion"
             isDefault = true
             buildConfigField("boolean", "PIDE_ALARMAS_EXACTAS", "true")
+            // Fuera de Play no hay ficha donde valorar: DracApps no tiene
+            // estrellas ni reseñas. Vacío significa «no enseñes el botón».
+            buildConfigField("String", "URL_TIENDA", "\"\"")
         }
         create("play") {
             dimension = "distribucion"
@@ -52,6 +55,14 @@ android {
             // de seguridad de Ajustes.
             applicationIdSuffix = ".play"
             buildConfigField("boolean", "PIDE_ALARMAS_EXACTAS", "false")
+            // La ficha donde se valora. No se compone con applicationId en
+            // tiempo de ejecución a propósito: en un build de depuración el
+            // sufijo .debug daría una URL que no existe.
+            buildConfigField(
+                "String",
+                "URL_TIENDA",
+                "\"https://play.google.com/store/apps/details?id=com.marcm.cronicasapetito.play\"",
+            )
         }
     }
 

@@ -164,6 +164,7 @@ private fun AjustesScreen(
                         )
                     }
                 }
+                FilasEnlaces()
             }
 
             Spacer(Modifier.height(24.dp))

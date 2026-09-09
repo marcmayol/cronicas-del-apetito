@@ -164,6 +164,13 @@
     <string name="settings_download_install">Descargar e instalar</string>
     <string name="settings_about">Acerca de</string>
     <string name="settings_local_only">· datos solo en este móvil</string>
+    <string name="about_rate">Valorar la app</string>
+    <string name="about_rate_desc">Abre su ficha en Google Play</string>
+    <string name="about_privacy">Privacidad</string>
+    <string name="about_privacy_desc">Qué guarda la app, y por qué no sale de aquí</string>
+    <string name="about_terms">Condiciones de uso</string>
+    <string name="about_terms_desc">Qué puedes esperar de la app, y qué no</string>
+    <string name="exit_confirm">Pulsa otra vez para salir</string>
     <string name="reminders_meal_section">Recordatorios de comida</string>
     <string name="reminders_meal_switch">Preguntarme si he comido</string>
     <string name="reminders_meal_off">Desactivado: no llegará ningún aviso</string>

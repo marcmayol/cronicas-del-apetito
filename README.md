@@ -18,6 +18,8 @@ App Android para registrar lo que comes a lo largo del día: en vez de esperar a
 - **Español e inglés**, según el idioma del móvil. En inglés la app se llama *Appetite Chronicles*.
 - **Tema claro y oscuro**: el del móvil, o el que elijas tú en Ajustes. Lo que se exporta se queda siempre en papel claro: se imprime.
 - **Tus datos son tuyos**: desde Ajustes se guarda una copia con todo el historial y las fotos en un ZIP, y se recupera igual de fácil. Sin cuentas ni nube, pero con salida.
+- **Atrás no cierra de golpe**: desde la pantalla principal hay que pulsarlo dos veces, con un aviso por medio. Con gestos, ese atrás se hace sin querer varias veces al día.
+- **Privacidad y condiciones, dentro de la app** (Ajustes → Acerca de), no solo en la ficha de la tienda: quien ya la tiene instalada no vuelve a la ficha a buscarlas. En la versión de Play hay además **Valorar la app**, que abre su ficha.
 
 Todo se guarda en local en el móvil. Sin nube ni cuentas.
 
