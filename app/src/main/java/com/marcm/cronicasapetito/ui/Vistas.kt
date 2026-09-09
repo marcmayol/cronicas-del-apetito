@@ -50,7 +50,10 @@ import com.marcm.cronicasapetito.R
 import com.marcm.cronicasapetito.data.EntryKind
 import com.marcm.cronicasapetito.data.Periodos
 import com.marcm.cronicasapetito.data.ResumenDia
+import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.format.TextStyle
+import java.util.Locale
 
 // ---------------------------------------------------------------------------
 // Vista Día — la lista de siempre, con el sistema nuevo encima
@@ -124,7 +127,7 @@ fun VistaSemana(
         ) {
             TarjetaCifra(
                 valor = resumen.comidas.toString(),
-                etiqueta = "comidas",
+                etiqueta = stringResource(R.string.summary_label_meals),
                 color = visualDe(EntryKind.FOOD).color,
                 modifier = Modifier.weight(1f),
             )
@@ -132,19 +135,19 @@ fun VistaSemana(
             // palabra larga se parte por la mitad dentro de la tarjeta.
             TarjetaCifra(
                 valor = "${resumen.minutosCaminados}′",
-                etiqueta = "min",
+                etiqueta = stringResource(R.string.summary_label_minutes),
                 color = visualDe(EntryKind.WALK).color,
                 modifier = Modifier.weight(1f),
             )
             TarjetaCifra(
                 valor = resumen.notasAnimo.toString(),
-                etiqueta = "notas",
+                etiqueta = stringResource(R.string.summary_label_notes),
                 color = visualDe(EntryKind.MOOD).color,
                 modifier = Modifier.weight(1f),
             )
             TarjetaCifra(
                 valor = resumen.diasGimnasio.toString(),
-                etiqueta = "gimnasio",
+                etiqueta = stringResource(R.string.summary_gym_went),
                 color = visualDe(EntryKind.GYM).color,
                 modifier = Modifier.weight(1f),
             )
@@ -163,10 +166,7 @@ fun VistaSemana(
         }
 
         if (estado.filtro != null) {
-            NotaFueraDeRango(
-                stringResource(R.string.filter_note_week) +
-                    "ni en lo que se comparte."
-            )
+            NotaFueraDeRango(stringResource(R.string.filter_note_week))
         }
     }
 }
@@ -239,8 +239,16 @@ fun VistaMes(
             .padding(horizontal = 14.dp)
             .padding(bottom = 96.dp),
     ) {
+        // Las iniciales las pone el idioma del móvil, no una lista escrita a mano: en
+        // castellano salen L M X J V S D y en inglés M T W T F S S. La semana sigue
+        // empezando en lunes, que es como se colocan las casillas.
+        val iniciales = remember(Locale.getDefault()) {
+            DayOfWeek.entries.map {
+                it.getDisplayName(TextStyle.NARROW_STANDALONE, Locale.getDefault()).uppercase()
+            }
+        }
         Row(modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp)) {
-            listOf("L", "M", "X", "J", "V", "S", "D").forEach { inicial ->
+            iniciales.forEach { inicial ->
                 Text(
                     text = inicial,
                     style = MaterialTheme.typography.labelSmall,
@@ -289,10 +297,7 @@ fun VistaMes(
 
         if (estado.filtro != null) {
             Spacer(Modifier.height(8.dp))
-            NotaFueraDeRango(
-                stringResource(R.string.filter_note_month) +
-                    "en el resumen ni en lo que se comparte."
-            )
+            NotaFueraDeRango(stringResource(R.string.filter_note_month))
         }
     }
 }
