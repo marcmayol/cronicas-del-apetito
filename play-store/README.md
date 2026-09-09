@@ -9,7 +9,7 @@ Lo necesario para subir **Crónicas del Apetito** a Play, ya preparado.
 | `CAPTURAS.md` | Cómo se hacen las capturas de la ficha, y por qué no valen los pantallazos |
 | `FICHA.md` | Nombre, descripciones corta y larga, categoría y enlaces, listos para pegar |
 | `data-safety.md` | El formulario de seguridad de los datos, respondido |
-| `graficos/` | Icono 512×512, gráfico destacado 1024×500 y cuatro capturas |
+| `graficos/` | Icono 512×512, destacado 1024×500 por idioma y seis capturas por idioma |
 
 El bundle se genera con:
 

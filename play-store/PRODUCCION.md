@@ -89,7 +89,7 @@ de mil ya sería mucho. La respuesta no cambia la decisión y no vale la pena in
 
 **8. ¿Qué cambiaste en la app a partir de la prueba cerrada?**
 
-> Version 2.5 addresses every point raised:
+> Version 2.5 addresses every point raised (shipped as 2.5.1):
 >
 > - Added a "Rate this app" entry in Settings, which opens the Play listing. It deliberately
 >   does not call the In-App Review API, because Google's own policy states that flow must not
@@ -126,8 +126,14 @@ de mil ya sería mucho. La respuesta no cambia la decisión y no vale la pena in
 
 ## Antes de enviarlo
 
-- [ ] Haber subido a Play la **2.5**, con los cambios que la respuesta 8 dice que existen.
-- [ ] Ficha actualizada con `FICHA.md` (descripción larga y corta, y título).
-- [ ] Capturas nuevas subidas (`graficos/es/`), y la ficha en inglés creada si se quiere.
-- [ ] Comprobar en Play Console que los 12 testers siguen apuntados: si alguno se sale antes
-      de los 14 días, la cuenta se rompe y el formulario no aparece.
+- [x] Haber subido a Play la **2.5**, con los cambios que la respuesta 8 dice que existen.
+      Subida la **2.5.1 (19)** y aprobada el 9-sep a las 17:06.
+- [x] Ficha actualizada con `FICHA.md` (descripción larga y corta, y título).
+- [x] Capturas nuevas subidas (`graficos/es/`), y la ficha en inglés creada: existe entera,
+      con sus capturas y su propio gráfico destacado.
+- [x] Comprobar en Play Console que los 12 testers siguen apuntados: si alguno se sale antes
+      de los 14 días, la cuenta se rompe y el formulario no aparece. El 9-sep Play cuenta
+      **12 testers durante 9 días sin interrupciones**.
+
+Queda solo esperar: el botón «Solicitar acceso a producción» sigue apagado hasta cumplir los
+**14 días**, sobre el **13-sep-2026**.
