@@ -114,3 +114,27 @@ Lo que la variante de Play **no** lleva, y por qué:
 Para probar la variante de Play sin publicarla, el canal de **pruebas internas**
 de Play instala y actualiza igual que el actualizador propio, y además el tiempo
 en pruebas cerradas cuenta para el requisito de los 12 testers.
+
+## Verificación de desarrolladores: el paquete de fuera también hay que registrarlo
+
+Play avisó el **8-sep-2026**: antes del **30 de septiembre de 2026** hay que
+registrar en *Verificación de desarrolladores de Android* el nombre de paquete y
+las claves de firma de **todas** las apps que se distribuyan en Android, no solo
+las de Play. Lo que no se registre deja de poder instalarse en dispositivos
+Android certificados de determinados países.
+
+El 9-sep la cuenta tenía registrados **tres** paquetes, los tres de Play:
+`com.marcm.cronicasapetito.play` (3 claves verificadas),
+`com.marcm.grimoriodepociones` y `com.marcmayol.buildingmyfuturo`.
+
+**`com.marcm.cronicasapetito` —el de DracApps— no está.** Es otro nombre de
+paquete y otra firma, así que la verificación de la variante `play` no le sirve
+de nada. Lo mismo vale para el resto del catálogo de DracApps.
+
+Se registra en Play Console → *Verificación de desarrolladores de Android* →
+*Registrar nombre de paquete*, y la huella SHA-256 de la keystore de release se
+saca con:
+
+```bash
+keytool -list -v -keystore C:/ruta/segura/cronicas-release.jks -alias cronicas
+```
