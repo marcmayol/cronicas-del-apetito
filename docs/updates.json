@@ -1,8 +1,8 @@
 {
-  "versionCode": 18,
-  "versionName": "2.5",
-  "url": "https://github.com/marcmayol/cronicas-del-apetito/releases/download/v2.5/cronicas-del-apetito-v2.5.apk",
-  "sha256": "d6e3f4b11bb7cb5e9f06de61bb587cbf88e459ae4a8edc19e882f3167e5ad3a8",
-  "notas": "Valorar la app, privacidad y condiciones en Ajustes, y atras ya no cierra de golpe. Arreglados dos textos que en ingles seguian en castellano.",
+  "versionCode": 19,
+  "versionName": "2.5.1",
+  "url": "https://github.com/marcmayol/cronicas-del-apetito/releases/download/v2.5.1/cronicas-del-apetito-v2.5.1.apk",
+  "sha256": "ff42a655aa8ea5ded9750abfb7288a608c2d433de49640464cdaae6c0d0a50b2",
+  "notas": "En la imagen de la semana, un dia sin registros ya no sale mudo: siempre pone Sin anotaciones.",
   "check_horas": 24
 }
