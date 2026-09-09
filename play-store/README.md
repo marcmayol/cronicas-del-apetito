@@ -85,11 +85,28 @@ Y revisando la app en inglés para las capturas salieron **dos fallos de traducc
 nadie había visto: los totales de la vista Semana y las iniciales del calendario seguían en
 castellano. Arreglados también en la 2.5.
 
+## La 2.5.1 está en el canal (9-sep-2026, 17:06)
+
+Google la aprobó el mismo día, otra vez. En Prueba cerrada – Alpha:
+
+| Qué | Cómo quedó |
+|---|---|
+| Versión | **19 (2.5.1)**, «Disponible para determinados testers», 177 países |
+| Ficha en español | Título, descripción breve y larga nuevas, y las 6 capturas con titular |
+| Ficha en inglés | Creada entera: `Appetite Chronicles: Food Log`, sus dos descripciones y sus 6 capturas |
+| Destacado en inglés | Enviado a revisión aparte, ver abajo |
+
+La ficha inglesa heredaba el **gráfico destacado en castellano**, así que anunciaba
+«Crónicas del Apetito» sobre una app que allí se llama Appetite Chronicles. Se ha
+hecho el suyo (`graficos/en/destacado-1024x500.png`) y enviado a revisión; el
+generador está en `scripts/generar_destacado_play.py` y se explica en `FICHA.md`.
+
 ## Lo que queda
 
-1. Que corran los **14 días** con los testers instalados (se cumplen sobre el **13-sep-2026**).
-2. Subir la **2.5** al canal de prueba cerrada, con la ficha y las capturas nuevas.
-3. Entonces, **Solicitar acceso a producción** y rellenar el formulario con `PRODUCCION.md`.
+1. Que corran los **14 días** con los testers instalados. El 9-sep Play contaba
+   **12 testers durante 9 días sin interrupciones**, así que la ventana se cumple
+   sobre el **13-sep-2026** y hasta entonces el botón sigue apagado.
+2. Entonces, **Solicitar acceso a producción** y rellenar el formulario con `PRODUCCION.md`.
 
 ## Si algún día lleva anuncios
 
