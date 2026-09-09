@@ -5,6 +5,8 @@ Lo necesario para subir **Crónicas del Apetito** a Play, ya preparado.
 | Archivo | Qué es |
 |---|---|
 | `AVISO-CATEGORIA.md` | **Léelo primero.** Por qué la categoría no puede ser Salud |
+| `PRODUCCION.md` | El formulario de acceso a producción, respondido de verdad |
+| `CAPTURAS.md` | Cómo se hacen las capturas de la ficha, y por qué no valen los pantallazos |
 | `FICHA.md` | Nombre, descripciones corta y larga, categoría y enlaces, listos para pegar |
 | `data-safety.md` | El formulario de seguridad de los datos, respondido |
 | `graficos/` | Icono 512×512, gráfico destacado 1024×500 y cuatro capturas |
@@ -59,11 +61,35 @@ En su panel: *Private Testing Pro · Day 0 / 16 · reports pending*. Su garantí
 dice que si se completan los 14 días y Google no da acceso a producción,
 devuelven el importe.
 
+## Los informes llegaron (9-sep-2026)
+
+Tres documentos de Testers Community: la respuesta de los testers, una auditoría ASO
+de la ficha y una plantilla para el formulario de acceso a producción.
+
+**Ni un fallo.** Ningún cierre inesperado ni ningún error de funcionamiento en ningún
+dispositivo ni versión de Android. Lo que trajeron fue otra cosa:
+
+| Lo que dijeron | Qué se hizo |
+|---|---|
+| Las capturas son pantallazos sin explicar nada | Seis nuevas con titular, en ES y EN. Ver `CAPTURAS.md` |
+| A la descripción le faltan las palabras que la gente busca | Ficha reescrita, y ficha en inglés. Ver `FICHA.md` |
+| No hay forma de valorar la app desde dentro | «Valorar la app» en Ajustes, que abre la ficha (v2.5) |
+| «No hay política de privacidad ni condiciones» | Falso en Play, cierto dentro: ahora están en Ajustes, y las condiciones se han escrito (v2.5) |
+| Atrás cierra la app sin avisar | Ahora pide pulsarlo dos veces (v2.5) |
+
+La **auditoría ASO daba 49/100** (grado F): la palabra clave no aparecía ni en el título ni
+en las descripciones, y la larga se quedaba en 2.023 caracteres. Todo eso está corregido en
+`FICHA.md`, que además explica lo único que no se hizo y por qué.
+
+Y revisando la app en inglés para las capturas salieron **dos fallos de traducción** que
+nadie había visto: los totales de la vista Semana y las iniciales del calendario seguían en
+castellano. Arreglados también en la 2.5.
+
 ## Lo que queda
 
-1. Que corran los **14 días** con los testers instalados.
-2. Entonces, **Solicitar acceso a producción** desde el panel de Play Console.
-3. Mirar los informes de los testers y arreglar lo que salga (para eso están).
+1. Que corran los **14 días** con los testers instalados (se cumplen sobre el **13-sep-2026**).
+2. Subir la **2.5** al canal de prueba cerrada, con la ficha y las capturas nuevas.
+3. Entonces, **Solicitar acceso a producción** y rellenar el formulario con `PRODUCCION.md`.
 
 ## Si algún día lleva anuncios
 
