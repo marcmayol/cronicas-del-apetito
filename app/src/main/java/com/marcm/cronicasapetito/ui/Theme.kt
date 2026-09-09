@@ -5,6 +5,7 @@ import android.app.Activity
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
+import android.os.Build
 import androidx.core.view.WindowCompat
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.darkColorScheme
@@ -247,7 +248,14 @@ fun CronicasTheme(content: @Composable () -> Unit) {
         val fondoBarra = (if (noche) NocheFondo else Color(0xFFFFF8EE)).toArgb()
         SideEffect {
             val ventana = (vista.context as Activity).window
-            ventana.statusBarColor = fondoBarra
+            // De Android 15 en adelante el sistema ignora este color: la barra es
+            // transparente y detrás se ve el fondo de la propia app, que ya es el
+            // que toca. Ponerlo allí no hace nada; aquí abajo, todavía es lo único
+            // que evita la franja del tema equivocado.
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+                @Suppress("DEPRECATION")
+                ventana.statusBarColor = fondoBarra
+            }
             WindowCompat.getInsetsController(ventana, vista)
                 .isAppearanceLightStatusBars = !noche
         }

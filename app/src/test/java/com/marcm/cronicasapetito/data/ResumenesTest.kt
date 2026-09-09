@@ -171,4 +171,31 @@ class ResumenesTest {
         assertTrue(resumen.vacio)
         assertFalse(resumen.tieneAlgoQueEnsenar)
     }
+
+    /**
+     * Las dos preguntas —«está vacío» y «hay algo que enseñar»— se hacen en sitios
+     * distintos (la pantalla y la imagen que se comparte) y tienen que contestar
+     * siempre lo contrario la una de la otra. El día que dejen de hacerlo, una
+     * fila se quedaría muda: ni resumen ni «Sin anotaciones».
+     */
+    @Test
+    fun `vacio y tieneAlgoQueEnsenar nunca dicen lo mismo`() {
+        val valores = listOf(0, 1, 3)
+        for (comidas in valores) for (minutos in valores) for (notas in valores) {
+            for (gimnasio in listOf(null, true, false)) {
+                val resumen = ResumenDia(
+                    dia = lunes,
+                    comidas = comidas,
+                    minutosCaminados = minutos,
+                    notasAnimo = notas,
+                    gimnasio = gimnasio,
+                )
+                assertEquals(
+                    "comidas=$comidas minutos=$minutos notas=$notas gimnasio=$gimnasio",
+                    resumen.vacio,
+                    !resumen.tieneAlgoQueEnsenar,
+                )
+            }
+        }
+    }
 }

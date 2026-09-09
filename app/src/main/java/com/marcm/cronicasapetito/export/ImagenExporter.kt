@@ -101,12 +101,18 @@ object ImagenExporter {
                 "${inicial(context, dia)} ${dia.dayOfMonth}",
                 MARGEN, y, p.diaEtiqueta
             )
-            if (resumen.vacio) {
+            // La decisión se toma sobre las piezas ya construidas, no sobre
+            // `vacio`: si algún día las dos condiciones dejan de decir lo mismo,
+            // la fila se quedaría en blanco sin poner siquiera «Sin anotaciones».
+            val piezas = piezasDe(context, resumen)
+            if (piezas.isEmpty()) {
+                p.cuerpoTenue.alpha = if (fuera) 100 else 255
                 canvas.drawText(
                     context.getString(R.string.summary_none), MARGEN + 130f, y, p.cuerpoTenue
                 )
+                p.cuerpoTenue.alpha = 255
             } else {
-                dibujarPiezas(context, canvas, p, resumen, MARGEN + 130f, y, fuera)
+                dibujarPiezas(canvas, p, piezas, MARGEN + 130f, y, fuera)
             }
             y += 18f
             canvas.drawLine(MARGEN, y, ANCHO - MARGEN, y, p.lineaSuave)
@@ -239,17 +245,13 @@ object ImagenExporter {
         return linea
     }
 
-    private fun dibujarPiezas(
-        context: Context,
-        canvas: Canvas,
-        p: Pinceles,
-        resumen: ResumenDia,
-        desdeX: Float,
-        y: Float,
-        atenuado: Boolean,
-    ) {
-        var x = desdeX
-        val piezas = buildList {
+    /**
+     * Lo que hay que contar de un día, en el mismo orden y con los mismos textos
+     * que enseña la app. Vacía significa día sin nada, y es lo único que decide
+     * si la fila lleva «Sin anotaciones».
+     */
+    private fun piezasDe(context: Context, resumen: ResumenDia): List<Pair<String, String>> =
+        buildList {
             val res = context.resources
             if (resumen.comidas > 0) add(
                 EntryKind.FOOD to
@@ -272,6 +274,16 @@ object ImagenExporter {
                 )
             )
         }
+
+    private fun dibujarPiezas(
+        canvas: Canvas,
+        p: Pinceles,
+        piezas: List<Pair<String, String>>,
+        desdeX: Float,
+        y: Float,
+        atenuado: Boolean,
+    ) {
+        var x = desdeX
         piezas.forEach { (kind, texto) ->
             val glifo = glifos[kind] ?: "·"
             p.glifo.color = colores[kind] ?: TINTA
@@ -281,8 +293,9 @@ object ImagenExporter {
             p.cuerpo.alpha = if (atenuado) 100 else 255
             canvas.drawText(texto, x, y, p.cuerpo)
             x += p.cuerpo.measureText(texto) + 34f
-            p.cuerpo.alpha = 255
         }
+        p.cuerpo.alpha = 255
+        p.glifo.alpha = 255
     }
 
     private fun dibujarCasilla(
