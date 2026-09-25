@@ -1,8 +1,8 @@
 {
-  "versionCode": 19,
-  "versionName": "2.5.1",
-  "url": "https://github.com/marcmayol/cronicas-del-apetito/releases/download/v2.5.1/cronicas-del-apetito-v2.5.1.apk",
-  "sha256": "ff42a655aa8ea5ded9750abfb7288a608c2d433de49640464cdaae6c0d0a50b2",
-  "notas": "En la imagen de la semana, un dia sin registros ya no sale mudo: siempre pone Sin anotaciones.",
+  "versionCode": 20,
+  "versionName": "2.5.2",
+  "url": "https://github.com/marcmayol/cronicas-del-apetito/releases/download/v2.5.2/cronicas-del-apetito-v2.5.2.apk",
+  "sha256": "d0550514f3c6f5fbffd12645978f731e3d6a84a1593b8637e9e04f25e13db5ac",
+  "notas": "Cada día se lee de la mañana a la noche: los registros salen por la hora a la que pasaron, no por cuándo se apuntaron.",
   "check_horas": 24
 }
