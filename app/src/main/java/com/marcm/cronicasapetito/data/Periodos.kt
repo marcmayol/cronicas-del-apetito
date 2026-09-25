@@ -50,6 +50,18 @@ object Periodos {
 }
 
 /**
+ * El orden en que se leen los registros: el día más reciente arriba, pero dentro
+ * de cada día por la hora en que pasaron, de la mañana a la noche. Lo de las 8
+ * va antes que lo de las 9 aunque se apuntara después.
+ */
+fun List<MealEntry>.enOrdenDeLectura(): List<MealEntry> =
+    sortedWith(
+        compareByDescending<MealEntry> { Periodos.fechaDe(it.timestampMillis) }
+            .thenBy { it.timestampMillis }
+            .thenBy { it.id }
+    )
+
+/**
  * Un intervalo de días cerrado por ambos extremos, en días naturales. Es lo que
  * el usuario elige en el filtro y lo que viaja con lo que se comparte.
  */

@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import com.marcm.cronicasapetito.R
 import com.marcm.cronicasapetito.data.EntryKind
 import com.marcm.cronicasapetito.data.Periodos
+import com.marcm.cronicasapetito.data.enOrdenDeLectura
 import com.marcm.cronicasapetito.data.ResumenDia
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -66,7 +67,7 @@ fun VistaDia(
     onAccionesRegistro: ((com.marcm.cronicasapetito.data.MealEntry) -> Unit)? = null,
 ) {
     val porDia = remember(estado.entradasVisibles) {
-        estado.entradasVisibles.groupBy { it.dia() }.toList().sortedByDescending { it.first }
+        estado.entradasVisibles.enOrdenDeLectura().groupBy { it.dia() }.toList()
     }
 
     LazyColumn(

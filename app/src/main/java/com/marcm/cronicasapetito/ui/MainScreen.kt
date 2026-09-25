@@ -71,6 +71,7 @@ import com.marcm.cronicasapetito.R
 import com.marcm.cronicasapetito.data.MealRepository
 import com.marcm.cronicasapetito.data.MealEntry
 import com.marcm.cronicasapetito.data.Periodos
+import com.marcm.cronicasapetito.data.enOrdenDeLectura
 import com.marcm.cronicasapetito.export.ImagenExporter
 import com.marcm.cronicasapetito.export.PdfExporter
 import com.marcm.cronicasapetito.export.shareFile
@@ -193,7 +194,7 @@ fun MainScreen(
                                                 // rango: sale el filtro entero, aunque
                                                 // cruce varios meses.
                                                 entries = estado.entradas
-                                                    .sortedByDescending { it.timestampMillis },
+                                                    .enOrdenDeLectura(),
                                                 titulo = Fechas.rangoConAnio(rango),
                                             )
                                             shareFile(context, file)
@@ -360,7 +361,7 @@ fun MainScreen(
                     val file = when (formato) {
                         FormatoCompartir.PDF -> PdfExporter.export(
                             context = context,
-                            entries = estado.entradasVisibles.sortedByDescending { it.timestampMillis },
+                            entries = estado.entradasVisibles.enOrdenDeLectura(),
                             titulo = contextoCompartir,
                         )
                         FormatoCompartir.IMAGEN -> when (estado.vista) {
@@ -381,7 +382,7 @@ fun MainScreen(
                             // La vista Día es una lista: como imagen se cortaría.
                             Vista.DIA -> PdfExporter.export(
                                 context = context,
-                                entries = estado.entradasVisibles.sortedByDescending { it.timestampMillis },
+                                entries = estado.entradasVisibles.enOrdenDeLectura(),
                                 titulo = contextoCompartir,
                             )
                         }
