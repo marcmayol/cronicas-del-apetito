@@ -3,9 +3,7 @@ package com.marcm.cronicasapetito.ui
 import androidx.annotation.StringRes
 import android.app.Activity
 import androidx.compose.runtime.SideEffect
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
-import android.os.Build
 import androidx.core.view.WindowCompat
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.darkColorScheme
@@ -240,24 +238,20 @@ fun CronicasTheme(content: @Composable () -> Unit) {
         TemaApp.Modo.SISTEMA -> isSystemInDarkTheme()
     }
 
-    // La barra de estado se pinta desde aquí y no desde themes.xml: el XML solo
-    // sabe lo que dice el móvil, y con el tema forzado a mano quedaría una
-    // franja clara sobre una app oscura, o al revés.
+    // Las barras del sistema son transparentes (enableEdgeToEdge) y detrás se ve
+    // el fondo del propio Scaffold, así que aquí solo se decide el color de sus
+    // iconos. Va desde aquí y no desde themes.xml porque el XML solo sabe lo que
+    // dice el móvil: con el tema forzado a mano, los iconos saldrían del color
+    // equivocado. Antes se pintaba además la barra con un crema propio, que no
+    // era el del fondo y dejaba una franja arriba en Android 14 y anteriores.
     val vista = LocalView.current
     if (!vista.isInEditMode) {
-        val fondoBarra = (if (noche) NocheFondo else Color(0xFFFFF8EE)).toArgb()
         SideEffect {
             val ventana = (vista.context as Activity).window
-            // De Android 15 en adelante el sistema ignora este color: la barra es
-            // transparente y detrás se ve el fondo de la propia app, que ya es el
-            // que toca. Ponerlo allí no hace nada; aquí abajo, todavía es lo único
-            // que evita la franja del tema equivocado.
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
-                @Suppress("DEPRECATION")
-                ventana.statusBarColor = fondoBarra
+            WindowCompat.getInsetsController(ventana, vista).apply {
+                isAppearanceLightStatusBars = !noche
+                isAppearanceLightNavigationBars = !noche
             }
-            WindowCompat.getInsetsController(ventana, vista)
-                .isAppearanceLightStatusBars = !noche
         }
     }
 

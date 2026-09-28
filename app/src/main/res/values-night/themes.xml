@@ -2,12 +2,11 @@
 <resources>
     <style name="Theme.CronicasDelApetito" parent="android:Theme.Material.NoActionBar">
         <!--
-          De noche la barra de estado se funde con el fondo de la app y sus
-          iconos pasan a claros: con el tema claro fijo, arriba quedaba una
-          franja crema encima de una pantalla oscura.
+          De noche los iconos de la barra de estado
+          pasan a claros; la barra es transparente y detrás se ve el fondo
+          de la propia app.
         -->
         <item name="android:windowLightStatusBar">false</item>
-        <item name="android:statusBarColor">#1A1512</item>
 
         <!-- Los selectores de fecha y hora son diálogos del sistema. -->
         <item name="android:colorAccent">#D9A574</item>

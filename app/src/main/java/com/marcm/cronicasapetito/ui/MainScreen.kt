@@ -14,7 +14,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -239,14 +238,17 @@ fun MainScreen(
                 shape = RoundedCornerShape(16.dp),
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
-                // Sin esto el botón queda debajo de la barra de navegación.
-                modifier = Modifier.navigationBarsPadding(),
+                // Sin navigationBarsPadding: el Scaffold ya lo sube por encima de
+                // la barra de navegación, y sumarlo otra vez lo dejaba flotando.
             )
         },
     ) { padding ->
+        // El borde de abajo no se aplica aquí: se lo lleva cada vista como relleno
+        // de su contenido, para que la lista pase por debajo de la barra de gestos.
+        val rellenoAbajo = padding.calculateBottomPadding()
         Column(
             modifier = Modifier
-                .padding(padding)
+                .padding(padding.sinAbajo())
                 .fillMaxSize(),
         ) {
             actualizaciones.Banner()
@@ -312,18 +314,21 @@ fun MainScreen(
 
                     estado.vista == Vista.DIA -> VistaDia(
                         estado = estado,
+                        rellenoAbajo = rellenoAbajo,
                         onAccionesRegistro = { registroConAcciones = it },
                     )
 
                     estado.vista == Vista.SEMANA -> VistaSemana(
                         estado = estado,
                         onAbrirDia = viewModel::abrirDia,
+                        rellenoAbajo = rellenoAbajo,
                     )
 
                     else -> VistaMes(
                         estado = estado,
                         onSeleccionarDia = viewModel::seleccionarDia,
                         onAbrirDia = viewModel::abrirDia,
+                        rellenoAbajo = rellenoAbajo,
                     )
                 }
             }

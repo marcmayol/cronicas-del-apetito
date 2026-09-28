@@ -45,6 +45,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.marcm.cronicasapetito.R
 import com.marcm.cronicasapetito.data.EntryKind
@@ -56,6 +57,9 @@ import java.time.LocalDate
 import java.time.format.TextStyle
 import java.util.Locale
 
+/** Hueco al final de cada vista para que el botón Anotar no tape lo último. */
+private val ESPACIO_BOTON = 96.dp
+
 // ---------------------------------------------------------------------------
 // Vista Día — la lista de siempre, con el sistema nuevo encima
 // ---------------------------------------------------------------------------
@@ -64,6 +68,7 @@ import java.util.Locale
 fun VistaDia(
     estado: EstadoPrincipal,
     modifier: Modifier = Modifier,
+    rellenoAbajo: Dp = 0.dp,
     onAccionesRegistro: ((com.marcm.cronicasapetito.data.MealEntry) -> Unit)? = null,
 ) {
     val porDia = remember(estado.entradasVisibles) {
@@ -72,7 +77,7 @@ fun VistaDia(
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp, 4.dp, 16.dp, 96.dp),
+        contentPadding = PaddingValues(16.dp, 4.dp, 16.dp, ESPACIO_BOTON + rellenoAbajo),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         porDia.forEach { (dia, registros) ->
@@ -111,6 +116,7 @@ fun VistaSemana(
     estado: EstadoPrincipal,
     onAbrirDia: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
+    rellenoAbajo: Dp = 0.dp,
 ) {
     val resumen = estado.resumenPeriodo
 
@@ -119,7 +125,7 @@ fun VistaSemana(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 16.dp)
-            .padding(bottom = 96.dp),
+            .padding(bottom = ESPACIO_BOTON + rellenoAbajo),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Row(
@@ -229,6 +235,7 @@ fun VistaMes(
     onSeleccionarDia: (LocalDate) -> Unit,
     onAbrirDia: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
+    rellenoAbajo: Dp = 0.dp,
 ) {
     val casillas = remember(estado.mes) { Periodos.casillasDe(estado.mes) }
     val hoy = LocalDate.now()
@@ -238,7 +245,7 @@ fun VistaMes(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 14.dp)
-            .padding(bottom = 96.dp),
+            .padding(bottom = ESPACIO_BOTON + rellenoAbajo),
     ) {
         // Las iniciales las pone el idioma del móvil, no una lista escrita a mano: en
         // castellano salen L M X J V S D y en inglés M T W T F S S. La semana sigue

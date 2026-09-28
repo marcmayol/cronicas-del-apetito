@@ -107,12 +107,16 @@ private fun AjustesScreen(
             )
         },
     ) { padding ->
+        // El borde de abajo va dentro del desplazamiento: así lo último de
+        // Ajustes se puede subir por encima de la barra de gestos, pero mientras
+        // tanto el contenido pasa por debajo en vez de cortarse.
         Column(
             modifier = Modifier
-                .padding(padding)
-                .padding(horizontal = 16.dp)
+                .padding(padding.sinAbajo())
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp)
+                .padding(bottom = padding.calculateBottomPadding()),
         ) {
             // Lo primero, porque es lo que cada persona necesita ajustar a su vida.
             SeccionRecordatorios()

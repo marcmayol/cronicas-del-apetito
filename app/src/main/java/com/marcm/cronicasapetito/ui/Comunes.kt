@@ -10,6 +10,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -47,6 +50,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -616,3 +620,19 @@ fun EstadoVacio(
 
 /** Día natural de un registro, para agrupar sin repetir el cálculo. */
 fun MealEntry.dia(): LocalDate = Periodos.fechaDe(timestampMillis)
+
+/**
+ * El relleno del Scaffold sin el borde de abajo. Arriba y a los lados se aplica
+ * al contenedor; el de abajo lo recibe la lista como relleno de su contenido,
+ * para que lo último se pueda subir por encima de la barra de gestos pero el
+ * resto pase por debajo de ella en vez de cortarse en seco.
+ */
+@Composable
+fun PaddingValues.sinAbajo(): PaddingValues {
+    val direccion = LocalLayoutDirection.current
+    return PaddingValues(
+        start = calculateStartPadding(direccion),
+        top = calculateTopPadding(),
+        end = calculateEndPadding(direccion),
+    )
+}
