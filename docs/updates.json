@@ -1,8 +1,8 @@
 {
-  "versionCode": 20,
-  "versionName": "2.5.2",
-  "url": "https://github.com/marcmayol/cronicas-del-apetito/releases/download/v2.5.2/cronicas-del-apetito-v2.5.2.apk",
-  "sha256": "d0550514f3c6f5fbffd12645978f731e3d6a84a1593b8637e9e04f25e13db5ac",
-  "notas": "Cada día se lee de la mañana a la noche: los registros salen por la hora a la que pasaron, no por cuándo se apuntaron.",
+  "versionCode": 21,
+  "versionName": "2.5.3",
+  "url": "https://github.com/marcmayol/cronicas-del-apetito/releases/download/v2.5.3/cronicas-del-apetito-v2.5.3.apk",
+  "sha256": "b84352d129d4afc42184e523eaf8aa90868ed321ac940486a5f2763c58013b6a",
+  "notas": "Las pantallas aprovechan todo el alto: la lista pasa por debajo de la barra de gestos, desaparece la franja de otro color que había arriba y el botón Anotar vuelve a su sitio.",
   "check_horas": 24
 }
