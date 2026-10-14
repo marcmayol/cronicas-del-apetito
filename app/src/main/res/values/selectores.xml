@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Los selectores de fecha y hora son diálogos del sistema, no Compose. Se
+      eligen en TemaApp.temaSelector() según el tema de la app, no el del móvil.
+      Los valores son los de Theme.kt.
+    -->
+    <style name="Selector.Neutro" parent="android:Theme.Material.Light.Dialog.Alert">
+        <item name="android:colorAccent">#36404A</item>
+        <item name="android:colorPrimary">#36404A</item>
+        <item name="android:colorControlActivated">#36404A</item>
+        <item name="android:textColorPrimary">#1C1F23</item>
+        <item name="android:colorBackground">#FFFFFF</item>
+    </style>
+
+    <style name="Selector.Neutro.Noche" parent="android:Theme.Material.Dialog.Alert">
+        <item name="android:colorAccent">#C9D1D9</item>
+        <item name="android:colorPrimary">#C9D1D9</item>
+        <item name="android:colorControlActivated">#C9D1D9</item>
+        <item name="android:textColorPrimary">#E6E8EA</item>
+        <item name="android:colorBackground">#1B1E21</item>
+    </style>
+
+    <style name="Selector.Grimorio" parent="android:Theme.Material.Light.Dialog.Alert">
+        <item name="android:colorAccent">#6B4326</item>
+        <item name="android:colorPrimary">#6B4326</item>
+        <item name="android:colorControlActivated">#6B4326</item>
+        <item name="android:textColorPrimary">#2A2018</item>
+        <item name="android:colorBackground">#FAF6EF</item>
+    </style>
+
+    <style name="Selector.Grimorio.Noche" parent="android:Theme.Material.Dialog.Alert">
+        <item name="android:colorAccent">#D9A574</item>
+        <item name="android:colorPrimary">#D9A574</item>
+        <item name="android:colorControlActivated">#D9A574</item>
+        <item name="android:textColorPrimary">#F0E7DC</item>
+        <item name="android:colorBackground">#241E1A</item>
+    </style>
+</resources>

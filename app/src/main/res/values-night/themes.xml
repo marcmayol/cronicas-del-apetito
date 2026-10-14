@@ -9,10 +9,10 @@
         <item name="android:windowLightStatusBar">false</item>
 
         <!-- Los selectores de fecha y hora son diálogos del sistema. -->
-        <item name="android:colorAccent">#D9A574</item>
-        <item name="android:colorPrimary">#D9A574</item>
-        <item name="android:colorControlActivated">#D9A574</item>
-        <item name="android:textColorPrimary">#F0E7DC</item>
-        <item name="android:colorBackground">#1A1512</item>
+        <item name="android:colorAccent">#C9D1D9</item>
+        <item name="android:colorPrimary">#C9D1D9</item>
+        <item name="android:colorControlActivated">#C9D1D9</item>
+        <item name="android:textColorPrimary">#E6E8EA</item>
+        <item name="android:colorBackground">#121416</item>
     </style>
 </resources>

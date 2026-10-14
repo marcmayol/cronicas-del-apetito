@@ -25,7 +25,7 @@ import com.marcm.cronicasapetito.R
 import com.marcm.cronicasapetito.data.EntryKind
 
 // ---------------------------------------------------------------------------
-// Paleta — sistema del rediseño. Marrón/crema afinado: fondo crema, tarjetas
+// Paleta «Grimorio» — sistema del rediseño. Marrón/crema afinado: fondo crema, tarjetas
 // blancas, y cuatro tonos tierra para los tipos de registro que comparten
 // saturación y luminosidad (contraste >= 4.5:1 sobre blanco).
 // ---------------------------------------------------------------------------
@@ -99,6 +99,61 @@ private val DarkColors = darkColorScheme(
     onError = Color(0xFF3A1610),
 )
 
+// --- Neutro ------------------------------------------------------------------
+// El tema por defecto: grises fríos y tinta casi negra, sin el aire de cuaderno.
+// El primario es gris pizarra a propósito: así no compite con los cuatro tonos
+// de los tipos de registro, que siguen siendo el único color de la pantalla.
+private val Pizarra = Color(0xFF36404A)
+private val PizarraTonal = Color(0xFFE6E9ED)
+private val PizarraOscura = Color(0xFF1E252C)
+private val NeutroFondo = Color(0xFFF5F6F7)
+private val NeutroTinta = Color(0xFF1C1F23)
+
+private val NeutroNocheFondo = Color(0xFF121416)
+private val NeutroNocheSuperficie = Color(0xFF1B1E21)
+
+private val NeutroColors = lightColorScheme(
+    primary = Pizarra,
+    onPrimary = Color.White,
+    primaryContainer = PizarraTonal,
+    onPrimaryContainer = PizarraOscura,
+    secondary = Color(0xFF5B6670),
+    onSecondary = Color.White,
+    secondaryContainer = PizarraTonal,
+    onSecondaryContainer = PizarraOscura,
+    background = NeutroFondo,
+    onBackground = NeutroTinta,
+    surface = Color.White,
+    onSurface = NeutroTinta,
+    surfaceVariant = Color(0xFFECEEF0),
+    onSurfaceVariant = Color(0xFF5D646B),
+    outline = Color(0xFFB7BDC3),
+    outlineVariant = Color(0xFFE3E6E9),
+    error = Color(0xFFB3261E),
+    onError = Color.White,
+)
+
+private val NeutroNocheColors = darkColorScheme(
+    primary = Color(0xFFC9D1D9),
+    onPrimary = PizarraOscura,
+    primaryContainer = Color(0xFF343B43),
+    onPrimaryContainer = PizarraTonal,
+    secondary = Color(0xFFAEB7C0),
+    onSecondary = PizarraOscura,
+    secondaryContainer = Color(0xFF343B43),
+    onSecondaryContainer = PizarraTonal,
+    background = NeutroNocheFondo,
+    onBackground = Color(0xFFE6E8EA),
+    surface = NeutroNocheSuperficie,
+    onSurface = Color(0xFFE6E8EA),
+    surfaceVariant = Color(0xFF262A2E),
+    onSurfaceVariant = Color(0xFFA8AFB6),
+    outline = Color(0xFF5E656C),
+    outlineVariant = Color(0xFF2E3236),
+    error = Color(0xFFF2B8B5),
+    onError = Color(0xFF601410),
+)
+
 /**
  * Colores del sistema que no tienen un rol Material 3 propio. Se leen con
  * [colorsCronicas] desde cualquier composable dentro de [CronicasTheme].
@@ -113,6 +168,16 @@ data class ColoresCronicas(
 private val ColoresNoche = ColoresCronicas(
     tenue = Color(0xFF9A8B7A),
     fondo = NocheFondo,
+)
+
+private val ColoresNeutro = ColoresCronicas(
+    tenue = Color(0xFF8E959C),
+    fondo = NeutroFondo,
+)
+
+private val ColoresNeutroNoche = ColoresCronicas(
+    tenue = Color(0xFF80878E),
+    fondo = NeutroNocheFondo,
 )
 
 private val LocalColoresCronicas = staticCompositionLocalOf { ColoresCronicas() }
@@ -226,6 +291,18 @@ private val CronicasTypography = Typography().let { base ->
     )
 }
 
+/**
+ * La misma escala sin Lora: en el tema neutro todo va en la letra del sistema,
+ * que es lo que hace que el cuaderno deje de parecerlo.
+ */
+private val NeutroTypography = CronicasTypography.let { base ->
+    base.copy(
+        headlineSmall = base.headlineSmall.copy(fontFamily = FontFamily.Default),
+        titleLarge = base.titleLarge.copy(fontFamily = FontFamily.Default),
+        titleMedium = base.titleMedium.copy(fontFamily = FontFamily.Default),
+    )
+}
+
 /** Cifras de resumen: Lora, para que los números tengan el aire del cuaderno. */
 val estiloCifra: TextStyle
     @Composable get() = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp)
@@ -235,8 +312,9 @@ fun CronicasTheme(content: @Composable () -> Unit) {
     val noche = when (TemaApp.modo) {
         TemaApp.Modo.CLARO -> false
         TemaApp.Modo.OSCURO -> true
-        TemaApp.Modo.SISTEMA -> isSystemInDarkTheme()
+        TemaApp.Modo.SISTEMA, TemaApp.Modo.GRIMORIO -> isSystemInDarkTheme()
     }
+    val grimorio = TemaApp.esGrimorio
 
     // Las barras del sistema son transparentes (enableEdgeToEdge) y detrás se ve
     // el fondo del propio Scaffold, así que aquí solo se decide el color de sus
@@ -256,12 +334,22 @@ fun CronicasTheme(content: @Composable () -> Unit) {
     }
 
     CompositionLocalProvider(
-        LocalColoresCronicas provides if (noche) ColoresNoche else ColoresCronicas(),
+        LocalColoresCronicas provides when {
+            grimorio && noche -> ColoresNoche
+            grimorio -> ColoresCronicas()
+            noche -> ColoresNeutroNoche
+            else -> ColoresNeutro
+        },
         LocalEsNoche provides noche,
     ) {
         MaterialTheme(
-            colorScheme = if (noche) DarkColors else LightColors,
-            typography = CronicasTypography,
+            colorScheme = when {
+                grimorio && noche -> DarkColors
+                grimorio -> LightColors
+                noche -> NeutroNocheColors
+                else -> NeutroColors
+            },
+            typography = if (grimorio) CronicasTypography else NeutroTypography,
             content = content,
         )
     }

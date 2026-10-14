@@ -221,6 +221,7 @@ private fun CampoFecha(
 private fun elegirFecha(context: Context, inicial: LocalDate, onElegir: (LocalDate) -> Unit) {
     DatePickerDialog(
         context,
+        TemaApp.temaSelector(context),
         { _, anio, mes, dia -> onElegir(LocalDate.of(anio, mes + 1, dia)) },
         inicial.year,
         inicial.monthValue - 1,

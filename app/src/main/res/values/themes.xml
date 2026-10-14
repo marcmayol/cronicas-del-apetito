@@ -5,13 +5,14 @@
 
         <!--
           Los selectores de fecha y hora son diálogos del sistema, no Compose: sin
-          esto salen con el verde de Material y rompen el papel y la tinta. Los
-          valores son los mismos de la paleta de Theme.kt.
+          esto salen con el verde de Material y rompen la paleta. Los valores son
+          los del tema neutro de Theme.kt; dentro de la app cada selector recibe
+          el suyo de TemaApp.temaSelector().
         -->
-        <item name="android:colorAccent">#6B4326</item>
-        <item name="android:colorPrimary">#6B4326</item>
-        <item name="android:colorControlActivated">#6B4326</item>
-        <item name="android:textColorPrimary">#2A2018</item>
-        <item name="android:colorBackground">#FAF6EF</item>
+        <item name="android:colorAccent">#36404A</item>
+        <item name="android:colorPrimary">#36404A</item>
+        <item name="android:colorControlActivated">#36404A</item>
+        <item name="android:textColorPrimary">#1C1F23</item>
+        <item name="android:colorBackground">#F5F6F7</item>
     </style>
 </resources>

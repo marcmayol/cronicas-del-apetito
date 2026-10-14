@@ -409,6 +409,7 @@ internal fun FilaHora(
 private fun pedirHora(context: Context, actual: Int, onElegir: (Int) -> Unit) {
     TimePickerDialog(
         context,
+        TemaApp.temaSelector(context),
         { _, hora, minuto -> onElegir(hora * 60 + minuto) },
         actual / 60,
         actual % 60,

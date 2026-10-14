@@ -555,9 +555,11 @@ private fun pickDateTime(context: Context, initial: Long, onPicked: (Long) -> Un
     val cal = Calendar.getInstance().apply { timeInMillis = initial }
     DatePickerDialog(
         context,
+        TemaApp.temaSelector(context),
         { _, year, month, dayOfMonth ->
             TimePickerDialog(
                 context,
+                TemaApp.temaSelector(context),
                 { _, hourOfDay, minute ->
                     val result = Calendar.getInstance().apply {
                         set(Calendar.YEAR, year)

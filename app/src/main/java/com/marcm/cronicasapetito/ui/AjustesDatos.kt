@@ -178,7 +178,8 @@ private fun selloDeHoy(): String =
  * Elegir el tema. Va con los tres de siempre —seguir al móvil, claro u
  * oscuro— porque «seguir al móvil» es lo que casi todo el mundo quiere, pero
  * quien tiene el sistema en oscuro y prefiere leer esto en claro (o al revés)
- * no debería tener que cambiar el móvil entero para conseguirlo.
+ * no debería tener que cambiar el móvil entero para conseguirlo. Los tres son
+ * neutros; el cuaderno marrón con Lora queda como cuarta opción, «Grimorio».
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -196,6 +197,7 @@ fun SeccionApariencia() {
                                 TemaApp.Modo.SISTEMA -> R.string.appearance_system
                                 TemaApp.Modo.CLARO -> R.string.appearance_light
                                 TemaApp.Modo.OSCURO -> R.string.appearance_dark
+                                TemaApp.Modo.GRIMORIO -> R.string.appearance_grimoire
                             }
                         ),
                         activo = TemaApp.modo == opcion,
