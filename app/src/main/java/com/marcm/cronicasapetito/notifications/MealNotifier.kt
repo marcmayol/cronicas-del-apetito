@@ -77,6 +77,16 @@ object MealNotifier {
                 if (conCaminata) addAction(0, context.getString(R.string.action_walk), walkPi)
             }
             .addAction(0, context.getString(R.string.action_no), noPi)
+            // En el reloj, en vez de «Sí» (que abriría el móvil): dictar ahí
+            // mismo. Si hay acciones propias del reloj, el reloj ya no enseña
+            // las del móvil, así que el «No» se repite aquí.
+            .extend(
+                NotificationCompat.WearableExtender()
+                    .addActions(
+                        VozRelojReceiver.acciones(context) +
+                            NotificationCompat.Action(0, context.getString(R.string.action_no), noPi)
+                    )
+            )
             .build()
 
         try {

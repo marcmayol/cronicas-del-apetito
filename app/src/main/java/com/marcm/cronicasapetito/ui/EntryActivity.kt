@@ -274,6 +274,11 @@ private fun EntryScreen(
                     value = foodText,
                     onValueChange = { foodText = it },
                     modifier = Modifier.fillMaxWidth(),
+                    trailingIcon = {
+                        BotonDictar(tinte = visualComida.color) {
+                            foodText = Dictado.unir(foodText, it)
+                        }
+                    },
                     // El placeholder enseña el formato —cantidad incluida— en vez de
                     // repetir la pregunta que ya está justo encima. Que la cantidad
                     // importa se dice debajo, una vez, sin sermón.
@@ -356,6 +361,11 @@ private fun EntryScreen(
                     value = moodText,
                     onValueChange = { moodText = it },
                     modifier = Modifier.fillMaxWidth(),
+                    trailingIcon = {
+                        BotonDictar(tinte = visualDe(EntryKind.MOOD).color) {
+                            moodText = Dictado.unir(moodText, it)
+                        }
+                    },
                     placeholder = { Text(stringResource(R.string.entry_mood_blank_ok)) },
                     minLines = 3,
                     shape = RoundedCornerShape(14.dp),

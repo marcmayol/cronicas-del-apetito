@@ -289,4 +289,13 @@
     <string name="share_exactly">You share exactly what you are looking at: %1$s.</string>
     <string name="share_filtered"> · filtered %1$s</string>
     <string name="empty_filtered">Nothing logged %1$s.</string>
+    <string name="dictation_start">Dictate</string>
+    <string name="dictation_stop">Stop listening</string>
+    <string name="dictation_no_permission">Dictation needs the microphone. You can allow it in the phone settings.</string>
+    <string name="dictation_no_language">The offline voice language is missing. The phone is downloading it; try again in a while.</string>
+    <string name="dictation_failed">Could not understand that. Try again.</string>
+    <string name="watch_voice_food">Food by voice</string>
+    <string name="watch_voice_food_prompt">What did you eat?</string>
+    <string name="watch_voice_mood">Mood by voice</string>
+    <string name="watch_voice_mood_prompt">How do you feel?</string>
 </resources>

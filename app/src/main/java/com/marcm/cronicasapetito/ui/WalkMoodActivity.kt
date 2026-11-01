@@ -359,6 +359,11 @@ private fun FlujoCaminata(
                         value = animo,
                         onValueChange = { animo = it },
                         modifier = Modifier.fillMaxWidth(),
+                        trailingIcon = {
+                            BotonDictar(tinte = visualDe(EntryKind.MOOD).color) {
+                                animo = Dictado.unir(animo, it)
+                            }
+                        },
                         placeholder = { Text(stringResource(R.string.mood_placeholder)) },
                         minLines = 4,
                         shape = RoundedCornerShape(14.dp),

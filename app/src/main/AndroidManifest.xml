@@ -11,6 +11,19 @@
     -->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!--
+      Para dictar con el micro (Dictado.kt). Se pide la primera vez que se pulsa
+      el botón, nunca al instalar, y el audio lo trata el reconocedor que va
+      dentro del móvil: no sale del teléfono.
+    -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <!-- Android 11+ esconde los servicios de voz si no se declara que se buscan. -->
+    <queries>
+        <intent>
+            <action android:name="android.speech.RecognitionService" />
+        </intent>
+    </queries>
 
     <application
         android:name=".CronicasApp"
@@ -75,6 +88,10 @@
 
         <receiver
             android:name=".notifications.NothingLogReceiver"
+            android:exported="false" />
+
+        <receiver
+            android:name=".notifications.VozRelojReceiver"
             android:exported="false" />
 
         <receiver
