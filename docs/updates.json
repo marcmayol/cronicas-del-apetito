@@ -1,8 +1,8 @@
 {
-  "versionCode": 23,
-  "versionName": "2.7",
-  "url": "https://github.com/marcmayol/cronicas-del-apetito/releases/download/v2.7/cronicas-del-apetito-v2.7.apk",
-  "sha256": "5cab02d95fa4aeff035a5b111de4e7fc84e843f1445119949a0fce67f5057332",
-  "notas": "Copia automática opcional: en Ajustes, Tus datos, la app puede guardar sola una copia cada día o cada semana en la carpeta que elijas, y conserva las cuatro últimas.",
+  "versionCode": 24,
+  "versionName": "2.8",
+  "url": "https://github.com/marcmayol/cronicas-del-apetito/releases/download/v2.8/cronicas-del-apetito-v2.8.apk",
+  "sha256": "4292c7c34226f2ed6560ad78cd44de1556110365a1cba93f38c74b625b3ca088",
+  "notas": "Dictar con la voz: micro en las cajas de comida y ánimo, con el reconocimiento que va dentro del móvil. Desde el reloj, el aviso deja dictar qué has comido o seguir con la caminata en el móvil.",
   "check_horas": 24
 }
