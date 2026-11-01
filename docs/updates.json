@@ -1,8 +1,8 @@
 {
-  "versionCode": 22,
-  "versionName": "2.6",
-  "url": "https://github.com/marcmayol/cronicas-del-apetito/releases/download/v2.6/cronicas-del-apetito-v2.6.apk",
-  "sha256": "cd3577e056c63685033c0117da2d20b60d74ee5c0a7f2f4c329a0acffa4fa894",
-  "notas": "Nuevo tema neutro (claro y oscuro) por defecto. El cuaderno marrón de siempre sigue disponible como «Grimorio» en Ajustes → Apariencia.",
+  "versionCode": 23,
+  "versionName": "2.7",
+  "url": "https://github.com/marcmayol/cronicas-del-apetito/releases/download/v2.7/cronicas-del-apetito-v2.7.apk",
+  "sha256": "5cab02d95fa4aeff035a5b111de4e7fc84e843f1445119949a0fce67f5057332",
+  "notas": "Copia automática opcional: en Ajustes, Tus datos, la app puede guardar sola una copia cada día o cada semana en la carpeta que elijas, y conserva las cuatro últimas.",
   "check_horas": 24
 }
