@@ -288,8 +288,7 @@
     <string name="dictation_no_permission">Sin permiso de micrófono no se puede dictar. Puedes darlo en los ajustes del móvil.</string>
     <string name="dictation_no_language">Falta el idioma de voz sin conexión. El móvil lo está descargando; prueba de nuevo en un rato.</string>
     <string name="dictation_failed">No se ha podido entender. Prueba otra vez.</string>
-    <string name="watch_voice_food">Comida por voz</string>
+    <string name="watch_voice_food">Comida (voz)</string>
     <string name="watch_voice_food_prompt">¿Qué has comido?</string>
-    <string name="watch_voice_mood">Ánimo por voz</string>
-    <string name="watch_voice_mood_prompt">¿Cómo te sientes?</string>
+    <string name="watch_walk">Caminata (en el móvil)</string>
 </resources>

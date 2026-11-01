@@ -19,4 +19,5 @@ class DictadoTest {
     fun `un dictado vacio no cambia nada`() {
         assertEquals("Café", Dictado.unir("Café", "   "))
     }
+
 }

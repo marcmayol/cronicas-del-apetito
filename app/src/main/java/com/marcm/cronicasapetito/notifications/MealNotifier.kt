@@ -83,8 +83,15 @@ object MealNotifier {
             .extend(
                 NotificationCompat.WearableExtender()
                     .addActions(
-                        VozRelojReceiver.acciones(context) +
-                            NotificationCompat.Action(0, context.getString(R.string.action_no), noPi)
+                        buildList {
+                            add(VozRelojReceiver.comida(context))
+                            // Los minutos no se pueden elegir en el reloj (una lista
+                            // dentro del aviso no devuelve la elección): sigue en el móvil.
+                            if (conCaminata) {
+                                add(NotificationCompat.Action(0, context.getString(R.string.watch_walk), walkPi))
+                            }
+                            add(NotificationCompat.Action(0, context.getString(R.string.action_no), noPi))
+                        }
                     )
             )
             .build()

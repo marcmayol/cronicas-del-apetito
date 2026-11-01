@@ -8,7 +8,6 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.RemoteInput
 import com.marcm.cronicasapetito.CronicasApp
 import com.marcm.cronicasapetito.R
-import com.marcm.cronicasapetito.data.EntryKind
 import com.marcm.cronicasapetito.data.MealRepository
 import com.marcm.cronicasapetito.ui.Dictado
 import kotlinx.coroutines.CoroutineScope
@@ -16,12 +15,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 /**
- * Anotar desde el reloj contestando al aviso con la voz.
+ * Anotar desde el reloj contestando al aviso, sin sacar el móvil.
  *
  * Los botones solo se ven en el reloj (`WearableExtender`): en el móvil el
- * aviso sigue igual, con su «Sí» que abre la pantalla completa. En el reloj,
- * en cambio, abrir el móvil es justo lo que se quiere evitar, así que se dicta
- * ahí mismo y se guarda con la hora en que se contesta.
+ * aviso sigue igual, con su «Sí» que abre la pantalla completa.
+ *  - Comida: el cuadro de respuesta de abajo («¿Qué has comido?»); se dicta
+ *    en el reloj y se guarda como comida.
+ *  - «Caminata»: abre la pantalla de caminata en el móvil (MealNotifier).
+ * Todo se guarda con la hora en que se contesta.
  *
  * El dictado lo hace el reloj con su propio reconocedor, no esta app: a
  * diferencia del micro del móvil, no se puede asegurar que se quede dentro.
@@ -29,57 +30,48 @@ import kotlinx.coroutines.launch
 class VozRelojReceiver : BroadcastReceiver() {
 
     companion object {
-        const val CLAVE_TEXTO = "texto_dictado"
+        const val CLAVE_TEXTO = "texto_reloj"
         private const val EXTRA_TIPO = "tipo"
+        private const val TIPO_COMIDA = "comida"
 
-        /** Las dos acciones de voz, listas para el `WearableExtender`. */
-        fun acciones(context: Context): List<NotificationCompat.Action> {
-            val conAnimo = PrefsRecordatorios.animoActivo(context)
-            return buildList {
-                add(accion(context, EntryKind.FOOD, R.string.watch_voice_food, R.string.watch_voice_food_prompt, 20))
-                if (conAnimo) {
-                    add(accion(context, EntryKind.MOOD, R.string.watch_voice_mood, R.string.watch_voice_mood_prompt, 21))
-                }
-            }
-        }
-
-        private fun accion(
-            context: Context,
-            tipo: String,
-            titulo: Int,
-            pregunta: Int,
-            codigo: Int,
-        ): NotificationCompat.Action {
-            val intent = Intent(context, VozRelojReceiver::class.java).putExtra(EXTRA_TIPO, tipo)
-            // MUTABLE a la fuerza: el sistema mete el texto dictado en este intent.
-            val pi = PendingIntent.getBroadcast(
-                context, codigo, intent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE,
-            )
+        /** La comida por voz, para el `WearableExtender` del aviso. */
+        fun comida(context: Context): NotificationCompat.Action {
             val entrada = RemoteInput.Builder(CLAVE_TEXTO)
-                .setLabel(context.getString(pregunta))
+                .setLabel(context.getString(R.string.watch_voice_food_prompt))
                 .build()
-            return NotificationCompat.Action.Builder(0, context.getString(titulo), pi)
+            return NotificationCompat.Action.Builder(
+                0, context.getString(R.string.watch_voice_food), pendiente(context, TIPO_COMIDA, 20),
+            )
                 .addRemoteInput(entrada)
                 .setAllowGeneratedReplies(false)
+                // En el cuadro de respuesta de abajo (micro, teclado, emoji), no
+                // como botón: en el Pixel Watch un botón que pide texto enseña el
+                // dictado pero no devuelve nada; el cuadro de abajo sí.
+                .extend(NotificationCompat.Action.WearableExtender().setHintDisplayActionInline(true))
                 .build()
         }
+
+        private fun pendiente(context: Context, tipo: String, codigo: Int): PendingIntent =
+            PendingIntent.getBroadcast(
+                context, codigo,
+                Intent(context, VozRelojReceiver::class.java).putExtra(EXTRA_TIPO, tipo),
+                // MUTABLE a la fuerza: el sistema mete la respuesta en este intent.
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE,
+            )
+
     }
 
     override fun onReceive(context: Context, intent: Intent) {
         val texto = RemoteInput.getResultsFromIntent(intent)
-            ?.getCharSequence(CLAVE_TEXTO)?.toString()
-            ?.let { Dictado.unir("", it) }
-            .orEmpty()
+            ?.getCharSequence(CLAVE_TEXTO)?.toString().orEmpty()
         if (texto.isBlank()) return
 
-        val tipo = intent.getStringExtra(EXTRA_TIPO) ?: EntryKind.FOOD
         val pending = goAsync()
         val app = context.applicationContext as CronicasApp
         val repo = MealRepository(app.database.mealDao())
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                if (tipo == EntryKind.MOOD) repo.addMood(texto) else repo.addFood(texto)
+                repo.addFood(Dictado.unir("", texto))
             } finally {
                 MealNotifier.dismiss(context)
                 pending.finish()

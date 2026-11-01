@@ -294,8 +294,7 @@
     <string name="dictation_no_permission">Dictation needs the microphone. You can allow it in the phone settings.</string>
     <string name="dictation_no_language">The offline voice language is missing. The phone is downloading it; try again in a while.</string>
     <string name="dictation_failed">Could not understand that. Try again.</string>
-    <string name="watch_voice_food">Food by voice</string>
+    <string name="watch_voice_food">Food (voice)</string>
     <string name="watch_voice_food_prompt">What did you eat?</string>
-    <string name="watch_voice_mood">Mood by voice</string>
-    <string name="watch_voice_mood_prompt">How do you feel?</string>
+    <string name="watch_walk">Walk (on the phone)</string>
 </resources>
