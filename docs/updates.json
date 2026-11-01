@@ -1,8 +1,8 @@
 {
-  "versionCode": 24,
-  "versionName": "2.8",
-  "url": "https://github.com/marcmayol/cronicas-del-apetito/releases/download/v2.8/cronicas-del-apetito-v2.8.apk",
-  "sha256": "4292c7c34226f2ed6560ad78cd44de1556110365a1cba93f38c74b625b3ca088",
-  "notas": "Dictar con la voz: micro en las cajas de comida y ánimo, con el reconocimiento que va dentro del móvil. Desde el reloj, el aviso deja dictar qué has comido o seguir con la caminata en el móvil.",
+  "versionCode": 25,
+  "versionName": "2.8.1",
+  "url": "https://github.com/marcmayol/cronicas-del-apetito/releases/download/v2.8.1/cronicas-del-apetito-v2.8.1.apk",
+  "sha256": "6ac2463286083e07d17286ca7188132b95230cd1fb2b66ed692670e2068aa6a1",
+  "notas": "El micrófono pasa a ser opcional: la app vuelve a poder instalarse en tablets y teles sin micro.",
   "check_horas": 24
 }
