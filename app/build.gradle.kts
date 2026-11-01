@@ -23,8 +23,8 @@ android {
         applicationId = "com.marcm.cronicasapetito"
         minSdk = 26
         targetSdk = 36
-        versionCode = 22
-        versionName = "2.6"
+        versionCode = 23
+        versionName = "2.7"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -139,6 +139,10 @@ dependencies {
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
     ksp("androidx.room:room-compiler:2.6.1")
+
+    // Copia automática: el trabajo periódico y la carpeta elegida con el selector.
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
+    implementation("androidx.documentfile:documentfile:1.0.1")
 
     // Solo fuera de Play: ver el comentario de productFlavors.
     "fueraImplementation"(project(":actualizador"))

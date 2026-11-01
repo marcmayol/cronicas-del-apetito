@@ -2,6 +2,7 @@ package com.marcm.cronicasapetito
 
 import android.app.Application
 import com.marcm.cronicasapetito.data.AppDatabase
+import com.marcm.cronicasapetito.data.CopiaAutomatica
 import com.marcm.cronicasapetito.data.MealRepository
 import com.marcm.cronicasapetito.notifications.GymAlarmScheduler
 import com.marcm.cronicasapetito.notifications.GymNotifier
@@ -33,6 +34,7 @@ class CronicasApp : Application() {
         GymNotifier.ensureChannel(this)
         MealAlarmScheduler.scheduleNext(this)
         GymAlarmScheduler.scheduleNext(this)
+        CopiaAutomatica.asegurar(this)
 
         // Las fotos de los registros borrados se quedan en el disco a propósito
         // —mientras se pueda deshacer, el archivo tiene que existir—, así que
