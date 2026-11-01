@@ -17,6 +17,11 @@
       dentro del móvil: no sale del teléfono.
     -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!--
+      Sin esto, pedir el micro hace que Play esconda la app en tablets y teles
+      sin micrófono. Dictar es un extra: donde no hay micro, no sale el botón.
+    -->
+    <uses-feature android:name="android.hardware.microphone" android:required="false" />
 
     <!-- Android 11+ esconde los servicios de voz si no se declara que se buscan. -->
     <queries>
