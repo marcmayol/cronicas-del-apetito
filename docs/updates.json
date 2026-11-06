@@ -1,8 +1,8 @@
 {
-  "versionCode": 25,
-  "versionName": "2.8.1",
-  "url": "https://github.com/marcmayol/cronicas-del-apetito/releases/download/v2.8.1/cronicas-del-apetito-v2.8.1.apk",
-  "sha256": "6ac2463286083e07d17286ca7188132b95230cd1fb2b66ed692670e2068aa6a1",
-  "notas": "El micrófono pasa a ser opcional: la app vuelve a poder instalarse en tablets y teles sin micro.",
+  "versionCode": 26,
+  "versionName": "2.9",
+  "url": "https://github.com/marcmayol/cronicas-del-apetito/releases/download/v2.9/cronicas-del-apetito-v2.9.apk",
+  "sha256": "6cdd7c5b0d90fe4c35985160c4b3a7f0479e3116253eb3540a0e2b2d31db9ca9",
+  "notas": "Modo vacaciones: elige de qué día a qué día y si mientras tanto la app te pregunta una vez al día (a la hora que digas) o no pregunta nada. Al acabar vuelven los avisos de siempre.",
   "check_horas": 24
 }
