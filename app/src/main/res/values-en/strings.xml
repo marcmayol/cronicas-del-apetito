@@ -297,4 +297,24 @@
     <string name="watch_voice_food">Food (voice)</string>
     <string name="watch_voice_food_prompt">What did you eat?</string>
     <string name="watch_walk">Walk (on the phone)</string>
+    <!-- Holiday mode -->
+    <string name="vacation_section">Holidays</string>
+    <string name="vacation_switch">Holiday mode</string>
+    <string name="vacation_off">A few days with fewer reminders, or none</string>
+    <string name="vacation_from">From</string>
+    <string name="vacation_to">Until (included)</string>
+    <string name="vacation_meanwhile">Meanwhile</string>
+    <string name="vacation_mode_once">Once a day</string>
+    <string name="vacation_mode_silent">No questions</string>
+    <string name="vacation_at">Ask me at</string>
+    <string name="vacation_note">The gym reminder stays quiet too. After the last day your usual reminders come back on their own.</string>
+    <string name="vacation_meal_off">Meal reminders are off, so this changes nothing right now.</string>
+    <string name="vacation_summary_range">%1$s to %2$s</string>
+    <string name="vacation_summary_once">once a day at %1$s</string>
+    <string name="vacation_summary_silent">no questions</string>
+    <string name="vacation_banner">On holiday until %1$s · %2$s</string>
+    <string name="vacation_end_button">End</string>
+    <string name="vacation_end_toast">Holiday over. Your usual reminders are back</string>
+    <string name="vacation_notif_title">How was your day?</string>
+    <string name="vacation_notif_text">You are on holiday. If you feel like it, log what you ate today</string>
 </resources>

@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import java.time.ZoneId
 
 object MealAlarmScheduler {
 
@@ -68,20 +69,23 @@ object MealAlarmScheduler {
     }
 
     /**
-     * Siguiente aviso según la ventana configurada. Si estamos en «modo a
-     * dormir», la próxima alarma es directamente el instante de despertar.
+     * Siguiente aviso según la ventana configurada y las vacaciones. Si estamos
+     * en «modo a dormir», la próxima alarma es directamente el instante de despertar.
      */
     private fun nextTrigger(context: Context): Long {
         val ahora = System.currentTimeMillis()
         val sleepUntil = SleepPrefs.getSleepUntil(context)
         if (sleepUntil > ahora) return sleepUntil
 
-        return RejillaAvisos.proximoDisparo(
+        val inicioMin = PrefsRecordatorios.comidaInicioMin(context)
+        val duracionMin = PrefsRecordatorios.comidaDuracionMin(context)
+        val cadaMin = PrefsRecordatorios.comidaCadaMin(context)
+        return PlanVacaciones.proximoDisparo(
             ahora = ahora,
-            inicioMin = PrefsRecordatorios.comidaInicioMin(context),
-            duracionMin = PrefsRecordatorios.comidaDuracionMin(context),
-            cadaMin = PrefsRecordatorios.comidaCadaMin(context),
-        )
+            v = VacacionesPrefs.vigentes(context),
+            inicioMin = inicioMin,
+            zona = ZoneId.systemDefault(),
+        ) { desde -> RejillaAvisos.proximoDisparo(desde, inicioMin, duracionMin, cadaMin) }
     }
 
     /** Hora a la que vuelven los avisos tras dormir: el primero de la próxima ventana. */

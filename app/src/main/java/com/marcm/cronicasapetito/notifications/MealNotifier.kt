@@ -30,7 +30,11 @@ object MealNotifier {
         nm.createNotificationChannel(channel)
     }
 
-    fun show(context: Context) {
+    /**
+     * [deVacaciones]: la única pregunta del día en modo vacaciones, con un
+     * texto que pregunta por el día entero en vez de por ahora mismo.
+     */
+    fun show(context: Context, deVacaciones: Boolean = false) {
         ensureChannel(context)
 
         // Acción "Sí" → abre la pantalla de entrada
@@ -63,10 +67,18 @@ object MealNotifier {
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentTitle(context.getString(R.string.notif_title))
+            .setContentTitle(
+                context.getString(
+                    if (deVacaciones) R.string.vacation_notif_title else R.string.notif_title
+                )
+            )
             .setContentText(
                 context.getString(
-                    if (conCaminata) R.string.notif_text else R.string.notif_text_sin_caminata
+                    when {
+                        deVacaciones -> R.string.vacation_notif_text
+                        conCaminata -> R.string.notif_text
+                        else -> R.string.notif_text_sin_caminata
+                    }
                 )
             )
             .setPriority(NotificationCompat.PRIORITY_HIGH)

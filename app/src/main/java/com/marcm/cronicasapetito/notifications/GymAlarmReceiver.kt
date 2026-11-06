@@ -18,8 +18,9 @@ class GymAlarmReceiver : BroadcastReceiver() {
             try {
                 // No molestamos si el carril está apagado, si hoy no es uno de los
                 // días elegidos, si ya hay registro hoy, o si ya se ha alcanzado
-                // el objetivo semanal.
-                val activo = PrefsRecordatorios.gymActivo(context)
+                // el objetivo semanal. De vacaciones tampoco.
+                val activo = PrefsRecordatorios.gymActivo(context) &&
+                    !VacacionesPrefs.deVacacionesHoy(context)
                 val toca = repo.shouldAskGym(
                     dias = PrefsRecordatorios.gymDias(context),
                     objetivoSemanal = PrefsRecordatorios.gymObjetivoSemanal(context),

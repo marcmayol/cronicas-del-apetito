@@ -291,4 +291,24 @@
     <string name="watch_voice_food">Comida (voz)</string>
     <string name="watch_voice_food_prompt">¿Qué has comido?</string>
     <string name="watch_walk">Caminata (en el móvil)</string>
+    <!-- Modo vacaciones -->
+    <string name="vacation_section">Vacaciones</string>
+    <string name="vacation_switch">Modo vacaciones</string>
+    <string name="vacation_off">Unos días con menos avisos, o ninguno</string>
+    <string name="vacation_from">Desde</string>
+    <string name="vacation_to">Hasta (incluido)</string>
+    <string name="vacation_meanwhile">Mientras tanto</string>
+    <string name="vacation_mode_once">Una vez al día</string>
+    <string name="vacation_mode_silent">No preguntar</string>
+    <string name="vacation_at">Pregúntame a las</string>
+    <string name="vacation_note">El gimnasio tampoco pregunta. Al acabar el último día vuelven los avisos de siempre, sin tocar nada.</string>
+    <string name="vacation_meal_off">Los recordatorios de comida están apagados, así que ahora mismo no cambia nada.</string>
+    <string name="vacation_summary_range">Del %1$s al %2$s</string>
+    <string name="vacation_summary_once">una vez al día, a las %1$s</string>
+    <string name="vacation_summary_silent">sin preguntas</string>
+    <string name="vacation_banner">De vacaciones hasta el %1$s · %2$s</string>
+    <string name="vacation_end_button">Terminar</string>
+    <string name="vacation_end_toast">Vacaciones terminadas. Vuelven los avisos de siempre</string>
+    <string name="vacation_notif_title">¿Qué tal el día?</string>
+    <string name="vacation_notif_text">Estás de vacaciones. Si te apetece, apunta lo que has comido hoy</string>
 </resources>

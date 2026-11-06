@@ -183,6 +183,9 @@ fun SeccionRecordatorios() {
         }
     }
 
+    // Justo debajo de la comida: es lo que cambia mientras duran.
+    SeccionVacaciones()
+
     // -----------------------------------------------------------------------
     // Estado de ánimo
     // -----------------------------------------------------------------------

@@ -26,6 +26,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.BeachAccess
 import androidx.compose.material.icons.filled.Bedtime
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Share
@@ -77,7 +78,11 @@ import com.marcm.cronicasapetito.export.shareFile
 import com.marcm.cronicasapetito.notifications.MealAlarmScheduler
 import com.marcm.cronicasapetito.notifications.PrefsRecordatorios
 import com.marcm.cronicasapetito.notifications.SleepPrefs
+import com.marcm.cronicasapetito.notifications.ModoVacaciones
+import com.marcm.cronicasapetito.notifications.Vacaciones
+import com.marcm.cronicasapetito.notifications.VacacionesPrefs
 import com.marcm.cronicasapetito.notifications.horaTexto
+import java.time.LocalDate
 import kotlinx.coroutines.launch
 
 /** Lo que dura el «pulsa otra vez»: menos no da tiempo, más se olvida. */
@@ -111,6 +116,10 @@ fun MainScreen(
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { relectura++ }
     var durmiendo by remember(relectura) { mutableStateOf(SleepPrefs.isSleeping(context)) }
     val comidaActiva = remember(relectura) { PrefsRecordatorios.comidaActiva(context) }
+    // Solo las de hoy: unas vacaciones por venir no cambian nada todavía.
+    var vacaciones by remember(relectura) {
+        mutableStateOf(VacacionesPrefs.vigentes(context)?.takeIf { it.cubre(LocalDate.now()) })
+    }
     val horaDespertar = remember(relectura) {
         horaTexto(PrefsRecordatorios.comidaInicioMin(context))
     }
@@ -153,7 +162,8 @@ fun MainScreen(
                     containerColor = MaterialTheme.colorScheme.background,
                 ),
                 actions = {
-                    if (comidaActiva) {
+                    // De vacaciones no hay noches que silenciar: ya pregunta poco o nada.
+                    if (comidaActiva && vacaciones == null) {
                         IconButton(onClick = { mostrarDormir = true }) {
                             Icon(Icons.Filled.Bedtime, stringResource(R.string.sleep_button))
                         }
@@ -252,6 +262,26 @@ fun MainScreen(
                 .fillMaxSize(),
         ) {
             actualizaciones.Banner()
+
+            vacaciones?.let { v ->
+                BannerVacaciones(
+                    texto = stringResource(
+                        R.string.vacation_banner,
+                        Fechas.corta(v.hasta),
+                        if (v.modo == Vacaciones.Modo.UNA_VEZ)
+                            stringResource(R.string.vacation_summary_once, horaTexto(v.horaMin))
+                        else stringResource(R.string.vacation_summary_silent),
+                    ),
+                    onTerminar = {
+                        ModoVacaciones.terminar(context)
+                        vacaciones = null
+                        Toast.makeText(
+                            context, context.getString(R.string.vacation_end_toast),
+                            Toast.LENGTH_LONG,
+                        ).show()
+                    },
+                )
+            }
 
             if (durmiendo) {
                 BannerDormir(
@@ -570,6 +600,38 @@ private fun VacioSegunFiltro(estado: EstadoPrincipal, onQuitarFiltro: () -> Unit
                 TextButton(onClick = onQuitarFiltro) { Text(stringResource(R.string.filter_clear)) }
             },
         )
+    }
+}
+
+@Composable
+private fun BannerVacaciones(texto: String, onTerminar: () -> Unit) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        color = MaterialTheme.colorScheme.secondaryContainer,
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                Icons.Filled.BeachAccess,
+                contentDescription = null,
+                modifier = Modifier.size(18.dp),
+                tint = MaterialTheme.colorScheme.onSecondaryContainer,
+            )
+            Spacer(Modifier.width(8.dp))
+            Text(
+                text = texto,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                modifier = Modifier.weight(1f),
+            )
+            TextButton(onClick = onTerminar) {
+                Text(stringResource(R.string.vacation_end_button))
+            }
+        }
     }
 }
 
